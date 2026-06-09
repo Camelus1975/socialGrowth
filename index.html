@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App Founder Growth Suite - Growth OS</title>
+  <link rel="stylesheet" href="styles.css">
+  <meta name="description" content="Ultimate Growth Operating System & Marketing Scheduler for SaaS, Startups & Indie Creators.">
+</head>
+<body>
+  <div id="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside>
+      <div class="sidebar-header">
+        <div class="logo-container">
+          <div class="logo-icon">▲</div>
+          <div>
+            <div class="logo-text">Growth Suite</div>
+            <div class="logo-tag">Founder OS</div>
+          </div>
+        </div>
+        
+        <!-- App Selector -->
+        <div class="app-selector-container">
+          <button class="app-select-btn" id="active-app-selector" data-on-click="toggleAppSelectorDropdown()">
+            <span><span class="app-dot" id="active-app-dot" style="background: linear-gradient(135deg, #FF6B6B, #FF8E53);"></span><span id="active-app-name">FitPulse AI</span></span>
+            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+          </button>
+          <div class="app-select-options" id="app-selector-dropdown">
+            <div class="app-option" data-on-click="selectActiveApp('fitpulse')">
+              <span class="app-dot" style="background: linear-gradient(135deg, #FF6B6B, #FF8E53); width: 8px; height: 8px; border-radius: 50%; margin-right: 8px;"></span>
+              FitPulse AI (Fitness)
+            </div>
+            <div class="app-option" data-on-click="selectActiveApp('taskflow')">
+              <span class="app-dot" style="background: linear-gradient(135deg, #4F46E5, #3B82F6); width: 8px; height: 8px; border-radius: 50%; margin-right: 8px;"></span>
+              TaskFlow SaaS (Productivity)
+            </div>
+            <div class="app-option" data-on-click="selectActiveApp('saasify')">
+              <span class="app-dot" style="background: linear-gradient(135deg, #10B981, #059669); width: 8px; height: 8px; border-radius: 50%; margin-right: 8px;"></span>
+              SaaSify Analytics (DevTools)
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Nav List -->
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Overview</div>
+        <ul class="nav-list">
+          <li class="nav-item">
+            <div class="nav-link active" data-on-click="switchView('founder-dash', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+              Founder Dashboard
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('war-room', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5L6.863 12a1 1 0 00.867 1.5h4.54a1 1 0 00.867-1.5l-2.27-4.5A1 1 0 0010 7z" /></svg>
+              Executive War Room
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('insights', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+              Executive Insights
+            </div>
+          </li>
+        </ul>
+        
+        <div class="nav-section-title">Growth & Listings</div>
+        <ul class="nav-list">
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('launch-center', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              Launch Command Center
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('aso-center', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              ASO Optimization
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('store-integrations', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+              App Store Connect
+            </div>
+          </li>
+        </ul>
+        
+        <div class="nav-section-title">Inbox & Testimonials</div>
+        <ul class="nav-list">
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('review-engine', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+              Review Marketing
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('social-inbox', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-4M4 13h4m0 0v1a2 2 0 002 2h4a2 2 0 002-2v-1" /></svg>
+              Unified Social Inbox
+            </div>
+          </li>
+        </ul>
+
+        <div class="nav-section-title">Content & Scheduling</div>
+        <ul class="nav-list">
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('social-calendar', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              Social Calendar
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('content-studio', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+              AI Content Studio
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('content-intelligence', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+              Content Intelligence
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('media-asset', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              Media Asset Manager
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('release-automator', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.2" /></svg>
+              Release Automation
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('roadmap-center', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+              Roadmap Manager
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('content-recycler', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.2" /></svg>
+              Content Recycler & Copilot
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('competitor-ecosystem', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+              Ecosystem & Competitors
+            </div>
+          </li>
+        </ul>
+
+        <div class="nav-section-title">Team & Data Settings</div>
+        <ul class="nav-list">
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('auth-team', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              Auth & Team Settings
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('db-console', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
+              Database & Jobs Console
+            </div>
+          </li>
+        </ul>
+
+        <div class="nav-section-title">Autonomous Agents</div>
+        <ul class="nav-list">
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('agent-framework', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+              AI Agent Framework
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('agent-orchestration', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.952 11.952 0 01-7.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+              Agent Orchestration Flow
+            </div>
+          </li>
+        </ul>
+      </nav>
+      
+      <!-- Footer Info -->
+      <div class="sidebar-footer">
+        <div class="copilot-status">
+          <div class="pulse-dot"></div>
+          <span>Copilot Connected</span>
+        </div>
+        <div>Active: <span id="sidebar-app-name">FitPulse AI</span></div>
+      </div>
+    </aside>
+    
+    <!-- Main Content Panel -->
+    <main>
+      
+      <!-- Sticky Header -->
+      <header>
+        <div class="header-title-area" style="display:flex; align-items:center;">
+          <button class="hamburger-btn" data-on-click="toggleMobileSidebar()">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+          </button>
+          <div>
+          <h2 id="current-view-title">Founder Dashboard</h2>
+          <p id="current-view-desc">Monitor startup metrics and cross-app growth performance.</p>
+        </div>
+        <div class="header-actions">
+          <!-- Theme Toggle Button -->
+          <button class="btn btn-secondary" data-on-click="toggleThemeMode()" id="theme-toggle-btn" style="padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center;" title="Toggle Light/Dark Theme">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" class="theme-icon-sun"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 7a5 5 0 100 10 5 5 0 000-10z" /></svg>
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" class="theme-icon-moon"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+          </button>
+
+          <!-- Notification Bell -->
+          <button class="btn btn-secondary" data-on-click="toggleNotificationDrawer()" style="padding: 10px; border-radius: 50%;">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+          </button>
+          
+          <div class="header-app-badge">
+            <span class="app-dot" id="header-app-dot" style="background: linear-gradient(135deg, #FF6B6B, #FF8E53); width: 8px; height: 8px; border-radius: 50%;"></span>
+            <span id="header-app-name">FitPulse AI</span>
+          </div>
+          
+          <!-- User Widget -->
+          <div class="user-profile-widget">
+            <img id="user-header-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">
+            <span id="user-header-name">Shadi</span>
+          </div>
+        </div>
+      </header>
+      
+      <!-- VIEW 1: FOUNDER DASHBOARD -->
+      <section id="view-founder-dash" class="view-panel active">
+        <!-- Daily Briefing Ribbon -->
+        <div class="briefing-ribbon">
+          <h4>
+            <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
+            Founder Daily Briefing
+          </h4>
+          <div class="briefing-bullet-grid">
+            <div class="briefing-bullet">⭐ <strong>Users:</strong> <span id="brief-users">54 new fitness subscribers.</span></div>
+            <div class="briefing-bullet">📈 <strong>Engagement:</strong> <span id="brief-engagement">+8.4% Instagram reach.</span></div>
+            <div class="briefing-bullet">🔥 <strong>Competitors:</strong> <span id="brief-competitor">Fitbod launched new routine options.</span></div>
+            <div class="briefing-bullet">🔔 <strong>Today's Priority:</strong> <span id="brief-priority">Schedule launch countdowns.</span></div>
+          </div>
+        </div>
+
+        <!-- Global Portfolio Metrics -->
+        <h3 style="margin-bottom: 16px; color: white;">Global Portfolio Performance</h3>
+        <div class="kpi-grid">
+          <div class="glass-card card-primary kpi-card">
+            <div class="kpi-title">Total Portfolio MRR</div>
+            <div class="kpi-value-row">
+              <div class="kpi-value" id="global-mrr">$184,500</div>
+              <div class="kpi-change up">▲ 22%</div>
+            </div>
+          </div>
+          <div class="glass-card card-secondary kpi-card">
+            <div class="kpi-title">Total Downloads</div>
+            <div class="kpi-value-row">
+              <div class="kpi-value" id="global-downloads">254,700</div>
+              <div class="kpi-change up">▲ 18%</div>
+            </div>
+          </div>
+          <div class="glass-card card-green kpi-card">
+            <div class="kpi-title">Total Active Users</div>
+            <div class="kpi-value-row">
+              <div class="kpi-value" id="global-active">90,900</div>
+              <div class="kpi-change up">▲ 15%</div>
+            </div>
+          </div>
+          <div class="glass-card card-purple kpi-card">
+            <div class="kpi-title">Total Subscribers</div>
+            <div class="kpi-value-row">
+              <div class="kpi-value" id="global-subscribers">14,640</div>
+              <div class="kpi-change up">▲ 25%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comparison-grid">
+          <!-- Multi-App Revenue Growth Chart -->
+          <div class="glass-card">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title">Cross-App Growth Comparison</h3>
+                <div class="card-subtitle">Comparing Monthly Recurring Revenue (MRR) across apps</div>
+              </div>
+              <div class="tabs-navigation" style="margin-bottom: 0; border: none;">
+                <button class="sub-tab-btn active" id="chart-mrr-btn" data-on-click="toggleDashboardChart('mrr')">MRR ($)</button>
+                <button class="sub-tab-btn" id="chart-downloads-btn" data-on-click="toggleDashboardChart('downloads')">Downloads</button>
+              </div>
+            </div>
+            <div class="analytics-chart-container" id="dashboard-bar-chart">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+          
+          <!-- App List Rankings Card -->
+          <div class="glass-card">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title">Portfolio Performance</h3>
+                <div class="card-subtitle">Growth speed ranking</div>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 16px;" id="portfolio-growth-list">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected App Detail Overview Card -->
+        <div class="glass-card" style="margin-top: 24px;">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title" id="selected-detail-title">FitPulse AI Overview</h3>
+              <div class="card-subtitle">Active app summary metrics</div>
+            </div>
+            <button class="btn btn-secondary" data-on-click="switchView('launch-center')">Plan Launch</button>
+          </div>
+          <div class="kpi-grid">
+            <div class="glass-card kpi-card" style="background: rgba(255,255,255,0.02); min-height: 100px;">
+              <div class="kpi-title">Active App Rating</div>
+              <div class="kpi-value-row">
+                <div class="kpi-value" id="app-detail-rating">4.8 ★</div>
+                <div class="kpi-change" style="color: var(--text-muted);">App Store / Google Play</div>
+              </div>
+            </div>
+            <div class="glass-card kpi-card" style="background: rgba(255,255,255,0.02); min-height: 100px;">
+              <div class="kpi-title">Conversion Rate</div>
+              <div class="kpi-value-row">
+                <div class="kpi-value" id="app-detail-conversion">4.2%</div>
+                <div class="kpi-change up">▲ Healthy</div>
+              </div>
+            </div>
+            <div class="glass-card kpi-card" style="background: rgba(255,255,255,0.02); min-height: 100px;">
+              <div class="kpi-title">MoM Growth</div>
+              <div class="kpi-value-row">
+                <div class="kpi-value" id="app-detail-growth">+24%</div>
+                <div class="kpi-change up">Steady</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 1.2: EXECUTIVE WAR ROOM (NEW) -->
+      <section id="view-war-room" class="view-panel">
+        <div class="briefing-ribbon">
+          <h4>
+            <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" /></svg>
+            War Room Strategic Alerts
+          </h4>
+          <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;">
+            Active marketing loops are running. BullMQ background publishing queues verified. 
+            Google Play & Apple Store sync intervals are operating cleanly. 
+            ASO Agent has registered 2 keyword ranking shifts.
+          </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px;">
+          <!-- FitPulse War Card -->
+          <div class="glass-card card-primary">
+            <h4 style="color: white; margin-bottom: 8px;">FitPulse AI</h4>
+            <div style="font-size: 1.4rem; font-weight:700; color: white;">$44,500 MRR</div>
+            <div style="font-size:0.75rem; color: var(--text-muted); margin-top:4px;">Downloads: 124,500 | Rating: 4.8★</div>
+            <div style="margin-top: 12px; font-size: 0.78rem; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 4px;">
+              <strong>Active Campaign:</strong> countdown_challenge_launch
+            </div>
+          </div>
+          <!-- TaskFlow War Card -->
+          <div class="glass-card card-secondary">
+            <h4 style="color: white; margin-bottom: 8px;">TaskFlow SaaS</h4>
+            <div style="font-size: 1.4rem; font-weight:700; color: white;">$63,000 MRR</div>
+            <div style="font-size:0.75rem; color: var(--text-muted); margin-top:4px;">Downloads: 98,200 | Rating: 4.6★</div>
+            <div style="margin-top: 12px; font-size: 0.78rem; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 4px;">
+              <strong>Active Campaign:</strong> stripe_v2_announcement
+            </div>
+          </div>
+          <!-- SaaSify War Card -->
+          <div class="glass-card card-green">
+            <h4 style="color: white; margin-bottom: 8px;">SaaSify Analytics</h4>
+            <div style="font-size: 1.4rem; font-weight:700; color: white;">$77,000 MRR</div>
+            <div style="font-size:0.75rem; color: var(--text-muted); margin-top:4px;">Downloads: 32,000 | Rating: 4.7★</div>
+            <div style="margin-top: 12px; font-size: 0.78rem; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 4px;">
+              <strong>Active Campaign:</strong> churn_forecast_teasing
+            </div>
+          </div>
+        </div>
+
+        <div class="comparison-grid">
+          <!-- Active Agent Task Board -->
+          <div class="glass-card">
+            <h3 class="card-title">Live Agent Orchestration Activity</h3>
+            <div class="card-subtitle" style="margin-bottom: 16px;">Real-time task allocations and audit pipelines</div>
+            
+            <div style="display:flex; flex-direction:column; gap:12px;" id="war-room-agent-activity">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Quick Actions Panel -->
+          <div class="glass-card">
+            <h3 class="card-title">Founder Controls</h3>
+            <div style="display:flex; flex-direction:column; gap:12px; margin-top:16px;">
+              <button class="btn btn-primary" data-on-click="switchView('social-calendar')">Open Content Calendar</button>
+              <button class="btn btn-secondary" data-on-click="switchView('social-inbox')">Open Unified Inbox</button>
+              <button class="btn btn-secondary" data-on-click="switchView('db-console')">Inspect Database Console</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: LAUNCH COMMAND CENTER -->
+      <section id="view-launch-center" class="view-panel">
+        <div class="glass-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">Launch Strategy Generator</h3>
+              <div class="card-subtitle">Create timelines, calendar schedules, and promo posts automatically.</div>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <div>
+              <div class="form-group">
+                <label for="launch-type">Launch Program Type</label>
+                <select id="launch-type">
+                  <option value="app_launch">Product Launch (Initial Release)</option>
+                  <option value="feature_release">Feature Release Campaign</option>
+                  <option value="beta_program">Beta Program Invites</option>
+                  <option value="milestone">Milestone Announcement</option>
+                  <option value="version_update">Major Version Update</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="launch-prompt">Launch Goal / Description</label>
+                <textarea id="launch-prompt" rows="4" placeholder="Enter target description, e.g., 'Launch my app FitPulse'"></textarea>
+                <div style="margin-top: 8px; display: flex; gap: 8px;">
+                  <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem;" data-on-click="prefillLaunchPrompt('Launch my app')">Suggest: Launch my app</button>
+                  <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem;" data-on-click="prefillLaunchPrompt('Launch a new feature')">Suggest: Launch new feature</button>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" data-on-click="generateLaunchCampaign()">Generate Launch Assets</button>
+            </div>
+            
+            <div class="glass-card" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.04);">
+              <h4 style="margin-bottom: 10px; color: white;">Strategic Blueprint</h4>
+              <div id="launch-strategy-summary" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+                Enter details on the left and click generate to build the AI-powered launch strategy.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px;">
+          <div class="glass-card">
+            <h3 class="card-title" style="margin-bottom: 12px;">Launch Sequence Timeline</h3>
+            <div class="timeline-wrapper" id="launch-timeline-container">
+              <div style="color: var(--text-sub); text-align: center; padding: 40px 0;">No active timeline generated.</div>
+            </div>
+          </div>
+          
+          <div class="glass-card">
+            <h3 class="card-title" style="margin-bottom: 12px;">Generated Content Calendar</h3>
+            <div id="content-calendar-container" style="max-height: 400px; overflow-y: auto;">
+              <div style="color: var(--text-sub); text-align: center; padding: 40px 0;">No posts in content calendar yet.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: ASO OPTIMIZATION -->
+      <section id="view-aso-center" class="view-panel">
+        <div class="glass-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">App Store Optimization Center</h3>
+              <div class="card-subtitle">Keyword research, description suggestions, competitor gaps.</div>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1.2fr 1.8fr; gap: 24px;">
+            <div>
+              <div class="form-group">
+                <label for="aso-meta-text">Listing Metadata Content</label>
+                <textarea id="aso-meta-text" rows="8"></textarea>
+              </div>
+              <button class="btn btn-primary" data-on-click="runASOAnalysis()">Analyze Optimization Level</button>
+            </div>
+            
+            <div class="glass-card" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.04);">
+              <h4 style="margin-bottom: 12px; color: white;">AI Store Listing Optimization</h4>
+              <div style="display: flex; flex-direction: column; gap: 12px;" id="aso-output-block">
+                <div style="color: var(--text-sub); text-align: center; padding: 40px 0;">
+                  Click 'Analyze Optimization Level' to pull keywords and recommendations.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.5fr 1.5fr; gap: 24px; margin-top: 24px;">
+          <div class="glass-card">
+            <h3 class="card-title">Keyword Search Rankings</h3>
+            <table class="keywords-table">
+              <thead>
+                <tr>
+                  <th>Keyword</th>
+                  <th>Volume</th>
+                  <th>Competition</th>
+                  <th>Current Rank</th>
+                </tr>
+              </thead>
+              <tbody id="aso-keywords-tbody"></tbody>
+            </table>
+          </div>
+          
+          <div class="glass-card">
+            <h3 class="card-title">Competitor Gap Analysis</h3>
+            <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 16px;" id="aso-competitor-gaps"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3.2: APP STORE INTEGRATIONS (NEW) -->
+      <section id="view-store-integrations" class="view-panel">
+        <div class="glass-card">
+          <h3 class="card-title">App Store Connect API Connection</h3>
+          <div class="card-subtitle" style="margin-bottom: 20px;">Connect Google Play and Apple App Store to import real-time ratings, reviews, keyword indexing, and install history.</div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px;">
+            <div>
+              <h4 style="color: white; margin-bottom: 12px;">OAuth & Credentials Config</h4>
+              
+              <div class="form-group">
+                <label for="store-select">Target Application Store</label>
+                <select id="store-select">
+                  <option value="apple">Apple App Store Connect</option>
+                  <option value="google">Google Play Developer Console</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="store-issuer-id">Issuer ID / Account ID</label>
+                <input type="text" id="store-issuer-id" placeholder="e.g. 69a6de70-e0db-47e1-a06d">
+              </div>
+
+              <div class="form-group">
+                <label for="store-private-key">Private Key (.p8 / JSON credentials)</label>
+                <textarea id="store-private-key" rows="4" placeholder="-----BEGIN PRIVATE KEY-----\nMIIEAgIBAAKCAQEA0y...\n-----END PRIVATE KEY-----"></textarea>
+              </div>
+
+              <button class="btn btn-primary" data-on-click="verifyStoreIntegration()">Establish Secure Connection</button>
+            </div>
+
+            <div class="glass-card" style="background: rgba(0,0,0,0.15);">
+              <h4 style="color: white; margin-bottom: 16px;">Active Store Integrations</h4>
+              <div style="display:flex; flex-direction:column; gap:16px;">
+                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:var(--radius-sm); padding:16px; display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <h5 style="color:white; font-size:0.9rem;">Apple App Store Connect</h5>
+                    <span style="font-size:0.75rem; color:var(--accent-green); font-weight:600;">Connected (Verified)</span>
+                  </div>
+                  <button class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;" data-on-click="syncAppStoreNow('apple')">Sync Now</button>
+                </div>
+                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:var(--radius-sm); padding:16px; display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <h5 style="color:white; font-size:0.9rem;">Google Play Developer Console</h5>
+                    <span style="font-size:0.75rem; color:var(--accent-green); font-weight:600;">Connected (Verified)</span>
+                  </div>
+                  <button class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;" data-on-click="syncAppStoreNow('google')">Sync Now</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: REVIEW MARKETING ENGINE -->
+      <section id="view-review-engine" class="view-panel">
+        <div class="glass-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">App Review Marketing Engine</h3>
+              <div class="card-subtitle">Turn app store reviews into stunning social media testimonials and success stories.</div>
+            </div>
+            <button class="btn btn-secondary" data-on-click="simulateReviewImport()">Import New Reviews</button>
+          </div>
+          
+          <div class="review-filters">
+            <span class="filter-chip active" id="review-filter-all" data-on-click="filterReviews('all')">All Sentiment</span>
+            <span class="filter-chip" id="review-filter-pos" data-on-click="filterReviews('positive')">Positive (4-5★)</span>
+            <span class="filter-chip" id="review-filter-neutral" data-on-click="filterReviews('neutral')">Neutral (3★)</span>
+            <span class="filter-chip" id="review-filter-neg" data-on-click="filterReviews('negative')">Negative (1-2★)</span>
+            <span style="border-left: 1px solid var(--border-glass); margin: 0 8px;"></span>
+            <span class="filter-chip" id="review-filter-ios" data-on-click="filterReviews('ios')">App Store (iOS)</span>
+            <span class="filter-chip" id="review-filter-android" data-on-click="filterReviews('android')">Google Play</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.6fr 1.4fr; gap: 24px;">
+            <div>
+              <div class="review-list" id="reviews-feed-container"></div>
+            </div>
+            
+            <div class="glass-card">
+              <h4 style="margin-bottom: 12px; color: white;">Marketing Testimonial Builder</h4>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 16px;">
+                Select a review and click "Generate Mockup" to format it into a high-converting square graphic.
+              </p>
+              
+              <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: center;">
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Theme Palette:</span>
+                <span class="filter-chip" data-on-click="changeMockupTheme('indigo')" style="padding: 4px 10px; font-size: 0.7rem;">Indigo</span>
+                <span class="filter-chip" data-on-click="changeMockupTheme('pink')" style="padding: 4px 10px; font-size: 0.7rem;">Rose</span>
+                <span class="filter-chip" data-on-click="changeMockupTheme('emerald')" style="padding: 4px 10px; font-size: 0.7rem;">Emerald</span>
+                <span class="filter-chip" data-on-click="changeMockupTheme('dark')" style="padding: 4px 10px; font-size: 0.7rem;">Cyberpunk</span>
+              </div>
+
+              <div class="marketing-mockup-container">
+                <div class="mockup-card-canvas" id="marketing-mockup-card">
+                  <div>
+                    <div class="mockup-stars" id="mockup-stars">★★★★★</div>
+                    <div class="mockup-quote" id="mockup-quote">Select a review card...</div>
+                  </div>
+                  <div class="mockup-footer">
+                    <span class="mockup-author" id="mockup-author">Reviewer</span>
+                    <span class="mockup-appname" id="mockup-appname">App Brand</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <button class="btn btn-primary" style="flex: 1;" data-on-click="exportMockupSuccess()">Export Graphic Asset</button>
+                <button class="btn btn-secondary" data-on-click="shareMockupAsTweet()">Draft Social Post</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4.2: UNIFIED SOCIAL INBOX (NEW) -->
+      <section id="view-social-inbox" class="view-panel">
+        <div class="inbox-layout">
+          <!-- Threads list -->
+          <div class="inbox-list-panel">
+            <div style="padding:16px; border-bottom:1px solid var(--border-glass);">
+              <h4 style="color:white; font-size:0.95rem;">Inbox Activity</h4>
+            </div>
+            <div style="flex:1; overflow-y:auto;" id="inbox-threads-list-container">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+          
+          <!-- Conversations panel -->
+          <div class="glass-card" style="display:flex; flex-direction:column; padding:0;">
+            <div style="padding:16px; border-bottom:1px solid var(--border-glass); display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <h4 style="color:white;" id="inbox-active-sender">Select Conversation</h4>
+                <span style="font-size:0.75rem; color:var(--text-muted);" id="inbox-active-platform">Choose a thread from the left</span>
+              </div>
+              <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.72rem;" data-on-click="markActiveInboxResolved()">Mark Resolved</button>
+            </div>
+            
+            <!-- Chat bubble scroll -->
+            <div style="flex:1; padding:20px; overflow-y:auto; min-height: 300px;" id="inbox-chat-bubbles">
+              <!-- Rendered via JS -->
+            </div>
+            
+            <!-- Response text area -->
+            <div style="padding:16px; border-top:1px solid var(--border-glass); background:rgba(0,0,0,0.15);">
+              <textarea id="inbox-reply-text" rows="3" placeholder="Write reply message..."></textarea>
+              <div style="display:flex; justify-content:space-between; margin-top:10px;">
+                <span style="font-size:0.75rem; color:var(--text-muted); align-self:center;">Timezone: Default (UTC+3)</span>
+                <button class="btn btn-primary" data-on-click="sendInboxMessageReply()">Send Message</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- AI Copilot Panel -->
+          <div class="inbox-list-panel" style="padding:16px;">
+            <h4 style="color:white; font-size:0.9rem; margin-bottom:12px;">AI Inbox Copilot</h4>
+            
+            <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); padding:12px; border-radius:6px; margin-bottom:16px;">
+              <span style="font-size:0.7rem; color:var(--text-muted);">INCOMING SENTIMENT</span>
+              <div style="font-weight:700; font-size:1rem; margin-top:4px;" id="inbox-ai-sentiment">-</div>
+            </div>
+
+            <span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; display:block; margin-bottom:8px;">SUGGESTED RESPONSES</span>
+            <div style="display:flex; flex-direction:column; gap:8px;" id="inbox-ai-replies-box">
+              <div style="font-size:0.75rem; color:var(--text-sub); text-align:center; padding:20px 0;">Select chat thread to generate options</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: SOCIAL CALENDAR (NEW) -->
+      <section id="view-social-calendar" class="view-panel">
+        <div class="calendar-layout">
+          <div class="calendar-header-bar">
+            <div>
+              <h3 style="color:white;">June 2026</h3>
+              <span style="font-size:0.8rem; color:var(--text-muted);">Queue Schedule conflicts: <strong style="color:var(--accent-green);">None Detected</strong></span>
+            </div>
+            
+            <div style="display:flex; gap:12px;">
+              <select id="calendar-timezone-select" style="width:180px; padding:6px 12px;">
+                <option value="EST">New York (EST)</option>
+                <option value="GMT">London (GMT)</option>
+                <option value="UTC+3" selected>Istanbul (UTC+3)</option>
+              </select>
+              <button class="btn btn-primary" data-on-click="openCalendarPostModal()">Schedule New Post</button>
+            </div>
+          </div>
+
+          <div class="glass-card">
+            <!-- Day labels -->
+            <div class="calendar-grid-month" style="margin-bottom:8px;">
+              <div class="calendar-day-header">Sun</div>
+              <div class="calendar-day-header">Mon</div>
+              <div class="calendar-day-header">Tue</div>
+              <div class="calendar-day-header">Wed</div>
+              <div class="calendar-day-header">Thu</div>
+              <div class="calendar-day-header">Fri</div>
+              <div class="calendar-day-header">Sat</div>
+            </div>
+            
+            <!-- Calendar Dates grid -->
+            <div class="calendar-grid-month" id="calendar-month-grid-boxes">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5.2: AI CONTENT STUDIO (NEW) -->
+      <section id="view-content-studio" class="view-panel">
+        <div class="glass-card">
+          <h3 class="card-title">AI Content Studio</h3>
+          <div class="card-subtitle" style="margin-bottom: 20px;">Draft, rephrase, and generate platform-optimized variant campaigns automatically.</div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px;">
+            <div>
+              <div class="form-group">
+                <label for="studio-platform">Target Channel Platform</label>
+                <select id="studio-platform">
+                  <option value="twitter">X (Twitter Thread)</option>
+                  <option value="linkedin">LinkedIn Professional Post</option>
+                  <option value="instagram">Instagram Carousel Caption</option>
+                  <option value="email">Email Campaign Newsletter</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="studio-prompt">Campaign Topic / Features Outline</label>
+                <textarea id="studio-prompt" rows="5" placeholder="e.g. Announcing the new smartwatch exercise logs built inside FitPulse AI. Highlight fitness challenges features."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="studio-tone">Audience Copy Tone</label>
+                <select id="studio-tone">
+                  <option value="hype">Energetic & Hype</option>
+                  <option value="professional">Professional & Analytical</option>
+                  <option value="casual">Casual & Conversational</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="switch-label">
+                  <input type="checkbox" checked class="switch-input" id="studio-ab-toggle">
+                  <span class="switch-slider"></span>
+                  <span>Enable A/B Variations Testing</span>
+                </label>
+              </div>
+
+              <button class="btn btn-primary" data-on-click="generateStudioContent()">Draft Studio Content</button>
+            </div>
+
+            <div class="glass-card" style="background: rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.04);">
+              <h4 style="color: white; margin-bottom: 12px;">Studio Copy Output</h4>
+              
+              <div style="display:flex; flex-direction:column; gap:16px;" id="studio-outputs-block">
+                <div style="color: var(--text-sub); text-align: center; padding: 40px 0;">
+                  Enter details and click 'Draft Studio Content' to generate variants.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5.2.b: CONTENT INTELLIGENCE & PERFORMANCE ANALYZER (NEW) -->
+      <section id="view-content-intelligence" class="view-panel">
+        <!-- KPI Ribbon -->
+        <div style="display: grid; grid-template-columns: 1fr 3fr; gap: 24px; margin-bottom: 24px;">
+          <!-- Score gauge card -->
+          <div class="glass-card" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px;">
+            <h4 style="color:white; font-size:0.9rem; margin-bottom:12px;">Average Success Score</h4>
+            <div id="intel-score-gauge" style="width:100px; height:100px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative; box-shadow: 0 0 15px rgba(99,102,241,0.2);">
+              <div style="width:84px; height:84px; border-radius:50%; background:#0b0f19; display:flex; align-items:center; justify-content:center;">
+                <span id="intel-score-label" style="font-size:2rem; font-weight:800; color:white;">74.5</span>
+              </div>
+            </div>
+            <span style="font-size:0.7rem; color:var(--text-sub); margin-top:10px;">Overall Portfolio Health</span>
+          </div>
+
+          <!-- General stats card -->
+          <div class="glass-card" style="display:flex; flex-direction:column; justify-content:center; padding:24px;">
+            <h4 style="color:white; font-size:1rem; margin-bottom:16px;">Portfolio Conversion Attribution</h4>
+            <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 0;">
+              <div style="background:rgba(255,255,255,0.02); padding:14px; border:1px solid var(--border-glass); border-radius:6px;">
+                <div style="font-size:0.75rem; color:var(--text-sub);">Attributed Revenue</div>
+                <div id="intel-revenue-stat" style="font-size:1.4rem; font-weight:800; color:var(--accent-green); margin-top:4px;">$28,450</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.02); padding:14px; border:1px solid var(--border-glass); border-radius:6px;">
+                <div style="font-size:0.75rem; color:var(--text-sub);">Attributed Downloads</div>
+                <div id="intel-downloads-stat" style="font-size:1.4rem; font-weight:800; color:white; margin-top:4px;">12,450</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.02); padding:14px; border:1px solid var(--border-glass); border-radius:6px;">
+                <div style="font-size:0.75rem; color:var(--text-sub);">Attributed Leads</div>
+                <div id="intel-leads-stat" style="font-size:1.4rem; font-weight:800; color:var(--primary); margin-top:4px;">3,100</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; margin-bottom: 24px;">
+          <!-- Predictor Card -->
+          <div class="glass-card">
+            <h3 class="card-title">AI Success Predictor</h3>
+            <div class="card-subtitle" style="margin-bottom:16px;">Test post copies before publishing to estimate reach and receive optimization tips.</div>
+            
+            <div class="form-group" style="margin-bottom:12px;">
+              <label for="intel-predict-input">Post Copy Draft</label>
+              <textarea id="intel-predict-input" rows="4" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:10px; border-radius:4px; font-size:0.85rem;" placeholder="Paste your social campaign copy draft here..."></textarea>
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+              <button class="btn btn-secondary" style="font-size:0.75rem;" data-on-click="prefillLaunchPrompt('Launch my app')">Load Test Draft</button>
+              <button class="btn btn-primary" data-on-click="runSuccessPrediction()">Predict Performance</button>
+            </div>
+
+            <!-- Prediction output -->
+            <div id="intel-prediction-results" style="background:rgba(0,0,0,0.2); border:1px solid var(--border-glass); border-radius:6px; padding:16px; min-height:140px; display:flex; gap:20px;">
+              <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; min-width:120px; border-right:1px solid var(--border-glass); padding-right:20px;" id="intel-predict-score-block">
+                <div style="font-size:2.5rem; font-weight:800; color:var(--text-sub);">--</div>
+                <span style="font-size:0.75rem; color:var(--text-muted);">Success Score</span>
+              </div>
+              <div style="flex:1;" id="intel-predict-details-block">
+                <p style="color:var(--text-muted); text-align:center; padding-top:40px; font-size:0.8rem;">Click 'Predict Performance' to evaluate this draft copy.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coach Card -->
+          <div class="glass-card" style="display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <h3 class="card-title">AI Content Coach</h3>
+              <div class="card-subtitle" style="margin-bottom:12px;">Ask the strategy brain questions regarding conversions and patterns.</div>
+              
+              <!-- Chat logs window -->
+              <div id="intel-coach-chat-logs" style="background:#02050b; border:1px solid var(--border-glass); border-radius:6px; height:240px; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px; margin-bottom:12px;">
+                <div class="chat-bubble-row received">
+                  <div class="agent-avatar growth" style="width:28px; height:28px; font-size:0.75rem; align-self:flex-end;">C</div>
+                  <div class="chat-bubble" style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass);">
+                    Hi Founder! I am your strategy Coach. Ask me anything about what content drives growth or choose a preset question:
+                    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;">
+                      <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.65rem;" data-on-click="askContentCoach('Why did this post fail?')">Why did this post fail?</button>
+                      <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.65rem;" data-on-click="askContentCoach('Which content drives downloads?')">Which content drives downloads?</button>
+                      <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.65rem;" data-on-click="askContentCoach('What should I post next week?')">What should I post next week?</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Input area -->
+            <div style="display:flex; gap:8px;">
+              <input type="text" id="intel-coach-input" placeholder="Type a custom query (e.g. Which platform performs best?)..." style="background:#040711; border:1px solid var(--border-glass); color:white; flex:1; padding:10px; border-radius:4px; font-size:0.8rem;">
+              <button class="btn btn-primary" data-on-click="askContentCoach()">Ask Coach</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; margin-bottom: 24px;">
+          <!-- Timing and Hashtags -->
+          <div class="glass-card">
+            <h3 class="card-title">Optimal Timing & Hashtags</h3>
+            <div class="card-subtitle" style="margin-bottom:16px;">AI analyzed times and hashtags with highest reach impact.</div>
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+              <div>
+                <h4 style="color:white; font-size:0.85rem; margin-bottom:8px;">Best Times to Post</h4>
+                <div style="display:flex; flex-direction:column; gap:8px;" id="intel-best-times-list">
+                  <!-- Rendered via JS -->
+                </div>
+              </div>
+              <div>
+                <h4 style="color:white; font-size:0.85rem; margin-bottom:8px;">Hashtag Reach Impact</h4>
+                <table class="competitor-table" style="font-size:0.75rem;">
+                  <thead>
+                    <tr><th>Hashtag</th><th>Reach Impact</th></tr>
+                  </thead>
+                  <tbody id="intel-hashtags-tbody">
+                    <!-- Rendered via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- CTA Analytics -->
+          <div class="glass-card">
+            <h3 class="card-title">CTA Conversion Rankings</h3>
+            <div class="card-subtitle" style="margin-bottom:16px;">Comparing calls-to-action click-through rates and downloads.</div>
+            
+            <table class="competitor-table" style="font-size:0.78rem;">
+              <thead>
+                <tr>
+                  <th>Call-to-Action</th>
+                  <th>CTR</th>
+                  <th>Conversions</th>
+                  <th>Attributed Rev</th>
+                </tr>
+              </thead>
+              <tbody id="intel-cta-tbody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Hall of Fame -->
+        <div class="glass-card" style="margin-bottom: 24px;">
+          <h3 class="card-title">Content Hall of Fame</h3>
+          <div class="card-subtitle" style="margin-bottom: 16px;">Your top 1% and 5% highest-performing campaign posts.</div>
+          
+          <div class="roadmap-board" style="grid-template-columns: repeat(3, 1fr);" id="intel-hall-grid">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Recycler panel -->
+        <div style="display:grid; grid-template-columns: 1fr 1.2fr; gap:24px; margin-bottom:24px;">
+          <div class="glass-card">
+            <h3 class="card-title">AI Content Recycler</h3>
+            <div class="card-subtitle" style="margin-bottom:16px;">Re-draft and scale high-performing captions into other channels automatically.</div>
+            
+            <div class="form-group" style="margin-bottom:12px;">
+              <label for="intel-recycle-input">Source Caption Text</label>
+              <textarea id="intel-recycle-input" rows="4" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:10px; border-radius:4px; font-size:0.85rem;" placeholder="Select a post from the Hall of Fame above or type copy to recycle here..."></textarea>
+            </div>
+            <button class="btn btn-primary" data-on-click="runSaaSContentRecycle()">Recycle Content Copy</button>
+          </div>
+
+          <div class="glass-card">
+            <h4 style="color:white; margin-bottom:12px;">Recycled Variants Output</h4>
+            <div id="intel-recycle-outputs">
+              <p style="color:var(--text-sub); text-align:center; padding-top:40px; font-size:0.8rem;">Enter source text and click 'Recycle Content Copy' to generate variations.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weekly Strategy Card -->
+        <div class="glass-card" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)); border: 1px solid var(--primary-glow);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h3 class="card-title" style="color:white;">Weekly Growth Strategy Review</h3>
+              <div class="card-subtitle" style="margin:4px 0 0 0; color:rgba(255,255,255,0.75);">Compile and download the portfolio-wide weekly content performance audit.</div>
+            </div>
+            <button class="btn btn-primary" data-on-click="downloadWeeklyReport()">Download Strategy Report</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5.3: MEDIA ASSET MANAGER (NEW) -->
+      <section id="view-media-asset" class="view-panel">
+        <div class="glass-card" style="margin-bottom: 24px;">
+          <h3 class="card-title">Media Asset Manager</h3>
+          <div class="card-subtitle" style="margin-bottom: 20px;">Upload image cards, promotional videos, and brand guidelines with automatic AI-descriptions.</div>
+          
+          <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+            <div style="display:flex; gap:8px;" id="media-folder-chips">
+              <!-- Rendered via JS -->
+            </div>
+            <button class="btn btn-primary" data-on-click="simulateMediaUploadClick()">Upload Asset</button>
+            <input type="file" id="media-upload-dummy-input" style="display:none;" onchange="simulateMediaUploadSelect(event)">
+          </div>
+
+          <!-- Folders -->
+          <div class="media-folder-grid">
+            <div class="media-folder-card active" id="media-folder-all" data-on-click="selectMediaFolder('all')">
+              <span style="font-size:1.5rem;">📁</span>
+              <div>
+                <div style="font-weight:600; color:white; font-size:0.85rem;">All Assets</div>
+                <span style="font-size:0.7rem; color:var(--text-sub);" id="media-total-count">4 items</span>
+              </div>
+            </div>
+            <div class="media-folder-card" id="media-folder-brand" data-on-click="selectMediaFolder('Brand Assets')">
+              <span style="font-size:1.5rem;">📂</span>
+              <div>
+                <div style="font-weight:600; color:white; font-size:0.85rem;">Brand Assets</div>
+                <span style="font-size:0.7rem; color:var(--text-sub);">1 item</span>
+              </div>
+            </div>
+            <div class="media-folder-card" id="media-folder-promo" data-on-click="selectMediaFolder('Promotions')">
+              <span style="font-size:1.5rem;">📂</span>
+              <div>
+                <div style="font-weight:600; color:white; font-size:0.85rem;">Promotions</div>
+                <span style="font-size:0.7rem; color:var(--text-sub);">1 item</span>
+              </div>
+            </div>
+            <div class="media-folder-card" id="media-folder-screens" data-on-click="selectMediaFolder('Screenshots')">
+              <span style="font-size:1.5rem;">📂</span>
+              <div>
+                <div style="font-weight:600; color:white; font-size:0.85rem;">Screenshots</div>
+                <span style="font-size:0.7rem; color:var(--text-sub);">1 item</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assets grid -->
+          <div class="media-asset-grid" id="media-assets-grid-container">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5.4: CONTENT APPROVALS (NEW) & RELEASE AUTOMATOR -->
+      <section id="view-release-automator" class="view-panel">
+        <div class="glass-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">App Release Automation</h3>
+              <div class="card-subtitle">Sync store updates, generate changelogs, promotional posts, and newsletter emails in one click.</div>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 24px;">
+            <div>
+              <div class="form-group">
+                <label for="release-version">Release Version Number</label>
+                <input type="text" id="release-version" value="v2.1.0">
+              </div>
+              <div class="form-group">
+                <label for="release-features">What is new in this build? (Raw Notes)</label>
+                <textarea id="release-features" rows="6"></textarea>
+              </div>
+              <button class="btn btn-primary" data-on-click="generateReleaseCampaign()">Formulate Release Assets</button>
+            </div>
+            
+            <div class="glass-card" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.04);">
+              <h4 style="margin-bottom: 12px; color: white;">AI Generated Release Package</h4>
+              
+              <div class="tabs-navigation" style="margin-bottom: 12px;">
+                <button class="sub-tab-btn active" id="rel-tab-social" data-on-click="switchReleaseTab('social')">Social Thread</button>
+                <button class="sub-tab-btn" id="rel-tab-email" data-on-click="switchReleaseTab('email')">User Email</button>
+                <button class="sub-tab-btn" id="rel-tab-changelog" data-on-click="switchReleaseTab('changelog')">Store Changelog</button>
+              </div>
+              
+              <div style="min-height: 220px;" id="release-output-container">
+                <div style="color: var(--text-sub); text-align: center; padding: 40px 0;">
+                  Enter details and click 'Formulate Release Assets' to load the templates.
+                </div>
+              </div>
+              
+              <div style="display: flex; gap: 12px; margin-top: 16px; border-top: 1px solid var(--border-glass); padding-top: 16px;">
+                <button class="btn btn-primary" data-on-click="approveAndScheduleRelease()">Approve & Schedule Campaign</button>
+                <button class="btn btn-secondary" data-on-click="copyReleaseToClipboard()">Copy to Clipboard</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 6: ROADMAP MANAGER -->
+      <section id="view-roadmap-center" class="view-panel">
+        <div class="glass-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">Feature Roadmap & Communication</h3>
+              <div class="card-subtitle">Keep users updated, manage feature requests, and announce progress.</div>
+            </div>
+            
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Toggle Visibility:</span>
+              <label class="switch-label">
+                <input type="checkbox" checked class="switch-input" id="roadmap-visibility-toggle" onchange="toggleRoadmapVisibility()">
+                <span class="switch-slider"></span>
+                <span id="roadmap-visibility-label">Public Roadmap</span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="roadmap-board" id="roadmap-columns-container">
+            <!-- Planned -->
+            <div class="roadmap-col">
+              <div class="roadmap-col-title planned">
+                <span>Planned</span>
+                <span class="filter-chip" style="padding: 2px 8px; font-size: 0.7rem;" id="roadmap-count-planned">0</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px;" id="roadmap-list-planned"></div>
+            </div>
+            
+            <!-- In Progress -->
+            <div class="roadmap-col">
+              <div class="roadmap-col-title inprogress">
+                <span>In Progress</span>
+                <span class="filter-chip" style="padding: 2px 8px; font-size: 0.7rem;" id="roadmap-count-inprogress">0</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px;" id="roadmap-list-inprogress"></div>
+            </div>
+            
+            <!-- Completed -->
+            <div class="roadmap-col">
+              <div class="roadmap-col-title completed">
+                <span>Completed</span>
+                <span class="filter-chip" style="padding: 2px 8px; font-size: 0.7rem;" id="roadmap-count-completed">0</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px;" id="roadmap-list-completed"></div>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; border-top: 1px solid var(--border-glass); padding-top: 24px;">
+            <div>
+              <h4 style="margin-bottom: 12px; color: white;">Submit Feature Proposal</h4>
+              <div class="form-group">
+                <label for="new-feature-title">Feature Title</label>
+                <input type="text" id="new-feature-title" placeholder="e.g. Calendar Integration">
+              </div>
+              <div class="form-group">
+                <label for="new-feature-desc">Feature Description</label>
+                <textarea id="new-feature-desc" rows="3"></textarea>
+              </div>
+              <button class="btn btn-secondary" data-on-click="addNewRoadmapItem()">Add Feature Proposal</button>
+            </div>
+            
+            <div class="glass-card" style="background: rgba(0,0,0,0.15);">
+              <h4 style="margin-bottom: 8px; color: white;">AI Promotional Content Generator</h4>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">
+                Generate promotional announcement copy immediately from any roadmap feature.
+              </p>
+              <div class="form-group">
+                <label for="roadmap-select-feature">Choose Roadmap Feature</label>
+                <select id="roadmap-select-feature"></select>
+              </div>
+              <button class="btn btn-primary" data-on-click="generateRoadmapAnnouncementPost()">Generate Announcement Copy</button>
+              
+              <div style="margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: 6px; font-size: 0.8rem; min-height: 80px;" id="roadmap-announcement-result">
+                Select feature and generate to preview post drafts.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 7: CONTENT RECYCLER & COPILOT -->
+      <section id="view-content-recycler" class="view-panel">
+        <div style="display: grid; grid-template-columns: 1.5fr 1.5fr; gap: 24px;">
+          <div class="glass-card">
+            <h3 class="card-title" style="margin-bottom: 6px;">Marketing Content Recycler</h3>
+            <div class="card-subtitle" style="margin-bottom: 20px;">Refurbish high-performing copy to match other channels without posting duplicates.</div>
+            
+            <div class="form-group">
+              <label for="recycle-input-post">High-Performing Original Content</label>
+              <textarea id="recycle-input-post" rows="6"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="recycle-target-platform">Target Variation Channel</label>
+              <select id="recycle-target-platform">
+                <option value="twitter">X (Twitter) - Punchy thread/micro-post</option>
+                <option value="linkedin">LinkedIn - Professional narrative with spacing</option>
+                <option value="newsletter">Email Newsletter - Conversational value card</option>
+              </select>
+            </div>
+            
+            <button class="btn btn-primary" data-on-click="recycleContent()">Re-phrase & Generate Variation</button>
+            
+            <div class="glass-card" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.04); margin-top: 20px;">
+              <h4 style="margin-bottom: 8px; color: white;">Refreshed Variation</h4>
+              <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; min-height: 120px;" id="recycler-output">
+                Input your top-performing text above to view fresh rephrasing outputs.
+              </div>
+            </div>
+          </div>
+          
+          <div class="glass-card">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title">AI Growth Copilot Advisor</h3>
+                <div class="card-subtitle">Intelligent suggestions for channels, bottlenecks, and audiences.</div>
+              </div>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 16px;" id="copilot-recommendations-list"></div>
+            
+            <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-glass);">
+              <h4 style="margin-bottom: 12px; color: white;">Generate Weekly Strategy Review</h4>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 16px;">
+                Compile a comprehensive strategic brief highlighting competitors, keyword opportunities, and target recommendations.
+              </p>
+              <button class="btn btn-secondary" data-on-click="generateWeeklyGrowthReport()">Generate Strategic Report</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 8: ECOSYSTEM & COMPETITORS -->
+      <section id="view-competitor-ecosystem" class="view-panel">
+        <div style="display: grid; grid-template-columns: 1.4fr 1.6fr; gap: 24px;">
+          <div class="glass-card">
+            <h3 class="card-title">Competitor App Intelligence</h3>
+            <div class="card-subtitle">Live store ratings, downloads, and search optimization gaps.</div>
+            
+            <table class="competitor-table">
+              <thead>
+                <tr>
+                  <th>Competitor Name</th>
+                  <th>Est. Downloads</th>
+                  <th>Store Rating</th>
+                  <th>Focus Keyword</th>
+                </tr>
+              </thead>
+              <tbody id="competitor-list-tbody"></tbody>
+            </table>
+            
+            <div class="glass-card" style="background: rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.04); margin-top: 20px;">
+              <h4 style="margin-bottom: 6px; color: white;">Competitor Launch Opportunities</h4>
+              <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;" id="competitor-analysis-tip">
+                Loading competitor insights...
+              </p>
+            </div>
+          </div>
+          
+          <div class="glass-card">
+            <h3 class="card-title">Multi-App Portfolio Ecosystem</h3>
+            <div class="card-subtitle" style="margin-bottom: 20px;">Launch bundle campaigns and direct cross-promotion across shared audiences.</div>
+            
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); padding: 20px; margin-bottom: 20px;">
+              <h4 style="color: white; font-size: 0.95rem; margin-bottom: 8px;">AI Cross-Promotion Recommendation</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;" id="crosspromo-tip-content">
+                Choose another app in the selector to check target opportunities.
+              </p>
+              
+              <div style="padding: 12px; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 6px; margin-bottom: 16px;">
+                <h5 style="color: white; font-size: 0.8rem; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                  <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--primary);"></span>
+                  Suggested Shared Campaign
+                </h5>
+                <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;" id="crosspromo-campaign-pitch">
+                  Select app to build promotional drafts.
+                </p>
+              </div>
+              
+              <button class="btn btn-primary" data-on-click="createCrossPromoAssets()">Draft Bundle Offer Post</button>
+            </div>
+
+            <div id="crosspromo-assets-result" style="display: none;">
+              <div class="glass-card" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.04);">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                  <span style="font-size:0.75rem; font-weight:700; color:var(--secondary);">CROSS-PROMOTION COPY</span>
+                  <span class="filter-chip" style="padding: 2px 6px; font-size: 0.65rem;" data-on-click="copyCrossPromoText()">Copy</span>
+                </div>
+                <div style="font-size: 0.85rem; color: white; line-height: 1.5;" id="crosspromo-post-text"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 9: EXECUTIVE INSIGHTS -->
+      <section id="view-insights" class="view-panel">
+        <div class="glass-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">Executive Insights Dashboard</h3>
+              <div class="card-subtitle">Downloadable strategy updates and portfolio financial analytics.</div>
+            </div>
+            
+            <button class="btn btn-primary" data-on-click="downloadExecutiveReport()">Download PDF Report</button>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="glass-card" style="background: rgba(0,0,0,0.15);">
+              <h4 style="margin-bottom: 12px; color: white;">MRR Acquisition Trends</h4>
+              <div class="analytics-chart-container" id="exec-mrr-trend-chart"></div>
+            </div>
+            
+            <div class="glass-card" style="background: rgba(0,0,0,0.15);">
+              <h4 style="margin-bottom: 12px; color: white;">Acquisition ROI Trend (%)</h4>
+              <div class="analytics-chart-container" id="exec-roi-trend-chart"></div>
+            </div>
+          </div>
+          
+          <div class="glass-card" style="background: rgba(99, 102, 241, 0.05); border-color: rgba(99,102,241,0.15);">
+            <h4 style="color: white; margin-bottom: 10px;">Strategic Executive Assessment</h4>
+            <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;" id="exec-strategic-text"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 10: AI AGENT FRAMEWORK -->
+      <section id="view-agent-framework" class="view-panel">
+        <div class="glass-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">Future AI Agent Framework</h3>
+              <div class="card-subtitle">An orchestration module where autonomous subagents collaborate on scheduling, research, copy, and analysis.</div>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-secondary" data-on-click="clearAgentTerminal()">Clear Log</button>
+              <button class="btn btn-primary" id="toggle-agent-simulation-btn" data-on-click="toggleAgentSimulation()">Start Agent Simulation</button>
+            </div>
+          </div>
+          
+          <div class="agent-workspace-grid">
+            <div class="agent-roster">
+              <div class="agent-badge active" id="agent-badge-marketing">
+                <div class="agent-avatar marketing">M</div>
+                <div class="agent-info">
+                  <div class="agent-name">Marketing Agent</div>
+                  <div class="agent-role-desc">Ad strategy & campaigns</div>
+                </div>
+                <span class="agent-status-tag agent-status-working" id="agent-status-marketing">Working</span>
+              </div>
+              
+              <div class="agent-badge" id="agent-badge-content">
+                <div class="agent-avatar content">C</div>
+                <div class="agent-info">
+                  <div class="agent-name">Content Agent</div>
+                  <div class="agent-role-desc">Post copywriting & layout</div>
+                </div>
+                <span class="agent-status-tag agent-status-idle" id="agent-status-content">Idle</span>
+              </div>
+              
+              <div class="agent-badge" id="agent-badge-aso">
+                <div class="agent-avatar aso">A</div>
+                <div class="agent-info">
+                  <div class="agent-name">ASO Agent</div>
+                  <div class="agent-role-desc">App Store SEO crawler</div>
+                </div>
+                <span class="agent-status-tag agent-status-idle" id="agent-status-aso">Idle</span>
+              </div>
+              
+              <div class="agent-badge" id="agent-badge-growth">
+                <div class="agent-avatar growth">G</div>
+                <div class="agent-info">
+                  <div class="agent-name">Growth Agent</div>
+                  <div class="agent-role-desc">Analytics & conversion auditing</div>
+                </div>
+                <span class="agent-status-tag agent-status-idle" id="agent-status-growth">Idle</span>
+              </div>
+            </div>
+            
+            <div class="terminal-console">
+              <div class="terminal-header">
+                <span>Multi-Agent Live Event Loop (Collaboration Console)</span>
+                <div class="terminal-controls">
+                  <span class="terminal-dot-ctrl red"></span>
+                  <span class="terminal-dot-ctrl yellow"></span>
+                  <span class="terminal-dot-ctrl green"></span>
+                </div>
+              </div>
+              <div class="terminal-body" id="agent-terminal-logs">
+                <div class="terminal-log-entry">
+                  <span class="log-time">[01:04:00]</span>
+                  <span class="log-sender system">[SYSTEM]</span>
+                  <span class="log-message">Future AI Agent Orchestration framework ready. Subagents initialized.</span>
+                </div>
+              </div>
+              
+              <div style="border-top: 1px solid var(--border-glass); padding: 10px; display: flex; gap: 10px; background: rgba(0,0,0,0.3);">
+                <span style="color: #10b981; font-weight: 700; align-self: center; padding-left: 8px;">&gt;</span>
+                <input type="text" id="agent-console-input" style="background: transparent; border: none; padding: 6px 0; color: #a5b4fc; font-family: monospace; font-size: 0.85rem;" placeholder="Direct the team (e.g. 'Optimize ASO keywords')...">
+                <button class="btn btn-primary" style="padding: 4px 12px; font-size: 0.75rem;" data-on-click="submitAgentConsoleCommand()">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 10.2: MULTI-AGENT ORCHESTRATION EVENT FLOW (NEW) -->
+      <section id="view-agent-orchestration" class="view-panel">
+        <div class="glass-card" style="margin-bottom: 24px;">
+          <h3 class="card-title">Multi-Agent Collaboration Engine</h3>
+          <div class="card-subtitle" style="margin-bottom: 20px;">Watch automated agents analyze metrics, deploy content updates, and trigger keyword tracking synchronously.</div>
+          
+          <!-- Orchestration line diagram nodes -->
+          <div class="agent-flow-chart-container">
+            <div class="agent-flow-node active" id="node-analytics">
+              <div class="agent-avatar analytics">📊</div>
+              <div class="agent-flow-label">Analytics</div>
+            </div>
+            <div class="agent-flow-line" id="line-an-gr"></div>
+            
+            <div class="agent-flow-node" id="node-growth">
+              <div class="agent-avatar growth">⚡</div>
+              <div class="agent-flow-label">Growth</div>
+            </div>
+            <div class="agent-flow-line" id="line-gr-aso"></div>
+            
+            <div class="agent-flow-node" id="node-aso">
+              <div class="agent-avatar aso">🔍</div>
+              <div class="agent-flow-label">ASO</div>
+            </div>
+            <div class="agent-flow-line" id="line-aso-mkt"></div>
+            
+            <div class="agent-flow-node" id="node-marketing">
+              <div class="agent-avatar marketing">🎯</div>
+              <div class="agent-flow-label">Marketing</div>
+            </div>
+            <div class="agent-flow-line" id="line-mkt-cnt"></div>
+            
+            <div class="agent-flow-node" id="node-content">
+              <div class="agent-avatar content">✍️</div>
+              <div class="agent-flow-label">Content</div>
+            </div>
+            <div class="agent-flow-line" id="line-cnt-sch"></div>
+            
+            <div class="agent-flow-node" id="node-scheduler">
+              <div class="agent-avatar scheduler">🗓️</div>
+              <div class="agent-flow-label">Scheduler</div>
+            </div>
+          </div>
+          
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px;">
+            <div>
+              <h4 style="color:white;">Current Status: <span id="orch-status-text" style="color:var(--primary);">Awaiting Action</span></h4>
+              <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;" id="orch-desc-text">Trigger pipeline execution simulation to see how autonomous subagents coordinate.</p>
+            </div>
+            <button class="btn btn-primary" data-on-click="startOrchestrationPipelineSimulation()">Execute Pipeline Run</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 11: AUTH & TEAM SETTINGS (NEW) -->
+      <section id="view-auth-team" class="view-panel">
+        <div class="glass-card" style="margin-bottom: 24px;">
+          <h3 class="card-title">Supabase Database Authentication</h3>
+          <div class="card-subtitle" style="margin-bottom: 20px;">Manage project environments, API secrets, OAuth providers, and user sessions.</div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px;">
+            <div>
+              <h4 style="color: white; margin-bottom: 12px;">Supabase Credentials</h4>
+              <div class="form-group">
+                <label for="auth-sb-url">Supabase Project URL</label>
+                <input type="text" id="auth-sb-url" value="https://xyzwijkmopqrstuv.supabase.co">
+              </div>
+              <div class="form-group">
+                <label for="auth-sb-key">Anon API Public Key</label>
+                <input type="password" id="auth-sb-key" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+              </div>
+              
+              <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn btn-primary" data-on-click="simulateSbAuthVerify()">Verify Environment</button>
+                <button class="btn btn-secondary" data-on-click="simulateSbAuthSignout()">Simulate Logout</button>
+              </div>
+            </div>
+
+            <div class="glass-card" style="background: rgba(0,0,0,0.15);">
+              <h4 style="color: white; margin-bottom: 12px;">Active User Profile</h4>
+              <div style="display:flex; gap:16px; align-items:center; margin-bottom: 20px;">
+                <img id="auth-user-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" style="width: 50px; height: 50px; border-radius: 50%;">
+                <div>
+                  <h5 style="color:white; font-size:1.05rem;" id="auth-user-name">Shadi</h5>
+                  <span style="font-size:0.75rem; color:var(--primary); font-weight:700;" id="auth-user-role">Owner (CyberVentures Ltd)</span>
+                </div>
+              </div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                <strong>Session Token status:</strong> Valid (Auto refresh active)<br>
+                <strong>Authentication Scope:</strong> full_dashboard_write, team_rbac_admin, db_console_access.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team & Roles table -->
+        <div class="glass-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">Team Organization Members</h3>
+              <div class="card-subtitle">Role-Based Access Control (RBAC) permissions settings.</div>
+            </div>
+            <button class="btn btn-secondary" data-on-click="inviteNewTeamMember()">Invite Member</button>
+          </div>
+          
+          <table class="competitor-table">
+            <thead>
+              <tr>
+                <th>Member Name</th>
+                <th>Email Address</th>
+                <th>Assigned Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="team-members-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VIEW 12: DATABASE & JOBS CONSOLE (NEW) -->
+      <section id="view-db-console" class="view-panel">
+        <div class="glass-card" style="margin-bottom:24px;">
+          <h3 class="card-title">PostgreSQL Database Schema</h3>
+          <div class="card-subtitle" style="margin-bottom: 20px;">Inspect production table layouts, execute mock SQL statements, and check BullMQ worker queues.</div>
+          
+          <div class="db-console-grid">
+            <!-- Table tree list -->
+            <ul class="db-tree-list" id="db-tree-tables-list">
+              <!-- Rendered via JS -->
+            </ul>
+            
+            <!-- SQL Console editor -->
+            <div class="glass-card" style="background:rgba(0,0,0,0.3); padding:20px; display:flex; flex-direction:column; gap:16px;">
+              <h4 style="color:white;">SQL Query Executor</h4>
+              <textarea id="db-sql-input" rows="4" style="font-family:monospace; background:#040711; color:#38bdf8; border:1px solid var(--border-glass);" placeholder="SELECT * FROM audit_logs LIMIT 5;"></textarea>
+              <div style="display:flex; justify-content:space-between;">
+                <button class="btn btn-secondary" style="font-size:0.75rem;" data-on-click="prefillSQLConsoleQuery()">Prefill Sample Query</button>
+                <button class="btn btn-primary" data-on-click="executeSQLQueryOnConsole()">Execute Statement</button>
+              </div>
+              
+              <!-- Query Output terminal box -->
+              <div style="background:#02050b; border:1px solid var(--border-glass); border-radius:4px; padding:12px; min-height:100px; font-family:monospace; font-size:0.75rem; color:#a5b4fc; overflow-x:auto;" id="db-sql-output-terminal">
+                Statement output terminal logs...
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1.5fr 1.5fr; gap:24px;">
+          <!-- BullMQ Redis status -->
+          <div class="glass-card">
+            <h3 class="card-title">BullMQ Background Jobs</h3>
+            <table class="competitor-table">
+              <thead>
+                <tr>
+                  <th>Queue Worker</th>
+                  <th>Status</th>
+                  <th>Total Jobs</th>
+                  <th>Failed</th>
+                  <th>Interval</th>
+                </tr>
+              </thead>
+              <tbody id="db-jobs-tbody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- RLS Policies -->
+          <div class="glass-card">
+            <h3 class="card-title">Row-Level Security (RLS)</h3>
+            <div style="display:flex; flex-direction:column; gap:12px; margin-top:16px;" id="db-rls-list-box">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+      
+    </main>
+  </div>
+
+  <!-- FLOATING NOTIFICATION DRAWER -->
+  <div id="notif-drawer">
+    <div class="drawer-header">
+      <h3 style="color:white;">Alert Center</h3>
+      <button class="btn btn-secondary" style="padding:6px; border-radius:50%;" data-on-click="toggleNotificationDrawer()">✕</button>
+    </div>
+    <div class="drawer-body" id="notif-drawer-container">
+      <!-- Rendered via JS -->
+    </div>
+  </div>
+  
+  <!-- Pop up Success Message Alert -->
+  <div id="toast-notification" style="position: fixed; bottom: 30px; right: 30px; background: var(--bg-card); border: 1px solid var(--accent-green); color: white; padding: 12px 24px; border-radius: var(--radius-sm); backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; gap: 10px; animation: slide-up 0.3s ease-out;">
+    <span style="color: var(--accent-green); font-size: 1.25rem;">✓</span>
+    <span id="toast-message">Success message here</span>
+  </div>
+
+  <!-- Include data & application logic scripts -->
+  <script src="mockData.js"></script>
+  <script type="module" src="app.js"></script>
+
+  <!-- CALENDAR DETAILS MODAL -->
+  <div id="calendar-details-modal" class="custom-modal-overlay">
+    <div class="custom-modal-content">
+      <div class="modal-header">
+        <h3 style="color:white; margin:0;" id="modal-post-platform">Platform Name</h3>
+        <button class="btn btn-secondary" style="padding:6px; border-radius:50%;" data-on-click="closeModal('calendar-details-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom:12px; font-size:0.85rem;"><strong>Status:</strong> <span id="modal-post-status" style="color:var(--primary); font-weight:700;">SCHEDULED</span></div>
+        <div style="margin-bottom:12px; font-size:0.85rem;"><strong>Scheduled Time:</strong> <span id="modal-post-date" style="color:white;">2026-06-08 @ 12:00</span></div>
+        <div style="margin-bottom:8px; font-size:0.85rem;"><strong>Post Content Copy:</strong></div>
+        <p id="modal-post-body" style="background:#040711; border:1px solid var(--border-glass); border-radius:4px; padding:12px; color:white; font-family:monospace; font-size:0.85rem; line-height:1.4; white-space:pre-wrap; margin:0;"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-on-click="closeModal('calendar-details-modal')">Close Details</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALENDAR CREATE/SCHEDULE MODAL -->
+  <div id="calendar-create-modal" class="custom-modal-overlay">
+    <div class="custom-modal-content">
+      <div class="modal-header">
+        <h3 style="color:white; margin:0;">Schedule New Campaign Post</h3>
+        <button class="btn btn-secondary" style="padding:6px; border-radius:50%;" data-on-click="closeModal('calendar-create-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group" style="margin-bottom:12px;">
+          <label for="modal-create-platform">Select Channel</label>
+          <select id="modal-create-platform" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:8px; border-radius:4px;">
+            <option value="twitter">Twitter / X</option>
+            <option value="linkedin">LinkedIn Profile</option>
+            <option value="newsletter">Email Newsletter</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label for="modal-create-date">Scheduled Date</label>
+          <input type="text" id="modal-create-date" value="2026-06-12" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:8px; border-radius:4px;">
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label for="modal-create-time">Scheduled Time</label>
+          <input type="text" id="modal-create-time" value="12:00" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:8px; border-radius:4px;">
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label for="modal-create-text">Post Copy details</label>
+          <textarea id="modal-create-text" rows="4" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:8px; border-radius:4px;" placeholder="Write campaign variant details here..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-on-click="closeModal('calendar-create-modal')">Cancel</button>
+        <button class="btn btn-primary" id="calendar-modal-save-btn">Save to Calendar</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
