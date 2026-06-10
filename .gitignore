@@ -1,7 +1,6 @@
 node_modules/
 .env
 *.log
-package-lock.json
 run_migrations.js
 test_poolers.js
 audit_helper.js
