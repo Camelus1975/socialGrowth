@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
+const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 const config = require('./config');
 
@@ -11,6 +12,12 @@ const PORT = config.PORT;
 // Enable CORS and JSON parsing
 app.use(cors());
 app.use(express.json());
+
+// Serve static frontend files (HTML, CSS, JS modules)
+app.use(express.static(path.join(__dirname, '.'), {
+  extensions: ['html'],
+  index: 'index.html'
+}));
 
 // Initialize Supabase Client using validated config settings
 const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
@@ -531,6 +538,11 @@ Recommend cross-promoting FitPulse's workout planners inside TaskFlow's calendar
 // Default status probe
 app.get('/health', (req, res) => {
   res.json({ status: "healthy", database: "connected", workers: "running" });
+});
+
+// Catch-all: serve index.html for any non-API route (SPA support)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Start Server

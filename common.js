@@ -1,9 +1,10 @@
 // App Founder Growth Suite - Common UI Utilities
 import { state } from './state.js';
 
+// Auto-detect API URL: same-origin in production, localhost in development
 export const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://127.0.0.1:3000'
-  : 'https://api.yourdomain.com'; // Replace this with your production backend gateway domain
+  : '';  // Empty string = same-origin requests (frontend served by Express)
 
 // Secure helper to fetch from Express API
 export async function requestApi(path, options = {}) {

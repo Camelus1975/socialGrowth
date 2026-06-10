@@ -4,10 +4,13 @@
   "description": "Growth Operating System for App Founders & Startup Creators",
   "main": "index.html",
   "scripts": {
-    "dev": "npx -y http-server -p 3000 -o",
+    "dev": "npx -y http-server -p 8080 -o",
     "backend": "node server.js",
     "worker": "node workers.js",
     "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.8",
