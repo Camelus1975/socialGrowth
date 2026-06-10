@@ -51,8 +51,8 @@ function decryptToken(encryptedText) {
 // AUTHENTICATION MIDDLEWARE
 // ------------------------------------------
 const authenticate = async (req, res, next) => {
-  // Allow health checks and initial session check to proceed without tokens
-  if (req.path === '/health' || req.path === '/api/auth/session') {
+  // Allow health checks, auth config, and initial session check to proceed without tokens
+  if (req.path === '/health' || req.path === '/api/auth/session' || req.path === '/api/auth/config') {
     return next();
   }
   
@@ -81,6 +81,14 @@ const authenticate = async (req, res, next) => {
 
 // Apply security auth middleware to all api routes
 app.use('/api', authenticate);
+
+// Public endpoint: expose Supabase config for frontend auth (anon key is public by design)
+app.get('/api/auth/config', (req, res) => {
+  res.json({
+    supabaseUrl: config.SUPABASE_URL,
+    supabaseAnonKey: config.SUPABASE_ANON_KEY
+  });
+});
 
 // ------------------------------------------
 // SECURED SAAS API ENDPOINTS

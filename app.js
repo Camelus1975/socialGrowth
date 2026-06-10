@@ -75,14 +75,43 @@ import {
   downloadWeeklyReport
 } from './contentIntelligenceModule.js';
 
+import {
+  initAuth,
+  loginWithEmail,
+  signupWithEmail,
+  loginWithOAuth,
+  logout,
+  toggleAuthMode,
+  onAuthStateChange
+} from './auth.js';
+
 // Initialize Application
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   // Initialize Theme from localStorage
   const savedTheme = localStorage.getItem('theme_mode');
   if (savedTheme === 'light') {
     document.body.classList.add('light-mode');
   }
 
+  // Wire up auth event listeners
+  setupAuthListeners();
+
+  // Initialize auth - checks for existing session
+  const session = await initAuth();
+
+  // Listen for auth state changes (handles OAuth redirects)
+  onAuthStateChange((session) => {
+    bootApp();
+  });
+
+  // If already logged in, boot the app
+  if (session) {
+    bootApp();
+  }
+});
+
+// Boot the main application after auth
+function bootApp() {
   // Load data from global scope (mockData.js fallback)
   loadLocalMockData();
   
@@ -103,7 +132,60 @@ window.addEventListener('DOMContentLoaded', () => {
   selectActiveApp(state.currentActiveApp);
   renderDashboard();
   renderNotifications();
-});
+}
+
+// Setup auth button event listeners
+function setupAuthListeners() {
+  // Login button
+  const loginBtn = document.getElementById('auth-login-btn');
+  if (loginBtn) {
+    loginBtn.addEventListener('click', () => {
+      const email = document.getElementById('auth-email')?.value;
+      const password = document.getElementById('auth-password')?.value;
+      if (email && password) {
+        loginWithEmail(email, password).then(success => {
+          if (success) bootApp();
+        });
+      }
+    });
+  }
+
+  // Signup button
+  const signupBtn = document.getElementById('auth-signup-btn');
+  if (signupBtn) {
+    signupBtn.addEventListener('click', () => {
+      const email = document.getElementById('auth-signup-email')?.value;
+      const password = document.getElementById('auth-signup-password')?.value;
+      if (email && password) {
+        signupWithEmail(email, password).then(success => {
+          if (success) bootApp();
+        });
+      }
+    });
+  }
+
+  // Toggle login/signup forms
+  const showSignup = document.getElementById('auth-show-signup');
+  if (showSignup) showSignup.addEventListener('click', (e) => { e.preventDefault(); toggleAuthMode(); });
+  
+  const showLogin = document.getElementById('auth-show-login');
+  if (showLogin) showLogin.addEventListener('click', (e) => { e.preventDefault(); toggleAuthMode(); });
+
+  // OAuth buttons
+  const googleBtn = document.getElementById('auth-google-btn');
+  if (googleBtn) googleBtn.addEventListener('click', () => loginWithOAuth('google'));
+
+  const githubBtn = document.getElementById('auth-github-btn');
+  if (githubBtn) githubBtn.addEventListener('click', () => loginWithOAuth('github'));
+
+  // Enter key support for login
+  const passwordInput = document.getElementById('auth-password');
+  if (passwordInput) {
+    passwordInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') loginBtn?.click();
+    });
+  }
+}
 
 // Load local mock data if Supabase backend is offline
 function loadLocalMockData() {
