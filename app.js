@@ -85,6 +85,12 @@ import {
   onAuthStateChange
 } from './auth.js';
 
+import { 
+  initAppManager, 
+  fetchUserApps, 
+  renderAppSelectorDropdown 
+} from './appManager.js';
+
 // Initialize Application
 window.addEventListener('DOMContentLoaded', async () => {
   // Initialize Theme from localStorage
@@ -111,14 +117,18 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Boot the main application after auth
-function bootApp() {
+async function bootApp() {
   // Load data from global scope (mockData.js fallback)
   loadLocalMockData();
+  
+  // Fetch real apps from Supabase and merge
+  await fetchUserApps();
   
   // Verify/Sync Session from production backend
   syncUserSession();
   
   // Initialize all view modules
+  initAppManager();
   initDashboard();
   initCalendar();
   initInbox();
@@ -129,6 +139,14 @@ function bootApp() {
   initContentIntelligence();
   
   // Render initial page views
+  renderAppSelectorDropdown();
+  
+  // Ensure we select a valid app, fallback to 'fitpulse' if currentActiveApp is invalid
+  if (!state.appsData[state.currentActiveApp]) {
+    const keys = Object.keys(state.appsData);
+    if (keys.length > 0) state.currentActiveApp = keys[0];
+  }
+  
   selectActiveApp(state.currentActiveApp);
   renderDashboard();
   renderNotifications();
