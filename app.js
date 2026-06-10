@@ -712,9 +712,10 @@ function callFunction(name, args, element, event) {
     prefillInboxReply,
     selectInboxThread,
     
-    // Calendar
+    // Calendar & Modals
     openCalendarPostModal,
     closeModal,
+    openModal,
     
     // Media
     simulateMediaUploadClick,
