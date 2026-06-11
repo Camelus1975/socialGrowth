@@ -3,6 +3,28 @@ const { Queue, Worker, QueueEvents } = require('bullmq');
 const Redis = require('ioredis');
 const dotenv = require('dotenv');
 const { createClient } = require('@supabase/supabase-js');
+const crypto = require('crypto');
+
+dotenv.config();
+
+// Initialize Encryption Vault
+const ENCRYPTION_KEY = crypto.scryptSync(process.env.ENCRYPTION_SECRET || 'development_fallback_secret_key_123', 'founder_suite_salt_2026', 32);
+
+function decryptToken(encryptedText) {
+  if (!encryptedText) return null;
+  try {
+    const textParts = encryptedText.split(':');
+    const iv = Buffer.from(textParts.shift(), 'hex');
+    const encrypted = Buffer.from(textParts.join(':'), 'hex');
+    const decipher = crypto.createDecipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+  } catch (err) {
+    console.error("Token Decryption failed:", err);
+    return null;
+  }
+}
 
 dotenv.config();
 
@@ -35,18 +57,128 @@ queuesList.forEach(qName => {
 
 // 1. Scheduled Publishing Worker
 const publishingWorker = new Worker('scheduled_publishing', async (job) => {
-  console.log(`[Worker - Publishing] Processing job ${job.id} for post ${job.data.postId}`);
-  
-  const { platform, content, accessTokenEncrypted } = job.data;
-  
-  // Simulated decryption check
-  console.log(`[Worker - Publishing] Decrypting access token vault credentials for platform: ${platform}`);
-  
-  // Simulated external API call to Twitter/LinkedIn
-  console.log(`[Worker - Publishing] Dispatching payload to ${platform} endpoint: "${content.substring(0, 20)}..."`);
-  
-  // Simulate successful post publish
-  return { success: true, url: `https://socialmedia.com/posts/published_${job.id}` };
+  if (job.name === 'poll_scheduled_posts') {
+    // 1-Minute CRON: Query Supabase for due posts
+    console.log(`[Worker - Publishing] Polling database for scheduled posts...`);
+    
+    // Check if we have the DB set up
+    const { data: duePosts, error } = await supabase
+      .from('scheduled_posts')
+      .select('*')
+      .eq('status', 'scheduled')
+      .lte('scheduled_date', new Date().toISOString().split('T')[0]); // simplified date check
+
+    if (error) {
+      if (error.code !== '42P01') { // Ignore missing table errors temporarily
+        console.error(`[Worker - Publishing] Error fetching posts:`, error);
+      }
+      return;
+    }
+
+    if (!duePosts || duePosts.length === 0) return;
+
+    // Additional filtering for time
+    const nowHourMin = new Date().toISOString().split('T')[1].substring(0, 5); // "HH:MM"
+    const today = new Date().toISOString().split('T')[0];
+
+    for (const post of duePosts) {
+      if (post.scheduled_date < today || (post.scheduled_date === today && post.scheduled_time <= nowHourMin)) {
+        // Post is due! Add to execution queue and mark as processing
+        await supabase.from('scheduled_posts').update({ status: 'processing' }).eq('id', post.id);
+        await activeQueues['scheduled_publishing'].add('execute_post', post);
+      }
+    }
+    return { success: true, processed: duePosts.length };
+  }
+
+  if (job.name === 'execute_post') {
+    const post = job.data;
+    console.log(`[Worker - Publishing] Executing publish job for post ${post.id} to ${post.platform}`);
+    
+    try {
+      // 1. Fetch credentials from social_accounts vault
+      const { data: accounts, error: accountErr } = await supabase
+        .from('social_accounts')
+        .select('access_token_encrypted, handle')
+        .eq('project_id', post.app_id)
+        .eq('platform', post.platform);
+
+      if (accountErr || !accounts || accounts.length === 0) {
+        throw new Error(`No connected ${post.platform} account found.`);
+      }
+
+      const account = accounts[0];
+      const accessToken = decryptToken(account.access_token_encrypted);
+      if (!accessToken) throw new Error("Failed to decrypt access token");
+
+      let apiResponse;
+      // 2. Publish to specific platform
+      if (post.platform === 'facebook') {
+        const url = `https://graph.facebook.com/v19.0/${account.handle}/feed`;
+        const payload = {
+          access_token: accessToken,
+          message: post.content
+        };
+        if (post.media_url) {
+          payload.link = post.media_url; // or /photos endpoint depending on media type
+        }
+        
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        apiResponse = await res.json();
+        if (apiResponse.error) throw new Error(apiResponse.error.message);
+
+      } else if (post.platform === 'instagram') {
+        // Step 1: Create media container
+        const url1 = `https://graph.facebook.com/v19.0/${account.handle}/media`;
+        const payload1 = {
+          access_token: accessToken,
+          caption: post.content
+        };
+        if (post.media_url) {
+          payload1.image_url = post.media_url;
+        } else {
+          throw new Error("Instagram requires an image or video URL.");
+        }
+
+        const res1 = await fetch(url1, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload1)
+        });
+        const data1 = await res1.json();
+        if (data1.error) throw new Error(data1.error.message);
+
+        // Step 2: Publish media container
+        const url2 = `https://graph.facebook.com/v19.0/${account.handle}/media_publish`;
+        const res2 = await fetch(url2, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            access_token: accessToken,
+            creation_id: data1.id
+          })
+        });
+        apiResponse = await res2.json();
+        if (apiResponse.error) throw new Error(apiResponse.error.message);
+      } else {
+        throw new Error("Unsupported platform");
+      }
+
+      // 3. Update status to published
+      await supabase.from('scheduled_posts').update({ status: 'published' }).eq('id', post.id);
+      console.log(`[Worker - Publishing] Successfully published post ${post.id}`);
+      return { success: true, apiResponse };
+
+    } catch (err) {
+      console.error(`[Worker - Publishing] Post ${post.id} failed:`, err);
+      await supabase.from('scheduled_posts').update({ status: 'failed' }).eq('id', post.id);
+      throw err;
+    }
+  }
 }, { connection: redisConnection });
 
 // 2. Analytics Collection Worker (Materialized View Refresher)
@@ -130,6 +262,16 @@ if (require.main === module) {
     console.log("[Workers] 1-Hour Analytics Cron Job scheduled successfully.");
   });
   
-  // Also trigger an immediate run on boot for testing/syncing
+  // Auto-Publishing Engine 1-Minute Cron Job
+  activeQueues['scheduled_publishing'].add('poll_scheduled_posts', {}, {
+    repeat: {
+      pattern: '* * * * *' // Runs every minute
+    }
+  }).then(() => {
+    console.log("[Workers] 1-Minute Auto-Publishing Cron Job scheduled successfully.");
+  });
+  
+  // Also trigger immediate runs on boot
   activeQueues['analytics_collection'].add('boot_refresh', { isBoot: true });
+  activeQueues['scheduled_publishing'].add('poll_scheduled_posts', { isBoot: true });
 }

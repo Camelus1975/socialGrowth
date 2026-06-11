@@ -125,6 +125,7 @@ async function saveCalendarPostFromModal() {
   const date = document.getElementById('modal-create-date').value;
   const platform = document.getElementById('modal-create-platform').value;
   const time = document.getElementById('modal-create-time').value;
+  const mediaUrl = document.getElementById('modal-create-media') ? document.getElementById('modal-create-media').value.trim() : null;
   
   if (!text) {
     showToast("Please enter post content copy details!", "error");
@@ -137,6 +138,7 @@ async function saveCalendarPostFromModal() {
     time: time,
     platform: platform,
     text: text,
+    media_url: mediaUrl,
     status: "scheduled",
     approval: "Approved"
   };
@@ -153,6 +155,7 @@ async function saveCalendarPostFromModal() {
           content: text,
           scheduled_date: date,
           scheduled_time: time,
+          media_url: mediaUrl,
           status: 'scheduled'
         }).select();
         

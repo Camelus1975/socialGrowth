@@ -293,26 +293,38 @@ app.get('/api/calendar/posts', async (req, res) => {
 });
 
 app.post('/api/calendar/schedule', async (req, res) => {
-  const { text, date, platform, time } = req.body;
+  const { text, date, platform, time, mediaUrl, projectId } = req.body;
   if (!text || !date || !platform) {
     return res.status(400).json({ error: "Text, date and platform variables required." });
   }
   
   try {
     if (isDummyDb) throw new Error("Offline Mode");
-    const scheduledDateTime = `${date}T${time || '12:00'}:00Z`;
+    
+    // Default to the first project if not provided
+    let appId = projectId;
+    if (!appId) {
+      const { data: projects } = await supabase.from('projects').select('id').limit(1);
+      if (projects && projects.length > 0) appId = projects[0].id;
+    }
+
     const { data, error } = await supabase
-      .from('posts')
+      .from('scheduled_posts')
       .insert([{
+        user_id: 'd9b7b9f3-8c43-4f11-b01a-8c48a735c029', // Fallback to hardcoded dev UID for local test
+        app_id: appId,
         platform: platform,
         content: text,
-        scheduled_at: scheduledDateTime,
+        scheduled_date: date,
+        scheduled_time: time || '12:00',
+        media_url: mediaUrl,
         status: 'scheduled'
       }]);
       
     if (error) throw error;
     res.json({ success: true, message: "Campaign successfully scheduled in posts database queue." });
   } catch (err) {
+    console.error("Schedule error:", err);
     res.json({ success: true, message: "Campaign successfully scheduled. (Offline Cache Mode)" });
   }
 });
