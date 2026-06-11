@@ -246,9 +246,9 @@ export async function generateStudioContent() {
   };
   
   try {
-    const data = await requestApi('/api/ai/studio/generate', {
+    const data = await requestApi('/api/ai-gateway/generate', {
       method: 'POST',
-      body: JSON.stringify({ prompt: promptText, platform, tone, enable_ab: isAb })
+      body: JSON.stringify({ prompt: promptText, platform, tone, enable_ab: isAb, taskType: 'post' })
     });
     resultCopy = data.copy;
   } catch (err) {

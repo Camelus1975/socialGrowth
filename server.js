@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 const config = require('./config');
+const aiGatewayRouter = require('./aiGatewayRouter');
 
 const app = express();
 const PORT = config.PORT;
@@ -81,6 +82,9 @@ const authenticate = async (req, res, next) => {
 
 // Apply security auth middleware to all api routes
 app.use('/api', authenticate);
+
+// Register AI Gateway
+app.use('/api/ai-gateway', aiGatewayRouter);
 
 // Public endpoint: expose Supabase config for frontend auth (anon key is public by design)
 app.get('/api/auth/config', (req, res) => {
