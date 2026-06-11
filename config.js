@@ -28,5 +28,6 @@ module.exports = {
   ENCRYPTION_SECRET: process.env.ENCRYPTION_SECRET,
   ENCRYPTION_SALT: process.env.ENCRYPTION_SALT || 'fallback_secure_production_salt',
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  REPLICATE_API_TOKEN: process.env.REPLICATE_API_TOKEN,
   PORT: process.env.PORT || 3000
 };

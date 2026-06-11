@@ -275,8 +275,15 @@ export async function generateStudioContent() {
       pA.style.color = 'white';
       pA.style.lineHeight = '1.4';
       
+      const btnA = createSafeElement('button', ['btn', 'btn-primary'], 'Schedule this Variant');
+      btnA.style.marginTop = '10px';
+      btnA.style.fontSize = '0.75rem';
+      btnA.style.padding = '6px 12px';
+      btnA.onclick = () => window.openSchedulePostModal(new Date().toISOString().split('T')[0], resultCopy.variant_a, platform, document.getElementById('studio-generated-image-url')?.value);
+      
       cardA.appendChild(headA);
       cardA.appendChild(pA);
+      cardA.appendChild(btnA);
       
       const cardB = createSafeElement('div');
       cardB.style.background = 'rgba(255,255,255,0.02)';
@@ -294,9 +301,16 @@ export async function generateStudioContent() {
       pB.style.fontSize = '0.82rem';
       pB.style.color = 'white';
       pB.style.lineHeight = '1.4';
+
+      const btnB = createSafeElement('button', ['btn', 'btn-primary'], 'Schedule this Variant');
+      btnB.style.marginTop = '10px';
+      btnB.style.fontSize = '0.75rem';
+      btnB.style.padding = '6px 12px';
+      btnB.onclick = () => window.openSchedulePostModal(new Date().toISOString().split('T')[0], resultCopy.variant_b, platform, document.getElementById('studio-generated-image-url')?.value);
       
       cardB.appendChild(headB);
       cardB.appendChild(pB);
+      cardB.appendChild(btnB);
       
       block.appendChild(cardA);
       block.appendChild(cardB);
@@ -317,8 +331,15 @@ export async function generateStudioContent() {
       p.style.color = 'white';
       p.style.lineHeight = '1.4';
       
+      const btn = createSafeElement('button', ['btn', 'btn-primary'], 'Schedule this Variant');
+      btn.style.marginTop = '10px';
+      btn.style.fontSize = '0.75rem';
+      btn.style.padding = '6px 12px';
+      btn.onclick = () => window.openSchedulePostModal(new Date().toISOString().split('T')[0], resultCopy.variant_a, platform, document.getElementById('studio-generated-image-url')?.value);
+
       card.appendChild(head);
       card.appendChild(p);
+      card.appendChild(btn);
       block.appendChild(card);
     }
   }
@@ -958,4 +979,99 @@ export function filterReviews(sentiment) {
     
     container.appendChild(card);
   });
+}
+
+// ------------------------------------------
+// AI IMAGE GENERATION
+// ------------------------------------------
+export async function generateStudioImage() {
+  const promptText = document.getElementById('studio-prompt').value.trim();
+  const mode = document.getElementById('studio-image-mode').value;
+  const app = state.appsData[state.currentActiveApp];
+  
+  if (!promptText) {
+    showToast("Please input a prompt to generate an image!", "error");
+    return;
+  }
+  
+  showToast("Routing image request to AI Creative Director...", "success");
+  const block = document.getElementById('studio-outputs-block');
+  
+  const loadingDiv = createSafeElement('div', [], "Generating image... Please wait (~5-15s)");
+  loadingDiv.style.color = "var(--primary)";
+  loadingDiv.style.textAlign = "center";
+  loadingDiv.style.padding = "20px";
+  block.insertBefore(loadingDiv, block.firstChild);
+
+  try {
+    const data = await requestApi('/api/ai-gateway/generate-image', {
+      method: 'POST',
+      body: JSON.stringify({ prompt: promptText, mode, appId: state.currentActiveApp })
+    });
+    
+    loadingDiv.remove();
+
+    const card = createSafeElement('div');
+    card.style.background = 'rgba(255,255,255,0.02)';
+    card.style.border = '1px solid var(--border-glass)';
+    card.style.padding = '14px';
+    card.style.borderRadius = '6px';
+    card.style.marginBottom = '12px';
+
+    const head = createSafeElement('h5', [], `Generated Asset (Mode: ${data.mode})`);
+    head.style.color = 'white';
+    head.style.fontSize = '0.8rem';
+    head.style.marginBottom = '10px';
+
+    let contentArea = createSafeElement('div');
+
+    if (data.mode === 'template') {
+      // MODE 1: $0 Template Rendering via html2canvas
+      contentArea.style.background = `linear-gradient(135deg, #111, #333)`; // Fallback template background
+      contentArea.style.padding = '40px';
+      contentArea.style.borderRadius = '8px';
+      contentArea.style.textAlign = 'center';
+      
+      const tmplText = createSafeElement('h2', [], promptText.substring(0, 50) + "...");
+      tmplText.style.color = 'white';
+      tmplText.style.fontFamily = 'Inter, sans-serif';
+      
+      const tmplLogo = createSafeElement('div', [], app.name);
+      tmplLogo.style.color = 'var(--primary)';
+      tmplLogo.style.marginTop = '20px';
+      tmplLogo.style.fontWeight = 'bold';
+      
+      contentArea.appendChild(tmplText);
+      contentArea.appendChild(tmplLogo);
+      
+      // Here we would run html2canvas(contentArea).then(canvas => canvas.toDataURL())
+      // For this demo, we'll just display the HTML directly.
+      showToast("Template Mode 1 utilized ($0 cost).", "success");
+      
+    } else {
+      // MODE 2/3: Actual AI Image
+      contentArea = createSafeElement('img');
+      contentArea.src = data.url;
+      contentArea.style.width = '100%';
+      contentArea.style.borderRadius = '8px';
+      
+      // Store the URL hidden so the "Schedule Variant" button can grab it
+      const hiddenInput = createSafeElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.id = 'studio-generated-image-url';
+      hiddenInput.value = data.url;
+      card.appendChild(hiddenInput);
+      
+      showToast(`AI Image created! Estimated cost: $${data.cost}`, "success");
+    }
+
+    card.appendChild(head);
+    card.appendChild(contentArea);
+    block.insertBefore(card, block.firstChild);
+
+  } catch (err) {
+    loadingDiv.remove();
+    showToast("Failed to generate image.", "error");
+    console.error(err);
+  }
 }

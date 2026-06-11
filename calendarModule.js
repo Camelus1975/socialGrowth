@@ -94,7 +94,7 @@ export function renderCalendarView() {
     
     // Click on date box triggers schedule modal
     dayBox.addEventListener('click', () => {
-      openSchedulePostModal(dateStr);
+      window.openSchedulePostModal(dateStr);
     });
     
     container.appendChild(dayBox);
@@ -114,9 +114,13 @@ function showCalendarPostDetailsModal(postId) {
   openModal('calendar-details-modal');
 }
 
-function openSchedulePostModal(dateStr) {
-  document.getElementById('modal-create-date').value = dateStr;
-  document.getElementById('modal-create-text').value = '';
+window.openSchedulePostModal = function(dateStr, textStr, platformStr, mediaUrlStr) {
+  document.getElementById('modal-create-date').value = dateStr || '';
+  if (textStr) document.getElementById('modal-create-text').value = textStr;
+  if (platformStr) document.getElementById('modal-create-platform').value = platformStr;
+  if (mediaUrlStr && document.getElementById('modal-create-media')) {
+    document.getElementById('modal-create-media').value = mediaUrlStr;
+  }
   openModal('calendar-create-modal');
 }
 
@@ -197,5 +201,5 @@ async function saveCalendarPostFromModal() {
 
 export function openCalendarPostModal() {
   const today = new Date().toISOString().split('T')[0];
-  openSchedulePostModal(today);
+  window.openSchedulePostModal(today);
 }

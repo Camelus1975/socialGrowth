@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <meta name="description" content="Ultimate Growth Operating System & Marketing Scheduler for SaaS, Startups & Indie Creators.">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -929,7 +930,20 @@
                 </label>
               </div>
 
-              <button class="btn btn-primary" data-on-click="generateStudioContent()">Draft Studio Content</button>
+              <div class="form-group">
+                <label for="studio-image-mode">Image Generation Router Mode</label>
+                <select id="studio-image-mode">
+                  <option value="auto">Auto-Route (AI Creative Director)</option>
+                  <option value="template">Mode 1: $0 Cost Templates (html2canvas)</option>
+                  <option value="assisted">Mode 2: Low-Cost AI (FLUX Schnell)</option>
+                  <option value="premium">Mode 3: Premium AI (DALL-E 3)</option>
+                </select>
+              </div>
+
+              <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-primary" style="flex:1;" data-on-click="generateStudioContent()">Draft Copy Variants</button>
+                <button class="btn btn-outline" style="flex:1;" data-on-click="generateStudioImage()">Generate Image Asset</button>
+              </div>
             </div>
 
             <div class="glass-card" style="background: rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.04);">

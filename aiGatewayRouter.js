@@ -1,11 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const { OpenAI } = require('openai');
+const Replicate = require('replicate');
 const { createClient } = require('@supabase/supabase-js');
 const config = require('./config');
 
 const openai = new OpenAI({
   apiKey: config.OPENAI_API_KEY,
+});
+
+const replicate = new Replicate({
+  auth: config.REPLICATE_API_TOKEN,
 });
 
 /**
@@ -112,6 +117,84 @@ router.post('/generate', async (req, res) => {
   } catch (err) {
     console.error("[AI Gateway] LLM Execution Error:", err);
     res.status(500).json({ error: 'AI Gateway failed to process request. Ensure OpenAI keys are valid.' });
+  }
+});
+
+// ==========================================
+// IMAGE MODEL ROUTER (3-TIER GENERATION)
+// ==========================================
+router.post('/generate-image', async (req, res) => {
+  const { prompt, mode, appId } = req.body;
+  if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
+
+  try {
+    let imageUrl = '';
+    let generationMode = mode || 'auto';
+    let costEstimated = 0;
+
+    // AI Creative Director: Auto-Route based on prompt
+    if (generationMode === 'auto') {
+      if (prompt.toLowerCase().includes('hero') || prompt.toLowerCase().includes('ad creative') || prompt.toLowerCase().includes('launch')) {
+        generationMode = 'premium';
+      } else if (prompt.toLowerCase().includes('testimonial') || prompt.toLowerCase().includes('milestone')) {
+        generationMode = 'template';
+      } else {
+        generationMode = 'assisted';
+      }
+    }
+
+    if (generationMode === 'template') {
+      // MODE 1: Template Graphics Engine
+      // Frontend html2canvas will handle actual rendering. We just return the template data instructions.
+      console.log(`[Image Router] Routed to Mode 1 (Template)`);
+      return res.json({ 
+        url: 'template_mode', // Signals frontend to trigger HTML renderer
+        mode: 'template',
+        cost: 0 
+      });
+      
+    } else if (generationMode === 'assisted') {
+      // MODE 2: FLUX Dev/Schnell via Replicate
+      console.log(`[Image Router] Routed to Mode 2 (FLUX via Replicate)`);
+      const output = await replicate.run(
+        "black-forest-labs/flux-schnell",
+        {
+          input: {
+            prompt: prompt,
+            go_fast: true,
+            num_outputs: 1,
+            aspect_ratio: "1:1",
+            output_format: "webp",
+            output_quality: 80
+          }
+        }
+      );
+      // Replicate returns an array of streams/URLs
+      imageUrl = Array.isArray(output) ? output[0] : output;
+      costEstimated = 0.003; // Approx Replicate FLUX Schnell cost
+      
+    } else {
+      // MODE 3: Premium OpenAI DALL-E 3
+      console.log(`[Image Router] Routed to Mode 3 (DALL-E 3)`);
+      const response = await openai.images.generate({
+        model: "dall-e-3",
+        prompt: prompt,
+        n: 1,
+        size: "1024x1024",
+      });
+      imageUrl = response.data[0].url;
+      costEstimated = 0.040;
+    }
+
+    res.json({
+      url: imageUrl,
+      mode: generationMode,
+      cost: costEstimated
+    });
+
+  } catch (err) {
+    console.error("[Image Router] Generation Error:", err);
+    res.status(500).json({ error: 'Image generation failed.' });
   }
 });
 
