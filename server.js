@@ -108,7 +108,6 @@ app.post('/api/auth/session', async (req, res) => {
   // Allow mock JWT token fallback for local development (disabled in production)
   if (access_token === 'mock-supabase-jwt-token' && process.env.NODE_ENV !== 'production') {
     return res.json({
-      user: {
         email: "founder@growthsuite.co",
         name: "Shadi",
         role: "Owner",
@@ -142,6 +141,70 @@ app.post('/api/auth/session', async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: "Database authentication verification error" });
+  }
+});
+
+// ==========================================
+// 1.5. OAuth Integrations (Meta - Facebook/Instagram)
+// ==========================================
+
+const META_REDIRECT_URI = 'https://socialgrowth-production.up.railway.app/api/auth/meta/callback';
+
+app.get('/api/auth/meta', (req, res) => {
+  const { projectId } = req.query;
+  if (!projectId) return res.status(400).send("Missing projectId");
+  
+  // Scopes required for Facebook Pages and Instagram Professional
+  const scopes = 'pages_show_list,pages_manage_posts,pages_read_engagement,instagram_basic,instagram_content_publish';
+  const url = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${process.env.META_APP_ID}&redirect_uri=${encodeURIComponent(META_REDIRECT_URI)}&state=${projectId}&scope=${scopes}`;
+  
+  res.redirect(url);
+});
+
+app.get('/api/auth/meta/callback', async (req, res) => {
+  const { code, state: projectId } = req.query;
+  if (!code || !projectId) return res.redirect('/?error=oauth_failed');
+
+  try {
+    // 1. Exchange code for short-lived access token
+    const tokenUrl = `https://graph.facebook.com/v19.0/oauth/access_token?client_id=${process.env.META_APP_ID}&redirect_uri=${encodeURIComponent(META_REDIRECT_URI)}&client_secret=${process.env.META_APP_SECRET}&code=${code}`;
+    const tokenRes = await fetch(tokenUrl);
+    const tokenData = await tokenRes.json();
+    if (!tokenData.access_token) throw new Error("Failed to get short-lived token");
+
+    // 2. Exchange for long-lived access token
+    const longTokenUrl = `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${process.env.META_APP_ID}&client_secret=${process.env.META_APP_SECRET}&fb_exchange_token=${tokenData.access_token}`;
+    const longTokenRes = await fetch(longTokenUrl);
+    const longTokenData = await longTokenRes.json();
+    const accessToken = longTokenData.access_token || tokenData.access_token;
+
+    // 3. Fetch user's managed Facebook Pages
+    const pagesUrl = `https://graph.facebook.com/v19.0/me/accounts?access_token=${accessToken}`;
+    const pagesRes = await fetch(pagesUrl);
+    const pagesData = await pagesRes.json();
+
+    if (pagesData.data && pagesData.data.length > 0) {
+      if (!isDummyDb) {
+        // Encrypt and store each page as a social connection using the RPC to bypass RLS
+        for (const page of pagesData.data) {
+          const encryptedToken = encryptToken(page.access_token);
+          await supabase.rpc('insert_social_account', {
+            p_project_id: projectId,
+            p_platform: 'facebook',
+            p_account_name: page.name,
+            p_handle: page.id,
+            p_access_token_encrypted: encryptedToken
+          });
+          
+          // Optionally fetch Instagram accounts attached to the page if needed
+        }
+      }
+    }
+
+    res.redirect('/?integration=meta_success');
+  } catch (err) {
+    console.error("Meta OAuth Error:", err);
+    res.redirect('/?error=meta_oauth_failed');
   }
 });
 
