@@ -180,6 +180,12 @@
         <div class="nav-section-title">Content & Scheduling</div>
         <ul class="nav-list">
           <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('social-integrations', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+              Social Integrations
+            </div>
+          </li>
+          <li class="nav-item">
             <div class="nav-link" data-on-click="switchView('social-calendar', this)">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
               Social Calendar
@@ -773,6 +779,56 @@
             <span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; display:block; margin-bottom:8px;">SUGGESTED RESPONSES</span>
             <div style="display:flex; flex-direction:column; gap:8px;" id="inbox-ai-replies-box">
               <div style="font-size:0.75rem; color:var(--text-sub); text-align:center; padding:20px 0;">Select chat thread to generate options</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4.5: SOCIAL INTEGRATIONS -->
+      <section id="view-social-integrations" class="view-panel">
+        <div class="glass-card">
+          <h3 class="card-title">Social Media Integrations</h3>
+          <div class="card-subtitle" style="margin-bottom:24px;">Connect your social media accounts to enable automated publishing and AI analytics.</div>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+            <!-- Instagram -->
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+              <div style="width:64px; height:64px; border-radius:16px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                <svg fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2" width="32" height="32"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+              </div>
+              <h4 style="color:white; margin:0 0 8px 0; font-size:1.1rem;">Instagram</h4>
+              <p style="color:var(--text-muted); font-size:0.85rem; margin:0 0 20px 0; line-height:1.4;">Automate posts, reels, and stories directly to your Instagram Professional Account.</p>
+              <button class="btn btn-primary" style="width: 100%;" data-on-click="showToast('OAuth Integration Mode: Waiting for Developer API Keys.', 'info')">Connect Account</button>
+            </div>
+
+            <!-- TikTok -->
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+              <div style="width:64px; height:64px; border-radius:16px; background: #000000; border: 1px solid #333; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                <svg fill="currentColor" viewBox="0 0 24 24" stroke="none" width="32" height="32" color="white"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 15.68a6.34 6.34 0 006.32 6.32 6.32 6.32 0 006.32-6.28V9.32a8.27 8.27 0 004.35 1.25V7.12a4.67 4.67 0 01-2.4-.68z"></path></svg>
+              </div>
+              <h4 style="color:white; margin:0 0 8px 0; font-size:1.1rem;">TikTok</h4>
+              <p style="color:var(--text-muted); font-size:0.85rem; margin:0 0 20px 0; line-height:1.4;">Schedule videos and analyze your viral growth trends.</p>
+              <button class="btn btn-primary" style="width: 100%;" data-on-click="showToast('OAuth Integration Mode: Waiting for Developer API Keys.', 'info')">Connect Account</button>
+            </div>
+
+            <!-- Facebook -->
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+              <div style="width:64px; height:64px; border-radius:16px; background: #1877F2; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                <svg fill="white" viewBox="0 0 24 24" width="32" height="32"><path d="M12 2.04c-5.5 0-10 4.48-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.19 2.23.19v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.9h-2.34v7a10 10 0 008.44-9.9c0-5.54-4.5-10.02-10-10.02z"></path></svg>
+              </div>
+              <h4 style="color:white; margin:0 0 8px 0; font-size:1.1rem;">Facebook Page</h4>
+              <p style="color:var(--text-muted); font-size:0.85rem; margin:0 0 20px 0; line-height:1.4;">Sync with your brand's Facebook page to manage content and replies.</p>
+              <button class="btn btn-primary" style="width: 100%;" data-on-click="showToast('OAuth Integration Mode: Waiting for Developer API Keys.', 'info')">Connect Account</button>
+            </div>
+
+            <!-- X (Twitter) -->
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+              <div style="width:64px; height:64px; border-radius:16px; background: #000000; border: 1px solid #333; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                <svg fill="white" viewBox="0 0 24 24" width="32" height="32"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+              </div>
+              <h4 style="color:white; margin:0 0 8px 0; font-size:1.1rem;">X (Twitter)</h4>
+              <p style="color:var(--text-muted); font-size:0.85rem; margin:0 0 20px 0; line-height:1.4;">Schedule threads, engage with followers, and track viral reach.</p>
+              <button class="btn btn-primary" style="width: 100%;" data-on-click="showToast('OAuth Integration Mode: Waiting for Developer API Keys.', 'info')">Connect Account</button>
             </div>
           </div>
         </div>
