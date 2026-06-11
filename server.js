@@ -521,18 +521,35 @@ app.get('/api/ai/growth-intelligence', (req, res) => {
 });
 
 // Priority 11: Multi-Agent Orchestration Stepper
+const { runMarketingOrchestration } = require('./aiOrchestrator');
+
 app.post('/api/agents/orchestration/trigger', async (req, res) => {
-  res.json({
-    orchestrationId: crypto.randomUUID(),
-    steps: [
-      { agent: "AnalyticsAgent", log: "Detected MRR conversion drops on fitness segments." },
-      { agent: "GrowthAgent", log: "Scanned competitor freeletics pricing models updates." },
-      { agent: "ASOAgent", log: "Optimized app store subtitle metadata tags." },
-      { agent: "MarketingAgent", log: "Planned smartwatch challenge launch campaign." },
-      { agent: "ContentAgent", log: "Generated copy variants for X/Twitter threads." },
-      { agent: "SchedulerAgent", log: "Dispatched and scheduled posts in queue." }
-    ]
-  });
+  const { goal, appId } = req.body;
+  if (!goal) {
+    // Fallback to demo mode for older UI calls
+    return res.json({
+      orchestrationId: crypto.randomUUID(),
+      steps: [
+        { agent: "CMO Agent", log: "Drafting strategy for default pipeline." },
+        { agent: "AnalyticsAgent", log: "Detected MRR conversion drops on fitness segments." },
+        { agent: "GrowthAgent", log: "Scanned competitor pricing models updates." },
+        { agent: "ASOAgent", log: "Optimized app store subtitle metadata tags." },
+        { agent: "MarketingAgent", log: "Planned challenge launch campaign." },
+        { agent: "ContentAgent", log: "Generated copy variants for social threads." },
+        { agent: "System", log: "Awaiting CEO Approval." }
+      ]
+    });
+  }
+
+  // Real Multi-Agent Orchestration Loop
+  const authHeader = req.headers.authorization;
+  const result = await runMarketingOrchestration(goal, authHeader, appId);
+  
+  if (result.success) {
+    res.json(result);
+  } else {
+    res.status(500).json({ error: result.error });
+  }
 });
 
 // Priority 16: Database & SQL Console execute

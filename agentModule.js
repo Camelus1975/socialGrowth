@@ -84,16 +84,38 @@ export function appendTerminalLog(sender, message) {
   consoleEl.scrollTop = consoleEl.scrollHeight;
 }
 
-export function submitAgentConsoleCommand() {
+export async function submitAgentConsoleCommand() {
   const input = document.getElementById('agent-console-input');
   if (!input) return;
   const cmd = input.value.trim();
   if (cmd) {
     appendTerminalLog('founder', cmd);
     input.value = '';
-    setTimeout(() => {
-      appendTerminalLog('growth-agent', "Growth Agent: Parsing direct query command parameters. Dispatching tasks...");
-    }, 1000);
+    appendTerminalLog('CMO Agent', "Received executive command. Drafting strategy and organizing AI task force... (Please wait ~15s)");
+    
+    // Call the real backend orchestration
+    try {
+      const data = await requestApi('/api/agents/orchestration/trigger', {
+        method: 'POST',
+        body: JSON.stringify({ goal: cmd, appId: state.currentActiveApp })
+      });
+      
+      if (data.success && data.steps) {
+        data.steps.forEach(step => {
+          appendTerminalLog(step.agent, step.log);
+        });
+        
+        // Render final CMO Strategy output
+        if (data.cmoStrategy) {
+          appendTerminalLog('Campaign Manager', "Campaign Portfolio is ready for your review. Check the Strategy Logs.");
+        }
+      } else {
+        appendTerminalLog('System', "Orchestration Pipeline failed to process request.");
+      }
+    } catch (err) {
+      console.error(err);
+      appendTerminalLog('System', "Error communicating with Orchestrator API.");
+    }
   }
 }
 
@@ -120,15 +142,20 @@ export async function startOrchestrationPipelineSimulation() {
   ];
   
   try {
-    const data = await requestApi('/api/agents/orchestration/trigger', { method: 'POST' });
-    steps = [
-      { node: 'node-analytics', status: data.steps[0].log, desc: "Funnel checks show active user drops.", line: 'line-an-gr' },
-      { node: 'node-growth', status: data.steps[1].log, desc: "Identified competitor launched campaign updates.", line: 'line-gr-aso' },
-      { node: 'node-aso', status: data.steps[2].log, desc: "Recommended keyword metadata tags.", line: 'line-aso-mkt' },
-      { node: 'node-marketing', status: data.steps[3].log, desc: "Constructing launch calendar sequences.", line: 'line-mkt-cnt' },
-      { node: 'node-content', status: data.steps[4].log, desc: "Created copy variant campaigns packages.", line: 'line-cnt-sch' },
-      { node: 'node-scheduler', status: data.steps[5].log, desc: "Dispatched posts in queue scheduler.", line: null }
-    ];
+    const data = await requestApi('/api/agents/orchestration/trigger', { 
+      method: 'POST',
+      body: JSON.stringify({ goal: "Demo pipeline run", appId: state.currentActiveApp })
+    });
+    if (data && data.steps && data.steps.length >= 6) {
+      steps = [
+        { node: 'node-analytics', status: data.steps[1]?.log || "Analytics Agent checking stats.", desc: "Funnel checks show active user drops.", line: 'line-an-gr' },
+        { node: 'node-growth', status: data.steps[2]?.log || "Growth agent identifying gaps.", desc: "Identified competitor launched campaign updates.", line: 'line-gr-aso' },
+        { node: 'node-aso', status: data.steps[3]?.log || "ASO Agent checking metadata.", desc: "Recommended keyword metadata tags.", line: 'line-aso-mkt' },
+        { node: 'node-marketing', status: data.steps[4]?.log || "Marketing agent planning.", desc: "Constructing launch calendar sequences.", line: 'line-mkt-cnt' },
+        { node: 'node-content', status: data.steps[5]?.log || "Content writer generating text.", desc: "Created copy variant campaigns packages.", line: 'line-cnt-sch' },
+        { node: 'node-scheduler', status: data.steps[6]?.log || "System awaiting CEO approval.", desc: "Dispatched posts in queue scheduler.", line: null }
+      ];
+    }
   } catch (err) {
     console.warn("Express orchestration pipeline offline. Relying on default simulation variables.");
   }
