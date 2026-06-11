@@ -108,6 +108,7 @@ app.post('/api/auth/session', async (req, res) => {
   // Allow mock JWT token fallback for local development (disabled in production)
   if (access_token === 'mock-supabase-jwt-token' && process.env.NODE_ENV !== 'production') {
     return res.json({
+      user: {
         email: "founder@growthsuite.co",
         name: "Shadi",
         role: "Owner",
