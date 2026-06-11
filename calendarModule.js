@@ -1,7 +1,7 @@
 // App Founder Growth Suite - Calendar Module
 import { state } from './state.js';
 import { createSafeElement, requestApi, showToast, openModal, closeModal } from './common.js';
-
+import { getSupabaseClient } from './auth.js';
 export function initCalendar() {
   state.on('appChanged', () => {
     if (state.currentActiveView === 'social-calendar') fetchCalendarPosts();
@@ -19,12 +19,39 @@ export function initCalendar() {
 }
 
 export async function fetchCalendarPosts() {
-  try {
-    const data = await requestApi(`/api/calendar/posts?appId=${state.currentActiveApp}`);
-    state.calendarState[state.currentActiveApp] = data.posts;
-  } catch (err) {
-    console.warn("Backend server offline. Relying on local scheduled calendar state.");
+  if (!state.currentActiveApp) return;
+  
+  // Initialize state array if it doesn't exist to prevent crashes
+  if (!state.calendarState[state.currentActiveApp]) {
+    state.calendarState[state.currentActiveApp] = [];
   }
+  
+  try {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('scheduled_posts')
+        .select('*')
+        .eq('app_id', state.currentActiveApp);
+        
+      if (error) throw error;
+      
+      if (data) {
+        state.calendarState[state.currentActiveApp] = data.map(dbPost => ({
+          id: dbPost.id,
+          date: dbPost.scheduled_date,
+          time: dbPost.scheduled_time,
+          platform: dbPost.platform,
+          text: dbPost.content,
+          status: dbPost.status,
+          approval: "Approved"
+        }));
+      }
+    }
+  } catch (err) {
+    console.warn("Could not fetch calendar posts from Supabase", err);
+  }
+  
   renderCalendarView();
 }
 
@@ -105,7 +132,7 @@ async function saveCalendarPostFromModal() {
   }
   
   const newPost = {
-    id: "cal_new_" + Date.now(),
+    id: "cal_new_" + Date.now(), // Fallback ID
     date: date,
     time: time,
     platform: platform,
@@ -115,15 +142,40 @@ async function saveCalendarPostFromModal() {
   };
   
   try {
-    await requestApi('/api/calendar/schedule', {
-      method: 'POST',
-      body: JSON.stringify(newPost)
-    });
-    showToast("Post scheduled successfully! Queue conflicts checked.", "success");
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase.from('scheduled_posts').insert({
+          user_id: user.id,
+          app_id: state.currentActiveApp,
+          platform: platform,
+          content: text,
+          scheduled_date: date,
+          scheduled_time: time,
+          status: 'scheduled'
+        }).select();
+        
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          newPost.id = data[0].id;
+        }
+        showToast(`Post scheduled to ${platform} successfully!`, "success");
+      } else {
+        throw new Error("Not logged in");
+      }
+    } else {
+      throw new Error("No Supabase client");
+    }
   } catch (err) {
-    showToast("Post scheduled locally. (Express Offline)", "success");
+    console.warn("Could not save to Supabase. Saving locally.", err);
+    showToast("Post scheduled locally. (Backend Offline)", "success");
   }
   
+  if (!state.calendarState[state.currentActiveApp]) {
+    state.calendarState[state.currentActiveApp] = [];
+  }
   state.calendarState[state.currentActiveApp].push(newPost);
   closeModal('calendar-create-modal');
   renderCalendarView();
