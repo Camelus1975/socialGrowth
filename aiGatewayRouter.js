@@ -42,7 +42,7 @@ async function callLLM(tier, prompt, contextData, tone) {
 
   // Construct context string if data is provided (e.g., from pgvector or materialized views)
   let userMessage = prompt;
-  if (contextData && contextData.length > 0) {
+  if (contextData && (Array.isArray(contextData) ? contextData.length > 0 : Object.keys(contextData).length > 0)) {
      userMessage += `\n\nContext Data:\n${JSON.stringify(contextData)}`;
   }
 

@@ -382,56 +382,71 @@ app.post('/api/db/query', async (req, res) => {
 // ------------------------------------------
 
 app.get('/api/content-intelligence/performance', async (req, res) => {
+  const appId = req.query.appId;
+  let mvData = null;
+  let realPosts = [];
+
   try {
-    if (isDummyDb) throw new Error("Offline Mode");
-    const { data, error } = await supabase
-      .from('historical_content')
-      .select('*')
-      .order('success_score', { ascending: false });
+    if (!isDummyDb && appId) {
+      // Fetch real SQL-aggregated stats from the Materialized View (Tier 4 Cost Optimization)
+      const { data } = await supabase
+        .from('mv_app_analytics_rollup')
+        .select('*')
+        .eq('app_id', appId)
+        .single();
+      if (data) mvData = data;
       
-    if (error) throw error;
-    res.json({ posts: data });
+      const { data: postsData } = await supabase
+        .from('apps_posts')
+        .select('id, platform, content_type as type, content_text as caption, success_score, reach, likes, ctr, conversions as downloads, revenue')
+        .eq('app_id', appId)
+        .order('success_score', { ascending: false })
+        .limit(3);
+      if (postsData) realPosts = postsData;
+    }
   } catch (err) {
-    // Fallback data
-    res.json({
-      averageScore: 74.5,
-      totalRevenue: 28450.00,
-      totalDownloads: 12450,
-      totalLeads: 3100,
-      topPosts: [
-        { id: "hist_1", platform: "twitter", type: "Founder Story", caption: "Why we bootstrapped FitPulse to $10k MRR in 6 months as indie creators. 🧵", success_score: 92.00, reach: 45000, likes: 1200, ctr: 4.80, downloads: 350, revenue: 1200.00 },
-        { id: "hist_2", platform: "linkedin", type: "Review/Testimonial", caption: "Elena Rostova saved 6 hours/week tracking workout routines using our WearOS widgets. Read her story:", success_score: 88.00, reach: 28000, likes: 980, ctr: 5.20, downloads: 210, revenue: 840.00 },
-        { id: "hist_3", platform: "twitter", type: "Product Launch", caption: "The wait is over. FitPulse smartwatch workout trackers are officially live! 🚀", success_score: 78.00, reach: 35000, likes: 850, ctr: 3.90, downloads: 410, revenue: 1640.00 }
-      ],
-      postingTimes: {
-        best: [
-          { platform: "twitter", time: "Tuesday 10:00 AM", score: 88 },
-          { platform: "linkedin", time: "Wednesday 09:00 AM", score: 92 },
-          { platform: "instagram", time: "Friday 08:00 PM", score: 85 }
-        ],
-        worst: [
-          { platform: "twitter", time: "Sunday 11:00 PM", score: 18 },
-          { platform: "linkedin", time: "Saturday 04:00 PM", score: 12 }
-        ]
-      },
-      hashtags: {
-        best: [
-          { hashtag: "#IndieHacker", impact: "+24% Reach" },
-          { hashtag: "#SaaSGrowth", impact: "+18% Clicks" },
-          { hashtag: "#FitnessTech", impact: "+32% Downloads" }
-        ],
-        worst: [
-          { hashtag: "#FitnessInspiration", impact: "-4% Reach" },
-          { hashtag: "#WorkoutGoals", impact: "-2% Clicks" }
-        ]
-      },
-      ctas: [
-        { cta: "Try Free", ctr: "5.4%", conversions: "3.2%", downloads: 1450, revenue: 5800.00 },
-        { cta: "Download Now", ctr: "4.8%", conversions: "2.8%", downloads: 1210, revenue: 4840.00 },
-        { cta: "Learn More", ctr: "3.2%", conversions: "1.1%", downloads: 340, revenue: 1360.00 }
-      ]
-    });
+    console.log("Materialized view fetch error:", err.message);
   }
+
+  // Serve real DB data if available, otherwise fallback to UI placeholders
+  res.json({
+    averageScore: mvData?.avg_success_score ? Number(mvData.avg_success_score).toFixed(1) : 74.5,
+    totalRevenue: mvData?.total_revenue || 28450.00,
+    totalDownloads: mvData?.total_conversions || 12450,
+    totalLeads: mvData?.total_engagement || 3100,
+    topPosts: realPosts.length > 0 ? realPosts : [
+      { id: "hist_1", platform: "twitter", type: "Founder Story", caption: "Why we bootstrapped FitPulse to $10k MRR in 6 months as indie creators. 🧵", success_score: 92.00, reach: 45000, likes: 1200, ctr: 4.80, downloads: 350, revenue: 1200.00 },
+      { id: "hist_2", platform: "linkedin", type: "Review/Testimonial", caption: "Elena Rostova saved 6 hours/week tracking workout routines using our WearOS widgets. Read her story:", success_score: 88.00, reach: 28000, likes: 980, ctr: 5.20, downloads: 210, revenue: 840.00 },
+      { id: "hist_3", platform: "twitter", type: "Product Launch", caption: "The wait is over. FitPulse smartwatch workout trackers are officially live! 🚀", success_score: 78.00, reach: 35000, likes: 850, ctr: 3.90, downloads: 410, revenue: 1640.00 }
+    ],
+    postingTimes: {
+      best: [
+        { platform: "twitter", time: "Tuesday 10:00 AM", score: 88 },
+        { platform: "linkedin", time: "Wednesday 09:00 AM", score: 92 },
+        { platform: "instagram", time: "Friday 08:00 PM", score: 85 }
+      ],
+      worst: [
+        { platform: "twitter", time: "Sunday 11:00 PM", score: 18 },
+        { platform: "linkedin", time: "Saturday 04:00 PM", score: 12 }
+      ]
+    },
+    hashtags: {
+      best: [
+        { hashtag: "#IndieHacker", impact: "+24% Reach" },
+        { hashtag: "#SaaSGrowth", impact: "+18% Clicks" },
+        { hashtag: "#FitnessTech", impact: "+32% Downloads" }
+      ],
+      worst: [
+        { hashtag: "#FitnessInspiration", impact: "-4% Reach" },
+        { hashtag: "#WorkoutGoals", impact: "-2% Clicks" }
+      ]
+    },
+    ctas: [
+      { cta: "Try Free", ctr: "5.4%", conversions: "3.2%", downloads: 1450, revenue: 5800.00 },
+      { cta: "Download Now", ctr: "4.8%", conversions: "2.8%", downloads: 1210, revenue: 4840.00 },
+      { cta: "Learn More", ctr: "3.2%", conversions: "1.1%", downloads: 340, revenue: 1360.00 }
+    ]
+  });
 });
 
 app.post('/api/content-intelligence/predict', (req, res) => {
@@ -489,25 +504,7 @@ app.post('/api/content-intelligence/recycle', (req, res) => {
   });
 });
 
-app.post('/api/content-intelligence/coach', (req, res) => {
-  const { question } = req.body;
-  if (!question) return res.status(400).json({ error: "Question query required." });
-  
-  let answer = "";
-  const query = question.toLowerCase();
-  
-  if (query.includes("why") || query.includes("fail")) {
-    answer = "Based on our database audit, posts that underperform (Success Score < 45) share three common attributes:\n\n1. **Lack of strong CTAs**: 80% of failing posts only include informational copy without directing users to a signup/download URL.\n2. **Text-only formats**: Media audits show text-only updates produce 42% less engagement compared to updates attaching screenshots or charts.\n3. **Posting off-peak**: Publishing during weekend afternoons results in 60% lower reach due to timezone inactivity.";
-  } else if (query.includes("download") || query.includes("revenue")) {
-    answer = "Our CTA and conversion trackers show that the **'Try Free'** call-to-action drives the highest downloads (1,450 conversions) and leads to the highest revenue cohort. Furthermore, posts categorized under **'Founder Stories'** and **'Customer Testimonials'** yield a 31% higher conversion CTR than feature announcements.";
-  } else if (query.includes("next week") || query.includes("what should i")) {
-    answer = "Here is your recommended Content Strategy for next week:\n\n- **Tuesday 10:00 AM (LinkedIn)**: Post a customer success testimonial quote (Elena's Watch App sync story) attaching a high-quality mockup graphic, utilizing the 'Try Free' CTA.\n- **Wednesday 09:00 AM (Twitter)**: Publish a thread detailing a 'Founder Story' explaining your development challenges with the new WearOS module.\n- **Friday 08:00 PM (Instagram)**: Post an image carousel displaying product screenshots focusing on gym checklists.";
-  } else {
-    answer = "Our analysis engine suggests focusing content strategies on **Founder Stories** (highest engagement) and **Customer Testimonials** (highest downloads). Schedule posts for **Tuesday/Wednesday mornings** and utilize **#IndieHacker** and **#SaaSGrowth** hashtags for optimized reach.";
-  }
-  
-  res.json({ answer });
-});
+// Removed mock /coach endpoint. Handled by /api/ai-gateway/generate instead!
 
 app.get('/api/content-intelligence/report', (req, res) => {
   const reportContent = `=========================================

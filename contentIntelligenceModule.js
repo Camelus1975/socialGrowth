@@ -373,12 +373,17 @@ export async function askContentCoach(presetQuestion = '') {
   
   let result = null;
   try {
-    result = await requestApi('/api/content-intelligence/coach', {
+    result = await requestApi('/api/ai-gateway/generate', {
       method: 'POST',
-      body: JSON.stringify({ question })
+      body: JSON.stringify({ 
+        taskType: 'copilot',
+        prompt: question,
+        contextData: intelligenceData
+      })
     });
   } catch (err) {
-    result = { answer: "Our metrics logs suggest focusing on testimonials and posting on Tuesday mornings." };
+    console.error("AI Gateway Copilot Error:", err);
+    result = { answer: "I'm having trouble connecting to the AI Gateway. Please check your OpenAI API keys and network." };
   }
   
   setTimeout(() => {
@@ -394,7 +399,8 @@ export async function askContentCoach(presetQuestion = '') {
     coachText.style.background = 'rgba(255,255,255,0.02)';
     coachText.style.border = '1px solid var(--border-glass)';
     
-    const paragraphs = result.answer.split('\n');
+    const answerText = result.copy?.variant_a || result.answer || "No response received.";
+    const paragraphs = answerText.split('\n');
     paragraphs.forEach((p, idx) => {
       if (idx > 0) coachText.appendChild(document.createElement('br'));
       coachText.appendChild(document.createTextNode(p));
