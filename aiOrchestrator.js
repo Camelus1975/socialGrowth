@@ -1,6 +1,7 @@
 const { OpenAI } = require('openai');
 const config = require('./config');
 const { createClient } = require('@supabase/supabase-js');
+const { searchGrowthMemory } = require('./memoryEngine');
 
 const openai = new OpenAI({
   apiKey: config.OPENAI_API_KEY,
@@ -60,14 +61,28 @@ async function runMarketingOrchestration(goal, authHeader, appId) {
   });
 
   try {
-    // 1. CMO Strategy Phase
+    // 1. RAG Memory Retrieval Phase
+    steps.push({ agent: "System", log: `Searching Growth Memory Engine for past insights on: "${appId}"...` });
+    const relevantMemories = await searchGrowthMemory(goal, appId, supabase, 5);
+    let memoryContext = "";
+    if (relevantMemories.length > 0) {
+      memoryContext = "Historical Growth Memories & Lessons Learned:\n";
+      relevantMemories.forEach((mem, idx) => {
+        memoryContext += `${idx + 1}. ${mem.content_text}\n`;
+      });
+      steps.push({ agent: "System", log: `Found ${relevantMemories.length} relevant historical memories. Injecting into CMO context.` });
+    } else {
+      steps.push({ agent: "System", log: "No relevant historical memories found. Relying on baseline intelligence." });
+    }
+
+    // 2. CMO Strategy Phase
     steps.push({ agent: "CMO Agent", log: `Drafting strategy for goal: "${goal}"` });
     
     const cmoResponse = await openai.chat.completions.create({
       model: "gpt-4o", // Strategy requires deep reasoning
       messages: [
         { role: "system", content: AGENT_PROMPTS.CMO },
-        { role: "user", content: `App: ${appId}. Goal: ${goal}` }
+        { role: "user", content: `App: ${appId}. Goal: ${goal}\n\n${memoryContext}` }
       ],
       response_format: { type: "json_object" }
     });

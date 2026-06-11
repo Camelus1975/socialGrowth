@@ -77,6 +77,8 @@ import {
   downloadWeeklyReport
 } from './contentIntelligenceModule.js';
 
+import { searchGrowthMemoryUI } from './memoryModule.js';
+
 import {
   initAuth,
   loginWithEmail,
@@ -772,6 +774,14 @@ function callFunction(name, args, element, event) {
     createCrossPromoAssets,
     copyCrossPromoText,
     downloadExecutiveReport,
+    
+    // Auth
+    toggleAuthMode,
+    logout,
+    
+    // Memory Engine
+    searchGrowthMemoryUI,
+    
     loadReviewInMockup,
     triggerQuickAction,
     generateStudioContent,

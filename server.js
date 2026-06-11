@@ -553,6 +553,20 @@ app.post('/api/agents/orchestration/trigger', async (req, res) => {
 });
 
 // Priority 16: Database & SQL Console execute
+const { handleUniversalWebhook } = require('./memoryEngine');
+
+app.post('/api/webhooks/ingest', async (req, res) => {
+  const payload = req.body;
+  const authHeader = req.headers.authorization;
+  
+  if (!payload) return res.status(400).json({ error: "Missing payload" });
+
+  // Offload to Growth Memory Engine asynchronously
+  handleUniversalWebhook(payload, authHeader).catch(err => console.error("Webhook processing error:", err));
+
+  res.status(200).json({ success: true, message: "Webhook accepted by Growth Memory Engine" });
+});
+
 app.post('/api/db/query', async (req, res) => {
   const { statement } = req.body;
   if (!statement) {
