@@ -63,7 +63,9 @@ import {
   generateWeeklyGrowthReport, 
   createCrossPromoAssets, 
   copyCrossPromoText, 
-  downloadExecutiveReport 
+  downloadExecutiveReport,
+  generateStudioContent,
+  recycleStudioContent
 } from './studioModule.js';
 
 import {
@@ -772,6 +774,8 @@ function callFunction(name, args, element, event) {
     downloadExecutiveReport,
     loadReviewInMockup,
     triggerQuickAction,
+    generateStudioContent,
+    recycleStudioContent,
     
     // Content Intelligence
     runSuccessPrediction,

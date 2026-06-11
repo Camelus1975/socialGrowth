@@ -325,6 +325,37 @@ export async function generateStudioContent() {
   showToast("Copy variations successfully created!", "success");
 }
 
+export async function recycleStudioContent() {
+  const promptEl = document.getElementById('studio-prompt');
+  const promptText = promptEl.value.trim();
+  const app = state.appsData[state.currentActiveApp];
+  
+  if (!promptText) {
+    showToast("Please type a topic first so we can find relevant past content!", "error");
+    return;
+  }
+  
+  showToast("Vector searching database for winning past content...", "success");
+  
+  try {
+    const res = await requestApi('/api/ai-gateway/search-similar', {
+      method: 'POST',
+      body: JSON.stringify({ query: promptText, appId: app.id })
+    });
+    
+    if (res.results && res.results.length > 0) {
+      showToast("Found 3 highly similar past posts! Injecting as context...", "success");
+      // Append the results to the prompt box so the LLM uses it as context when Generate is clicked
+      promptEl.value = promptText + "\n\n--- INSPIRATION CONTENT ---\n" + res.results.join("\n\n");
+    } else {
+      showToast("No similar past content found for this brand yet.", "error");
+    }
+  } catch (err) {
+    console.error("Failed to recycle content:", err);
+    showToast("Vector search failed. Is pgvector enabled?", "error");
+  }
+}
+
 // ------------------------------------------
 // RECYCLER & COPILOT VIEW
 // ------------------------------------------

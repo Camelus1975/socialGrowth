@@ -892,7 +892,13 @@
               </div>
 
               <div class="form-group">
-                <label for="studio-prompt">Campaign Topic / Features Outline</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <label for="studio-prompt" style="margin-bottom: 0;">Campaign Topic / Features Outline</label>
+                  <button id="btn-recycle-content" class="btn btn-outline" style="font-size: 0.8rem; padding: 4px 10px;" data-on-click="recycleStudioContent()">
+                    <svg fill="currentColor" viewBox="0 0 24 24" width="14" height="14" style="margin-right: 4px; vertical-align: text-bottom;"><path d="M12 2.75a9.25 9.25 0 104.737 17.197l-1.423-1.424A7.25 7.25 0 1119.25 12h-2l3.5-3.5 3.5 3.5h-2a9.25 9.25 0 00-10.25-9.25z"></path></svg>
+                    Recycle Winning Content
+                  </button>
+                </div>
                 <textarea id="studio-prompt" rows="5" placeholder="e.g. Announcing the new smartwatch exercise logs built inside FitPulse AI. Highlight fitness challenges features."></textarea>
               </div>
 

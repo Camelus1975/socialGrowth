@@ -162,6 +162,17 @@ async function saveCalendarPostFromModal() {
           newPost.id = data[0].id;
         }
         showToast(`Post scheduled to ${platform} successfully!`, "success");
+
+        // Fire and forget to Embeddings Engine
+        requestApi('/api/ai-gateway/embed', {
+          method: 'POST',
+          body: JSON.stringify({
+            text: text,
+            appId: state.currentActiveApp,
+            contentType: 'post'
+          })
+        }).catch(err => console.error("Embedding generation failed:", err));
+
       } else {
         throw new Error("Not logged in");
       }

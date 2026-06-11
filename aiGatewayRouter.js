@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { OpenAI } = require('openai');
+const { createClient } = require('@supabase/supabase-js');
 const config = require('./config');
 
 const openai = new OpenAI({
@@ -111,6 +112,87 @@ router.post('/generate', async (req, res) => {
   } catch (err) {
     console.error("[AI Gateway] LLM Execution Error:", err);
     res.status(500).json({ error: 'AI Gateway failed to process request. Ensure OpenAI keys are valid.' });
+  }
+});
+
+// Endpoint: Generate and Store Embedding
+router.post('/embed', async (req, res) => {
+  const { text, appId, contentType } = req.body;
+  if (!text || !appId || !contentType) {
+    return res.status(400).json({ error: 'Missing required parameters.' });
+  }
+
+  try {
+    // 1. Generate Embedding via OpenAI
+    const embeddingResponse = await openai.embeddings.create({
+      model: 'text-embedding-3-small',
+      input: text,
+      encoding_format: 'float',
+    });
+    
+    const vector = embeddingResponse.data[0].embedding;
+
+    // 2. Initialize scoped Supabase client with user's JWT for RLS
+    const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: req.headers.authorization } }
+    });
+
+    // 3. Store in Vector Database
+    const { error } = await supabase
+      .from('ai_content_embeddings')
+      .insert({
+        user_id: req.user.id,
+        app_id: appId,
+        content_type: contentType,
+        content_text: text,
+        embedding: vector
+      });
+
+    if (error) throw error;
+    res.json({ success: true, message: 'Content vectorized and stored successfully.' });
+    
+  } catch (err) {
+    console.error("[AI Gateway] Embedding Error:", err);
+    res.status(500).json({ error: 'Failed to generate embedding.' });
+  }
+});
+
+// Endpoint: Search Similar Content via pgvector
+router.post('/search-similar', async (req, res) => {
+  const { query } = req.body;
+  if (!query) return res.status(400).json({ error: 'Missing search query.' });
+
+  try {
+    // 1. Generate query embedding
+    const embeddingResponse = await openai.embeddings.create({
+      model: 'text-embedding-3-small',
+      input: query,
+      encoding_format: 'float',
+    });
+    
+    const queryVector = embeddingResponse.data[0].embedding;
+
+    // 2. Initialize scoped client
+    const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: req.headers.authorization } }
+    });
+
+    // 3. Perform Vector Similarity Search (via our RPC)
+    const { data, error } = await supabase.rpc('match_content_embeddings', {
+      query_embedding: queryVector,
+      match_threshold: 0.3, // Return results with >30% similarity
+      match_count: 3,       // Top 3 results
+      search_user_id: req.user.id // Enforce user bounds (cross-brand enabled)
+    });
+
+    if (error) throw error;
+    
+    // We just return the actual text content of the winning posts
+    res.json({ results: data.map(d => d.content_text) });
+    
+  } catch (err) {
+    console.error("[AI Gateway] Vector Search Error:", err);
+    res.status(500).json({ error: 'Failed to perform vector search.' });
   }
 });
 
