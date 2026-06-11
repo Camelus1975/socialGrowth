@@ -7,6 +7,10 @@ const SUPABASE_ANON_KEY = window.__SUPABASE_ANON_KEY__ || '';
 
 let supabaseClient = null;
 
+export function getSupabaseClient() {
+  return supabaseClient;
+}
+
 // Fetch config from backend and initialize Supabase
 export async function initAuth() {
   try {

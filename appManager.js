@@ -3,6 +3,8 @@ import { state } from './state.js';
 import { API_URL, showToast, closeModal, requestApi } from './common.js';
 import { selectActiveApp } from './app.js';
 
+import { getSupabaseClient } from './auth.js';
+
 // Random gradient generator for new apps
 function getRandomGradient() {
   const gradients = [
@@ -85,16 +87,21 @@ export function initAppManager() {
         reviews: [],
         roadmap: [
           { status: "planned", task: "Initial Launch", team: "Growth", progress: 0 }
-        ]
+        ],
+        analytics: {
+          months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          mrr: [0, 0, 0, 0, 0, 0],
+          downloads: [0, 0, 0, 0, 0, 0]
+        }
       };
       
-      // Attempt to save to Supabase via backend (we will implement the backend route later, or fail gracefully)
+      // Attempt to save to Supabase via backend
       try {
-        const token = localStorage.getItem('supabase_jwt_token');
-        if (token && window.supabase) {
-           const { data: { user } } = await window.supabase.auth.getUser();
+        const supabase = getSupabaseClient();
+        if (supabase) {
+           const { data: { user } } = await supabase.auth.getUser();
            if (user) {
-             const { error } = await window.supabase.from('apps').insert({
+             const { error } = await supabase.from('apps').insert({
                user_id: user.id,
                app_id: appId,
                name: name,
@@ -104,7 +111,7 @@ export function initAppManager() {
              });
              
              if (error) {
-               console.warn("Could not save to Supabase apps table. Table might not exist yet.", error);
+               console.warn("Could not save to Supabase apps table.", error);
              } else {
                console.log("App saved to Supabase!");
              }
@@ -140,9 +147,9 @@ export function initAppManager() {
 // Fetch apps from Supabase
 export async function fetchUserApps() {
   try {
-    const token = localStorage.getItem('supabase_jwt_token');
-    if (token && window.supabase) {
-      const { data, error } = await window.supabase.from('apps').select('*');
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      const { data, error } = await supabase.from('apps').select('*');
       if (error) throw error;
       
       if (data && data.length > 0) {
@@ -167,7 +174,12 @@ export async function fetchUserApps() {
             reviews: [],
             roadmap: [
                { status: "planned", task: "Grow App", team: "Marketing", progress: 10 }
-            ]
+            ],
+            analytics: {
+              months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+              mrr: [0, 0, 0, 0, 0, 0],
+              downloads: [0, 0, 0, 0, 0, 0]
+            }
           };
           if (!state.customRoadmapItems) state.customRoadmapItems = {};
           if (!state.customRoadmapItems[dbApp.app_id]) {
