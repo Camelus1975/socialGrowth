@@ -118,9 +118,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 // Boot the main application after auth
 async function bootApp() {
-  // Load data from global scope (mockData.js fallback)
-  loadLocalMockData();
-  
   // Fetch real apps from Supabase and merge
   await fetchUserApps();
   
@@ -141,10 +138,13 @@ async function bootApp() {
   // Render initial page views
   renderAppSelectorDropdown();
   
-  // Ensure we select a valid app, fallback to 'fitpulse' if currentActiveApp is invalid
-  if (!state.appsData[state.currentActiveApp]) {
-    const keys = Object.keys(state.appsData);
-    if (keys.length > 0) state.currentActiveApp = keys[0];
+  // Ensure we select a valid app, fallback to first if currentActiveApp is invalid
+  const keys = Object.keys(state.appsData);
+  if (!state.appsData[state.currentActiveApp] && keys.length > 0) {
+    state.currentActiveApp = keys[0];
+  } else if (keys.length === 0) {
+    state.currentActiveApp = null;
+    openModal('app-create-modal');
   }
   
   selectActiveApp(state.currentActiveApp);
@@ -261,7 +261,23 @@ window.addEventListener('click', (e) => {
 
 // Switch Selected Active App
 export function selectActiveApp(appId) {
-  if (!state.appsData[appId]) return;
+  if (!appId || !state.appsData[appId]) {
+    state.setActiveApp(null);
+    const activeName = document.getElementById('active-app-name');
+    const activeDot = document.getElementById('active-app-dot');
+    if (activeName) activeName.textContent = "No App Selected";
+    if (activeDot) activeDot.style.background = "#666";
+    
+    const headerName = document.getElementById('header-app-name');
+    const headerDot = document.getElementById('header-app-dot');
+    if (headerName) headerName.textContent = "No App Selected";
+    if (headerDot) headerDot.style.background = "#666";
+    
+    const sidebarName = document.getElementById('sidebar-app-name');
+    if (sidebarName) sidebarName.textContent = "No App Selected";
+    return;
+  }
+  
   state.setActiveApp(appId);
   
   const app = state.appsData[appId];

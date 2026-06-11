@@ -29,16 +29,15 @@ function toggleDashboardChart(metric) {
 
 export function renderDashboard() {
   const app = state.appsData[state.currentActiveApp];
-  if (!app) return;
   
   // Calculate Global Sums
   let totalMrr = 0, totalDownloads = 0, totalActive = 0, totalSubscribers = 0;
   
   Object.keys(state.appsData).forEach(key => {
-    totalMrr += state.appsData[key].mrr;
-    totalDownloads += state.appsData[key].downloads;
-    totalActive += state.appsData[key].activeUsers;
-    totalSubscribers += state.appsData[key].subscribers;
+    totalMrr += state.appsData[key].mrr || 0;
+    totalDownloads += state.appsData[key].downloads || 0;
+    totalActive += state.appsData[key].activeUsers || 0;
+    totalSubscribers += state.appsData[key].subscribers || 0;
   });
   
   // Update UI Elements safely using textContent
@@ -46,6 +45,14 @@ export function renderDashboard() {
   document.getElementById('global-downloads').textContent = totalDownloads.toLocaleString();
   document.getElementById('global-active').textContent = totalActive.toLocaleString();
   document.getElementById('global-subscribers').textContent = totalSubscribers.toLocaleString();
+  
+  if (!app) {
+    document.getElementById('selected-detail-title').textContent = `No App Selected`;
+    document.getElementById('app-detail-rating').textContent = `-`;
+    document.getElementById('app-detail-conversion').textContent = `-`;
+    document.getElementById('app-detail-growth').textContent = `-`;
+    return;
+  }
   
   document.getElementById('selected-detail-title').textContent = `${app.name} Overview`;
   document.getElementById('app-detail-rating').textContent = `${app.rating} ★`;

@@ -1,7 +1,7 @@
 // App Founder Growth Suite - Central ES6 State Manager
 
 export const state = {
-  currentActiveApp: 'fitpulse',
+  currentActiveApp: null,
   currentActiveView: 'founder-dash',
   activeMockupTheme: 'indigo',
   reviewFilterSentiment: 'all',
