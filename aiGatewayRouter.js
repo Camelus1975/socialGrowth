@@ -1,5 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const { OpenAI } = require('openai');
+const config = require('./config');
+
+const openai = new OpenAI({
+  apiKey: config.OPENAI_API_KEY,
+});
 
 /**
  * AI Gateway Router
@@ -23,49 +29,48 @@ function determineModelTier(taskType) {
   return 'TIER_4';
 }
 
-// Helper: Simulate the LLM API call based on the Tier
-async function callLLM(tier, prompt, contextData) {
-  // In a real implementation, this is where we'd use the OpenAI or Google SDKs
-  // e.g. if (tier === 'TIER_1') return openai.createChatCompletion({ model: 'gpt-4o-mini', ... })
-  
-  // Simulated delay for realism
-  await new Promise(r => setTimeout(r, tier === 'TIER_4' ? 1500 : 500));
-  
-  let modelUsed = '';
-  let content = '';
+// Helper: Execute OpenAI call based on the Tier
+async function callLLM(tier, prompt, contextData, tone) {
+  let modelToUse = 'gpt-4o-mini'; // Default to cheap model for Tier 1 & 2
+  let systemMessage = `You are an expert social media manager. Tone: ${tone || 'professional'}. Generate highly engaging content based on the user's prompt. Keep it concise, natively formatted for social platforms, and include relevant emojis and a CTA.`;
 
-  switch (tier) {
-    case 'TIER_1':
-      modelUsed = 'GPT-4o-Mini (Ultra Low Cost)';
-      content = `#growth #${prompt.replace(/\s+/g, '')} #startup`;
-      break;
-    case 'TIER_2':
-      modelUsed = 'GPT-4o-Mini (Standard Creation)';
-      content = `🚀 Say goodbye to manual work! Check out our new update regarding: ${prompt}`;
-      break;
-    case 'TIER_3':
-      modelUsed = 'GPT-4o (Advanced Analysis)';
-      content = `Based on the ${contextData?.length || 0} summarized data points provided, here is your growth analysis on ${prompt}: Engagement is trending up.`;
-      break;
-    case 'TIER_4':
-      modelUsed = 'GPT-4o / Claude 3.5 Sonnet (Premium Reasoning)';
-      content = `Founder Copilot Strategy: To grow BusinessPilot, I recommend focusing on the key segments identified in your database metrics. Never send raw datasets, rely on our embedded insights.`;
-      break;
+  if (tier === 'TIER_3' || tier === 'TIER_4') {
+    modelToUse = 'gpt-4o'; // Use premium model for advanced reasoning
+    systemMessage = `You are a strategic Founder Growth Copilot. Analyze the summarized context provided and deliver actionable insights. Never hallucinate data. Respond directly and clearly.`;
   }
-  
-  return { content, modelUsed };
+
+  // Construct context string if data is provided (e.g., from pgvector or materialized views)
+  let userMessage = prompt;
+  if (contextData && contextData.length > 0) {
+     userMessage += `\n\nContext Data:\n${JSON.stringify(contextData)}`;
+  }
+
+  const response = await openai.chat.completions.create({
+    model: modelToUse,
+    messages: [
+      { role: "system", content: systemMessage },
+      { role: "user", content: userMessage }
+    ],
+    temperature: 0.7,
+    max_tokens: 400, // Keep costs strictly capped
+  });
+
+  return {
+    content: response.choices[0].message.content,
+    modelUsed: modelToUse
+  };
 }
 
 // Main Gateway Endpoint
 router.post('/generate', async (req, res) => {
-  const { prompt, taskType, contextData } = req.body;
+  const { prompt, taskType, contextData, tone, enable_ab } = req.body;
   
   if (!prompt || !taskType) {
     return res.status(400).json({ error: 'Missing prompt or taskType parameters.' });
   }
 
   // 1. Cache Check: Prevent duplicate exact requests
-  const cacheKey = `${taskType}_${prompt}`;
+  const cacheKey = `${taskType}_${prompt}_${tone}_${enable_ab}`;
   if (aiResponseCache.has(cacheKey)) {
     console.log(`[AI Gateway] CACHE HIT for ${taskType}`);
     return res.json({ 
@@ -80,15 +85,21 @@ router.post('/generate', async (req, res) => {
 
   try {
     // 3. Execution
-    const response = await callLLM(tier, prompt, contextData);
+    const response = await callLLM(tier, prompt, contextData, tone);
     
     // Format response specifically for A/B variants if requested by our studio
     let formattedResult = {
       variant_a: response.content,
-      variant_b: `[Alternative] ${response.content}`
+      variant_b: enable_ab ? `[Alternative Generation Required via API] ${response.content}` : null 
     };
 
-    // 4. Cache the successful result (expires naturally in this simple Map, or use Redis TTL)
+    if (enable_ab) {
+       // In a full implementation, we could ask the LLM for 2 variants in JSON. For now, we do a second fast pass.
+       const responseB = await callLLM(tier, prompt + " (Provide an entirely different creative angle)", contextData, tone);
+       formattedResult.variant_b = responseB.content;
+    }
+
+    // 4. Cache the successful result
     aiResponseCache.set(cacheKey, formattedResult);
     
     // 5. Return payload
@@ -99,7 +110,7 @@ router.post('/generate', async (req, res) => {
     
   } catch (err) {
     console.error("[AI Gateway] LLM Execution Error:", err);
-    res.status(500).json({ error: 'AI Gateway failed to process request.' });
+    res.status(500).json({ error: 'AI Gateway failed to process request. Ensure OpenAI keys are valid.' });
   }
 });
 
