@@ -214,7 +214,7 @@ export function prefillInboxReply(optNum) {
   showToast("AI response drafted!", "success");
 }
 
-export function sendInboxMessageReply() {
+export async function sendInboxMessageReply() {
   const textarea = document.getElementById('inbox-reply-text');
   if (!textarea) return;
   const text = textarea.value.trim();
@@ -224,33 +224,47 @@ export function sendInboxMessageReply() {
     return;
   }
   
-  const chatBox = document.getElementById('inbox-chat-bubbles');
-  if (chatBox) {
-    const bubbleRow = createSafeElement('div', ['chat-bubble-row', 'sent']);
-    const bubble = createSafeElement('div', ['chat-bubble']);
-    bubble.textContent = text;
+  const threadId = state.activeInboxThreadId;
+  if (!threadId) return;
+
+  try {
+    const result = await requestApi('/api/inbox/reply', 'POST', { threadId, text });
     
-    const timeDiv = createSafeElement('div', [], 'Just now');
-    timeDiv.style.fontSize = '0.65rem';
-    timeDiv.style.color = 'rgba(255,255,255,0.5)';
-    timeDiv.style.textAlign = 'right';
-    timeDiv.style.marginTop = '4px';
-    
-    bubble.appendChild(timeDiv);
-    bubbleRow.appendChild(bubble);
-    chatBox.appendChild(bubbleRow);
+    if (result.success) {
+      const chatBox = document.getElementById('inbox-chat-bubbles');
+      if (chatBox) {
+        const bubbleRow = createSafeElement('div', ['chat-bubble-row', 'sent']);
+        const bubble = createSafeElement('div', ['chat-bubble']);
+        bubble.textContent = text;
+        
+        const timeDiv = createSafeElement('div', [], 'Just now');
+        timeDiv.style.fontSize = '0.65rem';
+        timeDiv.style.color = 'rgba(255,255,255,0.5)';
+        timeDiv.style.textAlign = 'right';
+        timeDiv.style.marginTop = '4px';
+        
+        bubble.appendChild(timeDiv);
+        bubbleRow.appendChild(bubble);
+        chatBox.appendChild(bubbleRow);
+      }
+      
+      textarea.value = '';
+      showToast("Reply sent to WhatsApp API!", "success");
+      
+      const threads = state.inboxState[state.currentActiveApp] || [];
+      const thread = threads.find(t => t.id === threadId);
+      if (thread) thread.resolved = true;
+      
+      setTimeout(() => {
+        fetchInboxThreads(); // Refresh from DB
+      }, 1000);
+    } else {
+      showToast(result.error || "Failed to send message", "error");
+    }
+  } catch (err) {
+    console.error("Reply failed:", err);
+    showToast("Failed to connect to API", "error");
   }
-  
-  textarea.value = '';
-  showToast("Reply sent to connected channel!", "success");
-  
-  const threads = state.inboxState[state.currentActiveApp] || [];
-  const thread = threads.find(t => t.id === state.activeInboxThreadId);
-  if (thread) thread.resolved = true;
-  
-  setTimeout(() => {
-    renderInboxView();
-  }, 1000);
 }
 
 export function markActiveInboxResolved() {

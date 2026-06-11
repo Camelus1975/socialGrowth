@@ -254,13 +254,128 @@ app.post('/api/calendar/schedule', async (req, res) => {
   }
 });
 
-// Priority 6: Inbox Messages
+// Priority 6: Inbox & Webhooks
+app.get('/api/webhooks/meta', (req, res) => {
+  const verify_token = process.env.META_WEBHOOK_VERIFY_TOKEN;
+  let mode = req.query['hub.mode'];
+  let token = req.query['hub.verify_token'];
+  let challenge = req.query['hub.challenge'];
+  
+  if (mode && token) {
+    if (mode === 'subscribe' && token === verify_token) {
+      console.log('WEBHOOK_VERIFIED');
+      return res.status(200).send(challenge);
+    }
+  }
+  return res.sendStatus(403);
+});
+
+app.post('/api/webhooks/meta', async (req, res) => {
+  const body = req.body;
+  if (body.object) {
+    if (body.entry && body.entry[0].changes && body.entry[0].changes[0] && body.entry[0].changes[0].value.messages && body.entry[0].changes[0].value.messages[0]) {
+      const message = body.entry[0].changes[0].value.messages[0];
+      const contact = body.entry[0].changes[0].value.contacts?.[0];
+      
+      const phoneNumber = message.from;
+      const senderName = contact?.profile?.name || phoneNumber;
+      const text = message.text?.body || "Unsupported message type";
+      
+      if (!isDummyDb) {
+        // Upsert thread
+        await supabase.from('inbox_threads').upsert({
+          id: phoneNumber,
+          sender: senderName,
+          platform: 'whatsapp',
+          last_text: text,
+          last_date: new Date().toISOString(),
+          read: false
+        });
+        
+        // Insert message
+        await supabase.from('inbox_messages').insert({
+          thread_id: phoneNumber,
+          sender_role: 'customer',
+          text: text
+        });
+      }
+    }
+    return res.sendStatus(200);
+  }
+  return res.sendStatus(404);
+});
+
 app.get('/api/inbox/threads', async (req, res) => {
-  res.json([
-    { id: "msg_1", sender: "Bradley Vance", platform: "instagram", text: "Is there any calendar syncing option for workout bookings?", date: "2026-06-08 09:12", read: false, resolved: false },
-    { id: "msg_2", sender: "Chloe Dubois", platform: "facebook", text: "I shared your fitness challenge link, is there an affiliate program?", date: "2026-06-07 18:34", read: true, resolved: false },
-    { id: "msg_3", sender: "Elena Rostova", platform: "twitter", text: "@FitPulse Your Apple Watch app is phenomenal! Saved my workouts this week.", date: "2026-06-07 14:02", read: true, resolved: true }
-  ]);
+  try {
+    if (isDummyDb) throw new Error("Offline Mode");
+    const { data, error } = await supabase
+      .from('inbox_threads')
+      .select('*')
+      .order('last_date', { ascending: false });
+      
+    if (error) throw error;
+    res.json(data.map(t => ({
+      id: t.id,
+      sender: t.sender,
+      platform: t.platform,
+      text: t.last_text,
+      date: new Date(t.last_date).toLocaleString(),
+      read: t.read,
+      resolved: t.resolved
+    })));
+  } catch (err) {
+    // Fallback to mock data
+    res.json([
+      { id: "msg_1", sender: "Bradley Vance", platform: "instagram", text: "Is there any calendar syncing option for workout bookings?", date: "2026-06-08 09:12", read: false, resolved: false },
+      { id: "msg_2", sender: "Chloe Dubois", platform: "facebook", text: "I shared your fitness challenge link, is there an affiliate program?", date: "2026-06-07 18:34", read: true, resolved: false },
+      { id: "msg_3", sender: "Elena Rostova", platform: "twitter", text: "@FitPulse Your Apple Watch app is phenomenal! Saved my workouts this week.", date: "2026-06-07 14:02", read: true, resolved: true }
+    ]);
+  }
+});
+
+app.post('/api/inbox/reply', async (req, res) => {
+  const { threadId, text } = req.body;
+  if (!threadId || !text) return res.status(400).json({ error: "Missing threadId or text" });
+
+  try {
+    if (!isDummyDb) {
+      // Log to DB
+      await supabase.from('inbox_messages').insert({
+        thread_id: threadId,
+        sender_role: 'brand',
+        text: text
+      });
+      await supabase.from('inbox_threads').update({ resolved: true, read: true }).eq('id', threadId);
+    }
+    
+    // Call Meta Graph API
+    if (process.env.WHATSAPP_PHONE_NUMBER_ID && process.env.WHATSAPP_ACCESS_TOKEN && !process.env.WHATSAPP_PHONE_NUMBER_ID.includes('here')) {
+      const url = `https://graph.facebook.com/v19.0/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.WHATSAPP_ACCESS_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          messaging_product: 'whatsapp',
+          to: threadId,
+          type: 'text',
+          text: { body: text }
+        })
+      });
+      
+      const responseData = await response.json();
+      if (!response.ok) {
+        console.error("WhatsApp Graph API Error:", responseData);
+      }
+    }
+    
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Inbox Reply Error:", err);
+    res.status(500).json({ error: "Failed to send message" });
+  }
 });
 
 // Priority 7: Media Asset upload simulation (saving record in media table)
