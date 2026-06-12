@@ -52,8 +52,8 @@ function decryptToken(encryptedText) {
 // AUTHENTICATION MIDDLEWARE
 // ------------------------------------------
 const authenticate = async (req, res, next) => {
-  // Allow auth config and initial session check to proceed without tokens
-  if (req.originalUrl.startsWith('/api/auth/session') || req.originalUrl.startsWith('/api/auth/config')) {
+  // Allow auth and OAuth routes to proceed without token headers
+  if (req.originalUrl.startsWith('/api/auth/')) {
     return next();
   }
   
