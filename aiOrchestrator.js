@@ -2,6 +2,7 @@ const { OpenAI } = require('openai');
 const config = require('./config');
 const { createClient } = require('@supabase/supabase-js');
 const { searchGrowthMemory } = require('./memoryEngine');
+const { createPendingCampaign, predictCampaignOutcomes } = require('./advertisingEngine');
 
 const openai = new OpenAI({
   apiKey: config.OPENAI_API_KEY,
@@ -11,7 +12,7 @@ const openai = new OpenAI({
 const AGENT_PROMPTS = {
   CMO: `You are the Chief Marketing Officer (CMO) Agent. 
 Role: Marketing strategist.
-Goal: Take the Founder's command and generate a high-level strategic plan. Break down the plan into specific tasks for your sub-agents: Growth Analyst, Content Strategist, Content Writer, Creative Director, ASO Agent, Campaign Manager, Video Marketing Agent, Publishing Agent, and Revenue Intelligence Agent.
+Goal: Take the Founder's command and generate a high-level strategic plan. Break down the plan into specific tasks for your sub-agents: Growth Analyst, Content Strategist, Content Writer, Creative Director, ASO Agent, Campaign Manager, Video Marketing Agent, Publishing Agent, Revenue Intelligence Agent, Ad Strategist, Audience Intelligence Agent, and Media Buyer.
 Output MUST be valid JSON with the format: 
 { 
   "strategy_summary": "...", 
@@ -58,10 +59,28 @@ Input: A campaign from the Campaign Manager.
 Output JSON format: { "channels": ["linkedin", "twitter"], "predicted_success": 85, "schedule": [ { "platform": "linkedin", "time": "10:00 AM", "content_type": "carousel" } ] }`,
 
   RevenueIntelligenceAgent: `You are the Revenue Intelligence Agent.
-Role: Attribution tracking, ROI analysis, and campaign expansion.
-Goal: Measure downloads/revenue and recommend campaign expansions.
-Input: Campaign performance data.
-Output JSON format: { "roi_analysis": "...", "winning_channels": ["..."], "expansion_recommendation": "..." }`
+Role: ROI analysis and attribution engine.
+Goal: Connect marketing activities to business outcomes (MRR, Installs, CAC).
+Input: Post-publishing campaign data.
+Output JSON format: { "roi_analysis": "...", "mrr_impact_score": 8.5, "recommendation": "Expand budget" }`,
+
+  AdStrategist: `You are the Ad Strategist Agent.
+Role: Media buying strategist.
+Goal: Plan paid acquisition campaigns, calculate budgets, and set CPA objectives.
+Input: A strategy from the CMO.
+Output JSON format: { "campaign_blueprint": "...", "channels": ["meta", "google"], "budget_allocation": { "meta": 500, "google": 500 }, "target_cpa": 10 }`,
+
+  AudienceIntelligenceAgent: `You are the Audience Intelligence Agent.
+Role: Audience generation and targeting intelligence.
+Goal: Create detailed targeting criteria (interests, demographics, lookalikes).
+Input: A strategy from the Ad Strategist.
+Output JSON format: { "audiences": [ { "name": "...", "platform": "meta", "interests": ["..."], "demographics": { "age": [18, 35] } } ] }`,
+
+  MediaBuyer: `You are the Media Buyer Agent.
+Role: Launch campaigns, run multivariate tests, and monitor budget optimization.
+Goal: Minimize CPA and Maximize ROAS autonomously.
+Input: Audiences and Creatives.
+Output JSON format: { "simulation_report": { "expected_reach": 10000, "expected_cpa": 8.5 }, "action": "request_approval" }`
 };
 
 /**
@@ -144,6 +163,25 @@ async function runMarketingOrchestration(goal, authHeader, appId, language = 'en
     // 3. Campaign Manager Phase
     steps.push({ agent: "Campaign Manager", log: "Aggregating agent outputs into Draft Campaign Portfolio." });
     
+    // Check if Advertising Strategy was generated
+    const adStrategy = agentResults.find(r => r.agent === 'AdStrategist' || r.agent === 'Ad Strategist');
+    let campaignId = null;
+    if (adStrategy) {
+      steps.push({ agent: "Media Buyer", log: "Simulating ad campaign performance and CPA predictions." });
+      try {
+        const campaign = await createPendingCampaign(appId, adStrategy.result, authHeader);
+        campaignId = campaign.id;
+        
+        // Predict outcomes based on strategy budget
+        const budget = adStrategy.result.budget_allocation ? Object.values(adStrategy.result.budget_allocation)[0] || 500 : 500;
+        const predictions = predictCampaignOutcomes(budget, 'installs', 'meta');
+        
+        steps.push({ agent: "Media Buyer", log: `Campaign "${campaign.name}" created. Pending Approval. Expected CPA: $${predictions.expected_case.cpa}, Expected Reach: ${predictions.expected_case.reach}` });
+      } catch (err) {
+        console.error("Failed to create pending campaign", err);
+      }
+    }
+
     // In a fully autonomous mode, this would pass to the PublishingAgent.
     // For safety, we pause here and present the plan to the Founder (CEO).
     steps.push({ agent: "System", log: "Awaiting CEO Approval before execution." });
@@ -151,6 +189,7 @@ async function runMarketingOrchestration(goal, authHeader, appId, language = 'en
     return {
       success: true,
       orchestrationId: crypto.randomUUID(),
+      campaignId: campaignId,
       cmoStrategy: cmoData,
       agentResults,
       steps

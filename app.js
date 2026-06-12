@@ -68,10 +68,10 @@ import {
   recycleStudioContent, 
   generateStudioImage 
 } from './studioModule.js';
-import {
-  initVideoFactory,
-  generateStudioVideo
-} from './videoFactoryModule.js';
+import { initCompetitorModule } from './competitorModule.js';
+import { initVideoFactoryModule } from './videoFactoryModule.js';
+import { initAdvertisingModule, startAdPolling, stopAdPolling } from './advertisingModule.js';
+import { i18nSetLanguage } from './i18nModule.js';
 
 import {
   initDistributionEngine,
@@ -146,6 +146,10 @@ export async function bootApp() {
   // Verify/Sync Session from production backend
   syncUserSession();
   
+  // Initialize Phase 4 Modules
+  initVideoFactoryModule();
+  initAdvertisingModule();
+
   // Initialize all view modules
   initAppManager();
   initDashboard();
@@ -377,7 +381,8 @@ export function switchView(viewId, element) {
     'db-console': { title: 'Database & Jobs Console', desc: 'Inspect Postgres schemas, run SQL statement logs, and verify Redis jobs.' },
     'agent-framework': { title: 'AI Agent Framework', desc: 'Coordinate and simulate automated subagent team collaborations.' },
     'agent-orchestration': { title: 'Agent Orchestration Flow', desc: 'Watch real-time cooperative agent pipelines execute target workflows.' },
-    'content-intelligence': { title: 'Content Intelligence & Performance', desc: 'Predict performance, analyze optimal CTAs, run recycling, and get Coach recommendations.' }
+    'content-intelligence': { title: 'Content Intelligence & Performance', desc: 'Predict performance, analyze optimal CTAs, run recycling, and get Coach recommendations.' },
+    'ad-dash': { title: 'Advertising Command Center', desc: 'Manage AI Media Buying, approve budgets, and monitor ROAS.' }
   };
   
   if (viewTitles[viewId]) {
@@ -438,6 +443,9 @@ export function refreshViewData() {
       break;
     case 'content-intelligence':
       fetchIntelligenceData();
+      break;
+    case 'ad-dash':
+      import('./advertisingModule.js').then(module => module.startAdPolling());
       break;
   }
 }
