@@ -78,6 +78,8 @@ import {
   executeAutonomousGrowth
 } from './distributionModule.js';
 
+import { initI18n } from './i18nModule.js';
+
 
 import {
   initContentIntelligence,
@@ -132,8 +134,13 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Boot the main application after auth
-async function bootApp() {
-  // Fetch real apps from Supabase and merge
+export async function bootApp() {
+  console.log("App Booting...");
+
+  // Initialize Internationalization
+  initI18n();
+
+  // Try fetching sessional apps from Supabase and merge
   await fetchUserApps();
   
   // Verify/Sync Session from production backend

@@ -69,8 +69,9 @@ Output JSON format: { "roi_analysis": "...", "winning_channels": ["..."], "expan
  * @param {string} goal - The Founder's command (e.g. "Grow BusinessPilot")
  * @param {string} authHeader - JWT token for Supabase RLS
  * @param {string} appId - The target app ID
+ * @param {string} language - User's language preference
  */
-async function runMarketingOrchestration(goal, authHeader, appId) {
+async function runMarketingOrchestration(goal, authHeader, appId, language = 'en') {
   const steps = [];
   
   const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
@@ -95,10 +96,14 @@ async function runMarketingOrchestration(goal, authHeader, appId) {
     // 2. CMO Strategy Phase
     steps.push({ agent: "CMO Agent", log: `Drafting strategy for goal: "${goal}"` });
     
+    const langDirective = language === 'ar' 
+      ? "CRITICAL: The user's language is Arabic. ALL generated output, text, copy, strategies, and plans MUST be written strictly in Arabic. Do not use English."
+      : "";
+
     const cmoResponse = await openai.chat.completions.create({
       model: "gpt-4o", // Strategy requires deep reasoning
       messages: [
-        { role: "system", content: AGENT_PROMPTS.CMO },
+        { role: "system", content: AGENT_PROMPTS.CMO + "\n" + langDirective },
         { role: "user", content: `App: ${appId}. Goal: ${goal}\n\n${memoryContext}` }
       ],
       response_format: { type: "json_object" }
@@ -116,7 +121,7 @@ async function runMarketingOrchestration(goal, authHeader, appId) {
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini", // Lower cost model for execution agents
         messages: [
-          { role: "system", content: AGENT_PROMPTS[agentKey] },
+          { role: "system", content: AGENT_PROMPTS[agentKey] + "\n" + langDirective },
           { role: "user", content: `CMO Strategy: ${cmoData.strategy_summary}\nYour Task: ${delegation.task}` }
         ],
         response_format: { type: "json_object" }

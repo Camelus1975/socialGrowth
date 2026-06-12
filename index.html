@@ -149,19 +149,19 @@
         <div class="nav-section-title">Growth & Listings</div>
         <ul class="nav-list">
           <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('launch-center', this)">
+            <div class="nav-link" data-on-click="switchView('launch-center', this)" data-i18n="nav.launch_center">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
               Launch Command Center
             </div>
           </li>
           <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('video-factory', this)">
+            <div class="nav-link" data-on-click="switchView('video-factory', this)" data-i18n="nav.video_factory">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
               AI Video Factory
             </div>
           </li>
           <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('autonomous-growth', this)">
+            <div class="nav-link" data-on-click="switchView('autonomous-growth', this)" data-i18n="nav.autonomous_growth">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
               Autonomous Growth
             </div>
@@ -311,6 +311,8 @@
           <p id="current-view-desc">Monitor startup metrics and cross-app growth performance.</p>
         </div>
         <div class="header-actions">
+          <!-- Language Toggle Button -->
+          <button class="btn btn-secondary" onclick="window.toggleLanguage()" data-i18n="header.toggle_lang" style="padding: 10px 15px; border-radius: 8px; margin-right: 10px;">English / العربية</button>
           <!-- Theme Toggle Button -->
           <button class="btn btn-secondary" data-on-click="toggleThemeMode()" id="theme-toggle-btn" style="padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center;" title="Toggle Light/Dark Theme">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" class="theme-icon-sun"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 7a5 5 0 100 10 5 5 0 000-10z" /></svg>
@@ -627,8 +629,8 @@
       <section id="view-autonomous-growth" class="view-section">
         <div class="view-header">
           <div>
-            <h2 id="autonomous-growth-title">Autonomous Growth Mode</h2>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Set a high-level objective and let the multi-agent system execute the entire funnel end-to-end.</p>
+            <h2 id="autonomous-growth-title" data-i18n="autonomous.title">Autonomous Growth Mode</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;" data-i18n="autonomous.desc">Set a high-level objective and let the multi-agent system execute the entire funnel end-to-end.</p>
           </div>
         </div>
         
@@ -639,12 +641,12 @@
           </div>
           
           <div class="form-group">
-            <label>What is your objective?</label>
-            <textarea id="autonomous-growth-objective" class="form-control" rows="3" placeholder="e.g. Launch the new AI Invoice feature and increase MRR by 10%..."></textarea>
+            <label data-i18n="autonomous.objective">What is your objective?</label>
+            <textarea id="autonomous-growth-objective" class="form-control" rows="3" placeholder="e.g. Launch the new AI Invoice feature and increase MRR by 10%..." data-i18n="dashboard.cmo_placeholder"></textarea>
           </div>
           
           <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button class="btn btn-primary" style="flex: 1;" data-on-click="executeAutonomousGrowth">
+            <button class="btn btn-primary" style="flex: 1;" data-on-click="executeAutonomousGrowth" data-i18n="autonomous.execute">
               <i class="fas fa-rocket"></i> Execute Autonomous Pipeline
             </button>
           </div>

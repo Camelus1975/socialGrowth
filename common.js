@@ -12,6 +12,7 @@ export async function requestApi(path, options = {}) {
   const headers = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`,
+    'X-App-Language': state.language || 'en',
     ...options.headers
   };
   

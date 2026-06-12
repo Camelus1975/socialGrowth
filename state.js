@@ -2,6 +2,7 @@
 
 export const state = {
   currentActiveApp: null,
+  language: 'en',
   currentActiveView: 'founder-dash',
   activeMockupTheme: 'indigo',
   reviewFilterSentiment: 'all',

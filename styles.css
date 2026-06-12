@@ -2111,3 +2111,41 @@ body.light-mode .theme-icon-moon {
   display: block;
 }
 
+/* RTL Support for Arabic */
+html[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Inter', sans-serif; /* Fallback. Can inject Cairo later */
+}
+
+html[dir="rtl"] .sidebar {
+  border-right: none;
+  border-left: 1px solid var(--border-glass);
+}
+
+html[dir="rtl"] .nav-link svg,
+html[dir="rtl"] .nav-link i {
+  margin-right: 0;
+  margin-left: 10px;
+}
+
+html[dir="rtl"] .modal-content,
+html[dir="rtl"] .panel,
+html[dir="rtl"] .card {
+  text-align: right;
+}
+
+html[dir="rtl"] .close-btn {
+  float: left;
+}
+
+html[dir="rtl"] .toast {
+  right: auto;
+  left: 20px;
+}
+
+html[dir="rtl"] .stats-grid {
+  direction: rtl;
+}
+
+

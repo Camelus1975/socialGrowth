@@ -543,7 +543,8 @@ app.post('/api/agents/orchestration/trigger', async (req, res) => {
 
   // Real Multi-Agent Orchestration Loop
   const authHeader = req.headers.authorization;
-  const result = await runMarketingOrchestration(goal, authHeader, appId);
+  const language = req.headers['x-app-language'] || 'en';
+  const result = await runMarketingOrchestration(goal, authHeader, appId, language);
   
   if (result.success) {
     res.json(result);
