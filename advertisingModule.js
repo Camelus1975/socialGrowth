@@ -1,6 +1,6 @@
 // App Founder Growth Suite - Advertising Command Center
 import { API_URL, requestApi } from './common.js';
-import { getSelectedAppId } from './appManager.js';
+import { state } from './state.js';
 
 let activeInterval = null;
 
@@ -59,7 +59,7 @@ export function initAdvertisingModule() {
 }
 
 export async function refreshAdDashboard() {
-  const appId = getSelectedAppId();
+  const appId = state.currentActiveApp;
   if (!appId) return;
 
   try {
