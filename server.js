@@ -157,7 +157,7 @@ app.get('/api/auth/meta', (req, res) => {
   
   // Scopes required for Facebook Pages and Instagram Professional
   const scopes = 'pages_show_list,pages_manage_posts,pages_read_engagement,instagram_basic,instagram_content_publish';
-  const url = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${process.env.META_APP_ID}&redirect_uri=${encodeURIComponent(META_REDIRECT_URI)}&state=${projectId}&scope=${scopes}`;
+  const url = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${process.env.FACEBOOK_CLIENT_ID || process.env.META_APP_ID}&redirect_uri=${encodeURIComponent(META_REDIRECT_URI)}&state=${projectId}&scope=${scopes}`;
   
   res.redirect(url);
 });
@@ -168,13 +168,13 @@ app.get('/api/auth/meta/callback', async (req, res) => {
 
   try {
     // 1. Exchange code for short-lived access token
-    const tokenUrl = `https://graph.facebook.com/v19.0/oauth/access_token?client_id=${process.env.META_APP_ID}&redirect_uri=${encodeURIComponent(META_REDIRECT_URI)}&client_secret=${process.env.META_APP_SECRET}&code=${code}`;
+    const tokenUrl = `https://graph.facebook.com/v19.0/oauth/access_token?client_id=${process.env.FACEBOOK_CLIENT_ID || process.env.META_APP_ID}&redirect_uri=${encodeURIComponent(META_REDIRECT_URI)}&client_secret=${process.env.FACEBOOK_CLIENT_SECRET || process.env.META_APP_SECRET}&code=${code}`;
     const tokenRes = await fetch(tokenUrl);
     const tokenData = await tokenRes.json();
     if (!tokenData.access_token) throw new Error("Failed to get short-lived token");
 
     // 2. Exchange for long-lived access token
-    const longTokenUrl = `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${process.env.META_APP_ID}&client_secret=${process.env.META_APP_SECRET}&fb_exchange_token=${tokenData.access_token}`;
+    const longTokenUrl = `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${process.env.FACEBOOK_CLIENT_ID || process.env.META_APP_ID}&client_secret=${process.env.FACEBOOK_CLIENT_SECRET || process.env.META_APP_SECRET}&fb_exchange_token=${tokenData.access_token}`;
     const longTokenRes = await fetch(longTokenUrl);
     const longTokenData = await longTokenRes.json();
     const accessToken = longTokenData.access_token || tokenData.access_token;
