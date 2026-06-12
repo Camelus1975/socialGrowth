@@ -155,6 +155,12 @@
             </div>
           </li>
           <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('video-factory', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+              AI Video Factory
+            </div>
+          </li>
+          <li class="nav-item">
             <div class="nav-link" data-on-click="switchView('aso-center', this)">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
               ASO Optimization
@@ -562,6 +568,50 @@
             <h3 class="card-title" style="margin-bottom: 12px;">Generated Content Calendar</h3>
             <div id="content-calendar-container" style="max-height: 400px; overflow-y: auto;">
               <div style="color: var(--text-sub); text-align: center; padding: 40px 0;">No posts in content calendar yet.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: AI VIDEO FACTORY -->
+      <section id="view-video-factory" class="view-panel">
+        <div class="glass-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title" id="video-factory-app-title">Video Assembly Line</h3>
+              <div class="card-subtitle">Generate high-volume marketing videos using Templates, Motion Graphics, and Premium AI.</div>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Cost Target: 80% Templates / 20% Premium AI</div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px;">
+            <div>
+              <div class="form-group">
+                <label for="video-factory-type">Video Objective</label>
+                <select id="video-factory-type">
+                  <option value="feature">Feature Announcement (Template)</option>
+                  <option value="testimonial">Customer Testimonial (Template)</option>
+                  <option value="case_study">Metrics / Case Study (Motion Graphics)</option>
+                  <option value="campaign">Marketing Campaign (AI Assembly)</option>
+                  <option value="hero">Hero / Premium Ad (Minimax AI)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="video-factory-prompt">Video Strategy & Prompt</label>
+                <textarea id="video-factory-prompt" rows="4" placeholder="e.g. Announce our new AI scheduling dashboard with an energetic hook..."></textarea>
+              </div>
+
+              <button class="btn btn-primary" style="width: 100%;" data-on-click="generateStudioVideo()">Initialize Video Assembly</button>
+            </div>
+
+            <div class="glass-card" style="background: rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.04);">
+              <h4 style="color: white; margin-bottom: 12px;">Asset Output Library</h4>
+              <div style="display:flex; flex-direction:column; gap:16px; max-height: 400px; overflow-y: auto;" id="video-factory-outputs-block">
+                <div style="color: var(--text-sub); text-align: center; padding: 40px 0;">
+                  Enter details and click 'Initialize' to render a video asset.
+                </div>
+              </div>
             </div>
           </div>
         </div>

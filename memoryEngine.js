@@ -23,8 +23,8 @@ async function handleUniversalWebhook(payload, authHeader) {
         { 
           role: "system", 
           content: `You are the Growth Analyst Agent. Your job is to parse incoming webhook JSON payloads (e.g., from Stripe, RevenueCat, or custom sources) and identify the growth event.
-          Categorize the event as 'revenue', 'install', 'churn', or 'other'.
-          Extract the exact value, currency, and the likely associated app or campaign.
+          Categorize the event as 'revenue', 'install', 'churn', 'video_metric' or 'other'.
+          Extract the exact value, currency, and the likely associated app or campaign. For video_metric, look for completion rates or CTRs.
           Return a strict JSON format: {"category": "...", "value": 0, "appId": "...", "inferred_campaign": "..."}` 
         },
         { role: "user", content: `Payload: ${JSON.stringify(payload)}` }

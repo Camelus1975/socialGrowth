@@ -63,10 +63,18 @@ import {
   generateWeeklyGrowthReport, 
   createCrossPromoAssets, 
   copyCrossPromoText, 
-  downloadExecutiveReport,
-  generateStudioContent,
-  recycleStudioContent
+  downloadExecutiveReport, 
+  loadReviewInMockup, 
+  triggerQuickAction, 
+  generateStudioContent, 
+  recycleStudioContent, 
+  generateStudioImage 
 } from './studioModule.js';
+import {
+  initVideoFactory,
+  generateStudioVideo
+} from './videoFactoryModule.js';
+
 
 import {
   initContentIntelligence,
@@ -136,6 +144,7 @@ async function bootApp() {
   initMedia();
   initDatabaseConsole();
   initStudio();
+  initVideoFactory();
   initAgentFramework();
   initContentIntelligence();
   
@@ -786,6 +795,8 @@ function callFunction(name, args, element, event) {
     triggerQuickAction,
     generateStudioContent,
     recycleStudioContent,
+    generateStudioImage,
+    generateStudioVideo,
     
     // Content Intelligence
     runSuccessPrediction,

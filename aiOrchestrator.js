@@ -11,7 +11,7 @@ const openai = new OpenAI({
 const AGENT_PROMPTS = {
   CMO: `You are the Chief Marketing Officer (CMO) Agent. 
 Role: Marketing strategist.
-Goal: Take the Founder's command and generate a high-level strategic plan. Break down the plan into specific tasks for your sub-agents: Growth Analyst, Content Strategist, Content Writer, Creative Director, ASO Agent, and Campaign Manager.
+Goal: Take the Founder's command and generate a high-level strategic plan. Break down the plan into specific tasks for your sub-agents: Growth Analyst, Content Strategist, Content Writer, Creative Director, ASO Agent, Campaign Manager, and Video Marketing Agent.
 Output MUST be valid JSON with the format: 
 { 
   "strategy_summary": "...", 
@@ -44,7 +44,12 @@ Output JSON format: { "copy_variants": [{ "platform": "twitter", "text": "..." }
   ASOAgent: `You are the App Store Optimization Agent.
 Role: Keyword optimization and App Store metadata ranking improvements.
 Input: A strategy from the CMO.
-Output JSON format: { "aso_recommendations": "...", "keywords": ["..."] }`
+Output JSON format: { "aso_recommendations": "...", "keywords": ["..."] }`,
+
+  VideoMarketingAgent: `You are the Video Marketing Agent.
+Role: Plan and storyboard video marketing assets (TikToks, Reels, Ads).
+Input: A strategy from the CMO.
+Output JSON format: { "video_concept": "...", "target_audience": "...", "storyboard": [ { "scene_number": 1, "visual_direction": "...", "duration": 3 } ] }`
 };
 
 /**

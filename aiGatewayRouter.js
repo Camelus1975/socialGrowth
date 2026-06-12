@@ -198,6 +198,57 @@ router.post('/generate-image', async (req, res) => {
   }
 });
 
+// Endpoint: AI Video Marketing Router
+router.post('/generate-video', async (req, res) => {
+  const { prompt, type, appId } = req.body;
+  if (!prompt) return res.status(400).json({ error: 'Missing prompt' });
+
+  // Intelligent Routing Logic for Video Factory
+  let generationMode = 'template';
+  let videoUrl = '';
+  let costEstimated = 0;
+
+  try {
+    const textLower = prompt.toLowerCase();
+    
+    if (textLower.includes('hero') || textLower.includes('ad') || textLower.includes('premium')) {
+      generationMode = 'premium_ai';
+    } else if (textLower.includes('campaign')) {
+      generationMode = 'assembly';
+    } else if (textLower.includes('case study') || textLower.includes('stats') || textLower.includes('report')) {
+      generationMode = 'motion_graphics';
+    } else {
+      generationMode = 'template';
+    }
+
+    if (generationMode === 'template' || generationMode === 'motion_graphics') {
+      console.log(`[Video Router] Routed to Mode 1/2 (${generationMode})`);
+      videoUrl = 'template_mode';
+      costEstimated = 0;
+    } else if (generationMode === 'assembly') {
+      console.log(`[Video Router] Routed to Mode 3 (Assembly)`);
+      videoUrl = 'assembly_mode';
+      costEstimated = 0.005;
+    } else {
+      console.log(`[Video Router] Routed to Mode 4 (Premium AI - Minimax)`);
+      // Simulate API call to Minimax via Replicate
+      // In production: await replicate.run("minimax/video-01", { input: { prompt: prompt } })
+      videoUrl = 'https://example.com/premium-ai-video-output.mp4';
+      costEstimated = 0.080;
+    }
+
+    res.json({
+      url: videoUrl,
+      mode: generationMode,
+      cost: costEstimated
+    });
+
+  } catch (err) {
+    console.error("[Video Router] Generation Error:", err);
+    res.status(500).json({ error: 'Video generation failed.' });
+  }
+});
+
 // Endpoint: Generate and Store Embedding
 router.post('/embed', async (req, res) => {
   const { text, appId, contentType } = req.body;
