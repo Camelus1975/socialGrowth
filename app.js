@@ -71,7 +71,7 @@ import {
 // competitorModule removed temporarily
 import { initVideoFactoryModule } from './videoFactoryModule.js';
 import { initAdvertisingModule, startAdPolling, stopAdPolling } from './advertisingModule.js?v=2';
-import { i18nSetLanguage } from './i18nModule.js';
+// import { i18nSetLanguage } removed
 
 import {
   initDistributionEngine,
