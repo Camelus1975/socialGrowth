@@ -738,6 +738,18 @@ function executeAction(actionStr, element, event) {
   callFunction(fnName, args, element, event);
 }
 
+export function connectOAuthPlatform(platform) {
+  const appId = state.currentActiveApp;
+  if (!appId) {
+    showToast("Please select or create an app first", "error");
+    return;
+  }
+  window.location.href = `/api/auth/${platform}?projectId=${appId}`;
+}
+
+// ------------------------------------------
+// GLOBAL EVENT DELEGATOR (for UI onclick handlers)
+// ------------------------------------------
 function callFunction(name, args, element, event) {
   const functionMap = {
     // Navigation / Shell
@@ -753,6 +765,7 @@ function callFunction(name, args, element, event) {
     simulateSbAuthSignout,
     inviteNewTeamMember,
     changeMemberRoleSim,
+    connectOAuthPlatform,
     
     // Inbox
     sendInboxMessageReply,
