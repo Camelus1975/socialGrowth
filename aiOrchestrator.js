@@ -11,7 +11,7 @@ const openai = new OpenAI({
 const AGENT_PROMPTS = {
   CMO: `You are the Chief Marketing Officer (CMO) Agent. 
 Role: Marketing strategist.
-Goal: Take the Founder's command and generate a high-level strategic plan. Break down the plan into specific tasks for your sub-agents: Growth Analyst, Content Strategist, Content Writer, Creative Director, ASO Agent, Campaign Manager, and Video Marketing Agent.
+Goal: Take the Founder's command and generate a high-level strategic plan. Break down the plan into specific tasks for your sub-agents: Growth Analyst, Content Strategist, Content Writer, Creative Director, ASO Agent, Campaign Manager, Video Marketing Agent, Publishing Agent, and Revenue Intelligence Agent.
 Output MUST be valid JSON with the format: 
 { 
   "strategy_summary": "...", 
@@ -49,7 +49,19 @@ Output JSON format: { "aso_recommendations": "...", "keywords": ["..."] }`,
   VideoMarketingAgent: `You are the Video Marketing Agent.
 Role: Plan and storyboard video marketing assets (TikToks, Reels, Ads).
 Input: A strategy from the CMO.
-Output JSON format: { "video_concept": "...", "target_audience": "...", "storyboard": [ { "scene_number": 1, "visual_direction": "...", "duration": 3 } ] }`
+Output JSON format: { "video_concept": "...", "target_audience": "...", "storyboard": [ { "scene_number": 1, "visual_direction": "...", "duration": 3 } ] }`,
+
+  PublishingAgent: `You are the Publishing Agent.
+Role: Channel selection, format adaptation, and scheduling intelligence.
+Goal: Predict success and distribute content optimally.
+Input: A campaign from the Campaign Manager.
+Output JSON format: { "channels": ["linkedin", "twitter"], "predicted_success": 85, "schedule": [ { "platform": "linkedin", "time": "10:00 AM", "content_type": "carousel" } ] }`,
+
+  RevenueIntelligenceAgent: `You are the Revenue Intelligence Agent.
+Role: Attribution tracking, ROI analysis, and campaign expansion.
+Goal: Measure downloads/revenue and recommend campaign expansions.
+Input: Campaign performance data.
+Output JSON format: { "roi_analysis": "...", "winning_channels": ["..."], "expansion_recommendation": "..." }`
 };
 
 /**

@@ -161,6 +161,12 @@
             </div>
           </li>
           <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('autonomous-growth', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              Autonomous Growth
+            </div>
+          </li>
+          <li class="nav-item">
             <div class="nav-link" data-on-click="switchView('aso-center', this)">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
               ASO Optimization
@@ -617,6 +623,41 @@
         </div>
       </section>
 
+      <!-- View: Autonomous Growth -->
+      <section id="view-autonomous-growth" class="view-section">
+        <div class="view-header">
+          <div>
+            <h2 id="autonomous-growth-title">Autonomous Growth Mode</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Set a high-level objective and let the multi-agent system execute the entire funnel end-to-end.</p>
+          </div>
+        </div>
+        
+        <div class="card" style="max-width: 600px; margin: 0 auto; background: linear-gradient(145deg, #1f2937, #111827); border: 1px solid var(--primary);">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <i class="fas fa-bolt" style="font-size: 2rem; color: var(--primary);"></i>
+            <h3 style="margin-top: 10px;">Growth Command</h3>
+          </div>
+          
+          <div class="form-group">
+            <label>What is your objective?</label>
+            <textarea id="autonomous-growth-objective" class="form-control" rows="3" placeholder="e.g. Launch the new AI Invoice feature and increase MRR by 10%..."></textarea>
+          </div>
+          
+          <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn btn-primary" style="flex: 1;" data-on-click="executeAutonomousGrowth">
+              <i class="fas fa-rocket"></i> Execute Autonomous Pipeline
+            </button>
+          </div>
+        </div>
+
+        <div class="card" style="max-width: 600px; margin: 20px auto;">
+          <h4 style="margin-bottom: 15px;">Pipeline Status</h4>
+          <div id="autonomous-pipeline-block" style="font-family: monospace; color: white;">
+            <div style="color: var(--text-muted); text-align: center; padding: 20px;">Waiting for command...</div>
+          </div>
+        </div>
+      </section>
+
       <!-- VIEW 3: ASO OPTIMIZATION -->
       <section id="view-aso-center" class="view-panel">
         <div class="glass-card">
@@ -934,7 +975,7 @@
             
             <!-- Calendar Dates grid -->
             <div class="calendar-grid-month" id="calendar-month-grid-boxes">
-              <!-- Rendered via JS -->
+              <!-- Rendered by JS -->
             </div>
           </div>
         </div>

@@ -73,6 +73,11 @@ import {
   generateStudioVideo
 } from './videoFactoryModule.js';
 
+import {
+  initDistributionEngine,
+  executeAutonomousGrowth
+} from './distributionModule.js';
+
 
 import {
   initContentIntelligence,
@@ -143,6 +148,7 @@ async function bootApp() {
   initDatabaseConsole();
   initStudio();
   initVideoFactory();
+  initDistributionEngine();
   initAgentFramework();
   initContentIntelligence();
   
@@ -795,6 +801,9 @@ function callFunction(name, args, element, event) {
     recycleStudioContent,
     generateStudioImage,
     generateStudioVideo,
+    
+    // Autonomous Distribution
+    executeAutonomousGrowth,
     
     // Content Intelligence
     runSuccessPrediction,
