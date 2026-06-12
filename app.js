@@ -69,7 +69,7 @@ import {
   generateStudioImage 
 } from './studioModule.js';
 // competitorModule removed temporarily
-import { initVideoFactoryModule } from './videoFactoryModule.js';
+import { initVideoFactory } from './videoFactoryModule.js';
 import { initAdvertisingModule, startAdPolling, stopAdPolling } from './advertisingModule.js?v=2';
 // import { i18nSetLanguage } removed
 
@@ -147,7 +147,7 @@ export async function bootApp() {
   syncUserSession();
   
   // Initialize Phase 4 Modules
-  initVideoFactoryModule();
+  // video factory init removed from here, called below
   initAdvertisingModule();
 
   // Initialize all view modules
