@@ -70,7 +70,7 @@ import {
 } from './studioModule.js';
 import { initCompetitorModule } from './competitorModule.js';
 import { initVideoFactoryModule } from './videoFactoryModule.js';
-import { initAdvertisingModule, startAdPolling, stopAdPolling } from './advertisingModule.js';
+import { initAdvertisingModule, startAdPolling, stopAdPolling } from './advertisingModule.js?v=2';
 import { i18nSetLanguage } from './i18nModule.js';
 
 import {
@@ -445,7 +445,7 @@ export function refreshViewData() {
       fetchIntelligenceData();
       break;
     case 'ad-dash':
-      import('./advertisingModule.js').then(module => module.startAdPolling());
+      import('./advertisingModule.js?v=2').then(module => module.startAdPolling());
       break;
   }
 }
