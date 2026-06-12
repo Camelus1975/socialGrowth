@@ -68,7 +68,7 @@ import {
   recycleStudioContent, 
   generateStudioImage 
 } from './studioModule.js';
-import { initCompetitorModule } from './competitorModule.js';
+// competitorModule removed temporarily
 import { initVideoFactoryModule } from './videoFactoryModule.js';
 import { initAdvertisingModule, startAdPolling, stopAdPolling } from './advertisingModule.js?v=2';
 import { i18nSetLanguage } from './i18nModule.js';
