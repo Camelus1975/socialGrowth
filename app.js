@@ -64,8 +64,6 @@ import {
   createCrossPromoAssets, 
   copyCrossPromoText, 
   downloadExecutiveReport, 
-  loadReviewInMockup, 
-  triggerQuickAction, 
   generateStudioContent, 
   recycleStudioContent, 
   generateStudioImage 
