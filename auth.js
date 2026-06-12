@@ -18,7 +18,9 @@ export async function initAuth() {
     if (res.ok) {
       const config = await res.json();
       if (config.supabaseUrl && config.supabaseAnonKey && window.supabase) {
-        supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+        if (!supabaseClient) {
+          supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+        }
       }
     }
   } catch (e) {
