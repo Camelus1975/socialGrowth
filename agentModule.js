@@ -97,7 +97,11 @@ export async function submitAgentConsoleCommand() {
     try {
       const data = await requestApi('/api/agents/orchestration/trigger', {
         method: 'POST',
-        body: JSON.stringify({ goal: cmd, appId: state.currentActiveApp })
+        body: JSON.stringify({ 
+          goal: cmd, 
+          appId: state.currentActiveApp,
+          businessType: state.appsData[state.currentActiveApp]?.businessType || 'saas'
+        })
       });
       
       if (data.success && data.steps) {
@@ -144,7 +148,11 @@ export async function startOrchestrationPipelineSimulation() {
   try {
     const data = await requestApi('/api/agents/orchestration/trigger', { 
       method: 'POST',
-      body: JSON.stringify({ goal: "Demo pipeline run", appId: state.currentActiveApp })
+      body: JSON.stringify({ 
+        goal: "Execute routine comprehensive cross-platform growth cycle", 
+        appId: state.currentActiveApp,
+        businessType: state.appsData[state.currentActiveApp]?.businessType || 'saas'
+      }) 
     });
     if (data && data.steps && data.steps.length >= 6) {
       steps = [

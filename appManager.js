@@ -2,6 +2,7 @@
 import { state } from './state.js';
 import { API_URL, showToast, closeModal, requestApi } from './common.js';
 import { selectActiveApp } from './app.js';
+import { getTemplateForBusiness } from './industryTemplates.js';
 
 import { getSupabaseClient } from './auth.js';
 
@@ -55,10 +56,12 @@ export function initAppManager() {
       const nameInput = document.getElementById('new-app-name');
       const taglineInput = document.getElementById('new-app-tagline');
       const categorySelect = document.getElementById('new-app-category');
+      const businessTypeSelect = document.getElementById('new-app-business-type');
       
       const name = nameInput.value.trim();
       const tagline = taglineInput.value.trim();
       const category = categorySelect.value;
+      const businessType = businessTypeSelect?.value || 'saas';
       
       if (!name) {
         showToast('App Name is required', 'error');
@@ -67,32 +70,22 @@ export function initAppManager() {
       
       const appId = generateAppId(name);
       const logoColor = getRandomGradient();
+      const template = getTemplateForBusiness(businessType);
       
       const newApp = {
         id: appId,
         name,
         tagline,
         category,
-        categoryRank: "New App",
-        rating: 0,
-        downloads: 0,
-        activeUsers: 0,
-        subscribers: 0,
-        mrr: 0,
-        socialGrowth: "0%",
-        conversionRate: "0%",
+        businessType,
         logoColor,
-        keywords: [],
-        competitors: [],
-        reviews: [],
+        metrics: template.kpis.reduce((acc, kpi) => {
+          acc[kpi.id] = [0, 0, 0, 0, 0, 0];
+          return acc;
+        }, {}),
         roadmap: [
           { status: "planned", task: "Initial Launch", team: "Growth", progress: 0 }
-        ],
-        analytics: {
-          months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-          mrr: [0, 0, 0, 0, 0, 0],
-          downloads: [0, 0, 0, 0, 0, 0]
-        }
+        ]
       };
       
       // Attempt to save to Supabase via backend
@@ -101,12 +94,13 @@ export function initAppManager() {
         if (supabase) {
            const { data: { user } } = await supabase.auth.getUser();
            if (user) {
-             const { error } = await supabase.from('apps').insert({
+             const { error } = await supabase.from('businesses').insert({
+               business_id: appId,
                user_id: user.id,
-               app_id: appId,
                name: name,
                tagline: tagline,
                category: category,
+               business_type: businessType,
                logo_color: logoColor
              });
              
@@ -149,41 +143,40 @@ export async function fetchUserApps() {
   try {
     const supabase = getSupabaseClient();
     if (supabase) {
-      const { data, error } = await supabase.from('apps').select('*');
+      const { data, error } = await supabase.from('businesses').select('*');
       if (error) throw error;
       
       if (data && data.length > 0) {
-        // Clear mock data if user has real apps, or merge them. We will merge.
         data.forEach(dbApp => {
-          state.appsData[dbApp.app_id] = {
-            id: dbApp.app_id,
+          const industryTemplate = getTemplateForBusiness(dbApp.business_type || 'saas');
+    
+          const kpiData = {};
+          industryTemplate.kpis.forEach(kpi => {
+            kpiData[kpi.id] = (dbApp.metrics_history && dbApp.metrics_history[kpi.id]) ? dbApp.metrics_history[kpi.id] : [0, 0, 0, 0, 0, 0];
+          });
+
+          state.appsData[dbApp.business_id] = {
+            id: dbApp.business_id,
             name: dbApp.name,
             tagline: dbApp.tagline,
             category: dbApp.category,
+            businessType: dbApp.business_type || 'saas',
             categoryRank: "Active",
             rating: 5.0,
-            downloads: dbApp.downloads || 0,
-            activeUsers: dbApp.active_users || 0,
-            subscribers: dbApp.subscribers || 0,
-            mrr: dbApp.mrr || 0,
-            socialGrowth: "+5%",
-            conversionRate: "2.1%",
+            socialGrowth: dbApp.social_growth || "+5%",
+            conversionRate: dbApp.conversion_rate || "2.1%",
             logoColor: dbApp.logo_color || '#333',
-            keywords: [],
-            competitors: [],
-            reviews: [],
+            metrics: kpiData,
             roadmap: [
                { status: "planned", task: "Grow App", team: "Marketing", progress: 10 }
             ],
             analytics: {
-              months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-              mrr: [0, 0, 0, 0, 0, 0],
-              downloads: [0, 0, 0, 0, 0, 0]
+              months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
             }
           };
           if (!state.customRoadmapItems) state.customRoadmapItems = {};
-          if (!state.customRoadmapItems[dbApp.app_id]) {
-            state.customRoadmapItems[dbApp.app_id] = state.appsData[dbApp.app_id].roadmap;
+          if (!state.customRoadmapItems[dbApp.business_id]) {
+            state.customRoadmapItems[dbApp.business_id] = state.appsData[dbApp.business_id].roadmap;
           }
         });
       }

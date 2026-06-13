@@ -3,6 +3,7 @@ import { state } from './state.js';
 import { requestApi, showToast, closeModal } from './common.js';
 import { renderAppSelectorDropdown } from './appManager.js';
 import { selectActiveApp } from './app.js';
+import { getTemplateForBusiness } from './industryTemplates.js';
 
 let discoveryPollingInterval = null;
 
@@ -37,6 +38,9 @@ async function startDiscovery() {
     return;
   }
   
+  const businessTypeInput = document.getElementById('new-app-business-type');
+  const businessType = businessTypeInput ? businessTypeInput.value : 'saas';
+  
   const urls = {
     website: websiteInput.value.trim(),
     instagram: igInput.value.trim(),
@@ -50,18 +54,18 @@ async function startDiscovery() {
   document.getElementById('discovery-step-2').style.display = 'block';
   
   try {
-    const res = await requestApi('/api/discovery/start', 'POST', { urls, appId });
+    const res = await requestApi('/api/discovery/start', 'POST', { urls, appId, businessType });
     if (!res || !res.jobId) throw new Error("Failed to start discovery job.");
     
     // Start Polling
-    discoveryPollingInterval = setInterval(() => pollJobStatus(res.jobId, appId), 2000);
+    discoveryPollingInterval = setInterval(() => pollJobStatus(res.jobId, appId, businessType), 2000);
   } catch (err) {
     showToast(err.message || 'Discovery failed to start.', 'error');
     resetWizard();
   }
 }
 
-async function pollJobStatus(jobId, appId) {
+async function pollJobStatus(jobId, appId, businessType) {
   try {
     const job = await requestApi(`/api/discovery/status/${jobId}`, 'GET');
     
@@ -70,7 +74,7 @@ async function pollJobStatus(jobId, appId) {
       
       if (job.status === 'complete') {
         clearInterval(discoveryPollingInterval);
-        await finalizeDiscovery(appId);
+        await finalizeDiscovery(appId, businessType);
       } else if (job.status === 'failed') {
         clearInterval(discoveryPollingInterval);
         showToast('Discovery Engine failed.', 'error');
@@ -90,7 +94,7 @@ function updateProgressUI(percent, latestLog) {
   if (statusText && latestLog) statusText.innerText = latestLog.replace(/\[.*?\] /, ''); // Clean timestamp
 }
 
-async function finalizeDiscovery(appId) {
+async function finalizeDiscovery(appId, businessType) {
   // In a real app, we would fetch the newly updated app data from Supabase.
   // Since we don't have a real db fetch endpoint for a single app in this demo context,
   // we will manually simulate fetching it by fetching the job again (which doesn't have the payload).
@@ -120,13 +124,22 @@ async function finalizeDiscovery(appId) {
   document.getElementById('discovery-result-tone').innerText = mockDiscoveryProfile.brandVoice.tone;
   document.getElementById('discovery-result-score').innerText = mockDiscoveryProfile.audits.marketingReadinessScore + '/100';
   
+  const template = getTemplateForBusiness(businessType);
+  const kpiData = {};
+  template.kpis.forEach(kpi => {
+    kpiData[kpi.id] = [0, 0, 0, 0, 0, 0];
+  });
+
   // Add to state and re-render dropdown
   state.appsData[appId] = {
     id: appId,
     name: mockDiscoveryProfile.businessProfile.name,
-    category: "Discovered App",
+    category: "Discovered Business",
+    businessType: businessType,
     logoColor: mockDiscoveryProfile.brandKit.logoColor,
-    discoveryProfile: mockDiscoveryProfile
+    discoveryProfile: mockDiscoveryProfile,
+    metrics: kpiData,
+    analytics: { months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"] }
   };
   
   renderAppSelectorDropdown();

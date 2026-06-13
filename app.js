@@ -13,6 +13,7 @@ import {
 
 import { initDashboard, renderDashboard } from './dashboardModule.js';
 import { initCalendar, fetchCalendarPosts, renderCalendarView, openCalendarPostModal } from './calendarModule.js';
+import { initUniversalCRM } from './crmModule.js';
 import { 
   initInbox, 
   fetchInboxThreads, 
@@ -156,6 +157,7 @@ export async function bootApp() {
   initBusinessDiscovery();
   initDashboard();
   initCalendar();
+  initUniversalCRM();
   initInbox();
   initMedia();
   initDatabaseConsole();

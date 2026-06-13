@@ -98,7 +98,7 @@
         <!-- App Selector -->
         <div class="app-selector-container">
           <button class="app-select-btn" id="active-app-selector" data-on-click="toggleAppSelectorDropdown()">
-            <span><span class="app-dot" id="active-app-dot" style="background: linear-gradient(135deg, #FF6B6B, #FF8E53);"></span><span id="active-app-name">FitPulse AI</span></span>
+            <span><span class="app-dot" id="active-app-dot" style="background: linear-gradient(135deg, #FF6B6B, #FF8E53);"></span><span id="active-app-name">Select Business</span></span>
             <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
           </button>
           <div class="app-select-options" id="app-selector-dropdown">
@@ -110,7 +110,7 @@
             
             <div class="app-option" data-on-click="openModal('discovery-wizard-modal')" style="justify-content: center; color: var(--accent-green);">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              Add New App
+              Add New Business
             </div>
           </div>
         </div>
@@ -142,6 +142,12 @@
             <div class="nav-link" data-on-click="switchView('growth-memory', this)">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
               Growth Memory Engine
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('universal-crm', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+              Universal CRM
             </div>
           </li>
         </ul>
@@ -367,33 +373,33 @@
         </div>
 
         <!-- Global Portfolio Metrics -->
-        <h3 style="margin-bottom: 16px; color: white;">Global Portfolio Performance</h3>
+        <h3 id="dashboard-main-title" style="margin-bottom: 16px; color: white;">Global Portfolio Performance</h3>
         <div class="kpi-grid">
           <div class="glass-card card-primary kpi-card">
-            <div class="kpi-title">Total Portfolio MRR</div>
+            <div class="kpi-title" id="kpi-title-1">Total Portfolio MRR</div>
             <div class="kpi-value-row">
-              <div class="kpi-value" id="global-mrr">$184,500</div>
+              <div class="kpi-value" id="kpi-value-1">$184,500</div>
               <div class="kpi-change up">▲ 22%</div>
             </div>
           </div>
           <div class="glass-card card-secondary kpi-card">
-            <div class="kpi-title">Total Downloads</div>
+            <div class="kpi-title" id="kpi-title-2">Total Downloads</div>
             <div class="kpi-value-row">
-              <div class="kpi-value" id="global-downloads">254,700</div>
+              <div class="kpi-value" id="kpi-value-2">254,700</div>
               <div class="kpi-change up">▲ 18%</div>
             </div>
           </div>
           <div class="glass-card card-green kpi-card">
-            <div class="kpi-title">Total Active Users</div>
+            <div class="kpi-title" id="kpi-title-3">Total Active Users</div>
             <div class="kpi-value-row">
-              <div class="kpi-value" id="global-active">90,900</div>
+              <div class="kpi-value" id="kpi-value-3">90,900</div>
               <div class="kpi-change up">▲ 15%</div>
             </div>
           </div>
           <div class="glass-card card-purple kpi-card">
-            <div class="kpi-title">Total Subscribers</div>
+            <div class="kpi-title" id="kpi-title-4">Total Subscribers</div>
             <div class="kpi-value-row">
-              <div class="kpi-value" id="global-subscribers">14,640</div>
+              <div class="kpi-value" id="kpi-value-4">14,640</div>
               <div class="kpi-change up">▲ 25%</div>
             </div>
           </div>
@@ -1891,6 +1897,11 @@
         <!-- Rendered by advertisingModule.js -->
       </section>
 
+      <!-- VIEW 11: UNIVERSAL CRM -->
+      <section id="view-universal-crm" class="view-panel">
+        <!-- Rendered by crmModule.js -->
+      </section>
+
     </main>
   </div>
 
@@ -1994,6 +2005,18 @@
         <div class="form-group" style="margin-bottom:15px;">
           <label>Website URL *</label>
           <input type="url" id="discovery-url-website" placeholder="https://yourwebsite.com" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:10px; border-radius:4px;">
+        </div>
+
+        <div class="form-group" style="margin-bottom:15px;">
+          <label>Business Type</label>
+          <select id="new-app-business-type" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:10px; border-radius:4px;">
+            <option value="saas">SaaS / Software</option>
+            <option value="ecommerce">E-commerce</option>
+            <option value="restaurant">Restaurant / Cafe</option>
+            <option value="dental">Dental Clinic</option>
+            <option value="real_estate">Real Estate</option>
+            <option value="generic">Other Professional Services</option>
+          </select>
         </div>
         
         <div class="form-group" style="margin-bottom:15px;">

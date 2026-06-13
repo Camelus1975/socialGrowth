@@ -160,7 +160,7 @@ app.post('/api/discovery/start', async (req, res) => {
     const { data: job, error } = await supabase
       .from('discovery_jobs')
       .insert([{ 
-        app_id: appId, 
+        business_id: appId, 
         urls_to_scan: urls,
         status: 'pending',
         progress_percent: 0,
@@ -367,7 +367,7 @@ app.post('/api/calendar/schedule', async (req, res) => {
       .from('scheduled_posts')
       .insert([{
         user_id: 'd9b7b9f3-8c43-4f11-b01a-8c48a735c029', // Fallback to hardcoded dev UID for local test
-        app_id: appId,
+        business_id: appId,
         platform: platform,
         content: text,
         scheduled_date: date,
@@ -598,7 +598,8 @@ app.post('/api/agents/orchestration/trigger', async (req, res) => {
   // Real Multi-Agent Orchestration Loop
   const authHeader = req.headers.authorization;
   const language = req.headers['x-app-language'] || 'en';
-  const result = await runMarketingOrchestration(goal, authHeader, appId, language);
+  const businessType = req.body.businessType || 'saas';
+  const result = await runMarketingOrchestration(appId, goal, authHeader, language, businessType);
   
   if (result.success) {
     res.json(result);
@@ -669,14 +670,14 @@ app.get('/api/content-intelligence/performance', async (req, res) => {
       const { data } = await supabase
         .from('mv_app_analytics_rollup')
         .select('*')
-        .eq('app_id', appId)
+        .eq('business_id', appId)
         .single();
       if (data) mvData = data;
       
       const { data: postsData } = await supabase
-        .from('apps_posts')
+        .from('businesses_posts')
         .select('id, platform, content_type as type, content_text as caption, success_score, reach, likes, ctr, conversions as downloads, revenue')
-        .eq('app_id', appId)
+        .eq('business_id', appId)
         .order('success_score', { ascending: false })
         .limit(3);
       if (postsData) realPosts = postsData;

@@ -118,11 +118,11 @@ async function processDiscoveryJob(jobId, appId, urls) {
     // Add a generated logo placeholder
     discoveryData.brandKit.logoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(discoveryData.businessProfile.name)}&background=${discoveryData.brandKit.colors.primary.replace('#','')}&color=fff&size=512`;
 
-    // Save to the apps table
+    // Save to the businesses table
     await supabase
-      .from('apps')
+      .from('businesses')
       .update({ discovery_profile: discoveryData })
-      .eq('id', appId);
+      .eq('business_id', appId);
 
     // Complete Job
     await updateJobStatus(supabase, jobId, 'complete', 100, 'Brand Intelligence Profile generated successfully.');

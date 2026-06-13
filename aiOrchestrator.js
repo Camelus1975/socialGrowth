@@ -85,12 +85,13 @@ Output JSON format: { "simulation_report": { "expected_reach": 10000, "expected_
 
 /**
  * Multi-Agent Orchestration Engine
+ * @param {string} appId - The target app ID
  * @param {string} goal - The Founder's command (e.g. "Grow BusinessPilot")
  * @param {string} authHeader - JWT token for Supabase RLS
- * @param {string} appId - The target app ID
  * @param {string} language - User's language preference
+ * @param {string} businessType - The category of business
  */
-async function runMarketingOrchestration(goal, authHeader, appId, language = 'en') {
+async function runMarketingOrchestration(appId, goal, authHeader, language = 'en', businessType = 'saas') {
   const steps = [];
   
   const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
@@ -123,7 +124,7 @@ async function runMarketingOrchestration(goal, authHeader, appId, language = 'en
       model: "gpt-4o", // Strategy requires deep reasoning
       messages: [
         { role: "system", content: AGENT_PROMPTS.CMO + "\n" + langDirective },
-        { role: "user", content: `App: ${appId}. Goal: ${goal}\n\n${memoryContext}` }
+        { role: "user", content: `Business Type: ${businessType}\nApp/Business ID: ${appId}\nGoal: ${goal}\n\n${memoryContext}` }
       ],
       response_format: { type: "json_object" }
     });

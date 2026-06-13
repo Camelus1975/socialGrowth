@@ -2,6 +2,8 @@
 import { state } from './state.js';
 import { createSafeElement } from './common.js';
 
+import { getTemplateForBusiness, formatMetric } from './industryTemplates.js';
+
 let activeDashChartMetric = 'mrr';
 
 export function initDashboard() {
@@ -22,29 +24,51 @@ export function initDashboard() {
 
 function toggleDashboardChart(metric) {
   activeDashChartMetric = metric;
-  document.getElementById('chart-mrr-btn').classList.toggle('active', metric === 'mrr');
-  document.getElementById('chart-downloads-btn').classList.toggle('active', metric === 'downloads');
+  document.getElementById('chart-mrr-btn')?.classList.toggle('active', metric === 'mrr');
+  document.getElementById('chart-downloads-btn')?.classList.toggle('active', metric === 'downloads');
   renderDashboardChart();
 }
 
 export function renderDashboard() {
   const app = state.appsData[state.currentActiveApp];
   
-  // Calculate Global Sums
-  let totalMrr = 0, totalDownloads = 0, totalActive = 0, totalSubscribers = 0;
+  // Update Dashboard main title based on context
+  if (app) {
+     document.getElementById('dashboard-main-title').textContent = `${app.name} Performance`;
+  } else {
+     document.getElementById('dashboard-main-title').textContent = `Global Portfolio Performance`;
+  }
   
-  Object.keys(state.appsData).forEach(key => {
-    totalMrr += state.appsData[key].mrr || 0;
-    totalDownloads += state.appsData[key].downloads || 0;
-    totalActive += state.appsData[key].activeUsers || 0;
-    totalSubscribers += state.appsData[key].subscribers || 0;
+  const template = getTemplateForBusiness(app ? app.businessType : 'generic');
+  
+  // Calculate Sums based on Template KPIs
+  template.kpis.forEach((kpi, index) => {
+    let totalValue = 0;
+    
+    if (app) {
+       // Single business view
+       const historyArray = app.metrics[kpi.id] || [];
+       totalValue = historyArray.length > 0 ? historyArray[historyArray.length - 1] : 0;
+    } else {
+       // Global view (only sums up businesses of the SAME type, or defaults to generic logic)
+       Object.keys(state.appsData).forEach(key => {
+         const business = state.appsData[key];
+         if (business.metrics && business.metrics[kpi.id]) {
+           const historyArray = business.metrics[kpi.id];
+           totalValue += historyArray.length > 0 ? historyArray[historyArray.length - 1] : 0;
+         }
+       });
+    }
+    
+    // Update the UI card dynamically
+    const titleEl = document.getElementById(`kpi-title-${index + 1}`);
+    const valueEl = document.getElementById(`kpi-value-${index + 1}`);
+    
+    if (titleEl && valueEl) {
+      titleEl.textContent = kpi.label;
+      valueEl.textContent = formatMetric(totalValue, kpi.format);
+    }
   });
-  
-  // Update UI Elements safely using textContent
-  document.getElementById('global-mrr').textContent = `$${totalMrr.toLocaleString()}`;
-  document.getElementById('global-downloads').textContent = totalDownloads.toLocaleString();
-  document.getElementById('global-active').textContent = totalActive.toLocaleString();
-  document.getElementById('global-subscribers').textContent = totalSubscribers.toLocaleString();
   
   if (!app) {
     document.getElementById('selected-detail-title').textContent = `No App Selected`;
@@ -121,17 +145,23 @@ export function renderDashboard() {
     const rightFlex = createSafeElement('div');
     rightFlex.style.textAlign = 'right';
     
-    const mrrEl = createSafeElement('div', [], `$${item.mrr.toLocaleString()} MRR`);
-    mrrEl.style.fontWeight = '700';
-    mrrEl.style.fontSize = '0.85rem';
-    mrrEl.style.color = 'white';
+    // Dynamically grab primary metric
+    const itemTemplate = getTemplateForBusiness(item.businessType || 'saas');
+    const primaryKpi = itemTemplate.kpis[0];
+    const metricHistory = item.metrics[primaryKpi.id] || [0];
+    const latestValue = metricHistory[metricHistory.length - 1] || 0;
+    
+    const metricEl = createSafeElement('div', [], `${formatMetric(latestValue, primaryKpi.format)} ${primaryKpi.label}`);
+    metricEl.style.fontWeight = '700';
+    metricEl.style.fontSize = '0.85rem';
+    metricEl.style.color = 'white';
     
     const growthEl = createSafeElement('div', [], `${item.socialGrowth} Growth`);
     growthEl.style.fontSize = '0.75rem';
     growthEl.style.color = 'var(--accent-green)';
     growthEl.style.fontWeight = '600';
     
-    rightFlex.appendChild(mrrEl);
+    rightFlex.appendChild(metricEl);
     rightFlex.appendChild(growthEl);
     
     row.appendChild(leftFlex);
@@ -151,11 +181,22 @@ function renderDashboardChart() {
   if (!app) return;
   const history = app.analytics;
   const labels = history.months;
-  const data = activeDashChartMetric === 'mrr' ? history.mrr : history.downloads;
-  const maxVal = Math.max(...data) * 1.1;
+  
+  // Use template to get metric for chart based on button pressed
+  const template = getTemplateForBusiness(app.businessType);
+  const chartKpi = activeDashChartMetric === 'mrr' ? template.kpis[0] : template.kpis[1];
+  
+  if (!chartKpi) return;
+  
+  const data = app.metrics[chartKpi.id] || [0,0,0,0,0,0];
+  const maxVal = Math.max(...data) * 1.1 || 1; // avoid div by 0
+  
+  // Update Chart Labels dynamically
+  document.getElementById('chart-mrr-btn').textContent = template.kpis[0].label;
+  if(template.kpis[1]) document.getElementById('chart-downloads-btn').textContent = template.kpis[1].label;
   
   labels.forEach((month, idx) => {
-    const value = data[idx];
+    const value = data[idx] || 0;
     const heightPercentage = Math.round((value / maxVal) * 100);
     
     const barCol = createSafeElement('div', ['chart-bar-column']);
@@ -163,7 +204,7 @@ function renderDashboardChart() {
     barFill.style.height = `${heightPercentage}%`;
     barFill.style.background = app.logoColor;
     
-    const tooltip = createSafeElement('div', ['chart-bar-tooltip'], `${activeDashChartMetric === 'mrr' ? '$' : ''}${value.toLocaleString()}`);
+    const tooltip = createSafeElement('div', ['chart-bar-tooltip'], formatMetric(value, chartKpi.format));
     barFill.appendChild(tooltip);
     
     const label = createSafeElement('div', ['chart-label'], month);
