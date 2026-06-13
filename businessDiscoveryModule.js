@@ -159,6 +159,12 @@ async function finalizeDiscovery(appId, businessType) {
   
   renderAppSelectorDropdown();
   selectActiveApp(appId);
+  
+  // Automate transition to dashboard after 3 seconds
+  setTimeout(() => {
+    closeModal('discovery-wizard-modal');
+    switchView('dashboard');
+  }, 3000);
 }
 
 function resetWizard() {
