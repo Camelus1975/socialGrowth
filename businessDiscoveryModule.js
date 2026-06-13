@@ -72,6 +72,7 @@ async function startDiscovery() {
     // Start Polling
     discoveryPollingInterval = setInterval(() => pollJobStatus(res.jobId, appId, businessType), 2000);
   } catch (err) {
+    alert("DISCOVERY ERROR: " + (err.message || 'Discovery failed to start.'));
     showToast(err.message || 'Discovery failed to start.', 'error');
     resetWizard();
   }
@@ -89,6 +90,8 @@ async function pollJobStatus(jobId, appId, businessType) {
         await finalizeDiscovery(appId, businessType);
       } else if (job.status === 'failed') {
         clearInterval(discoveryPollingInterval);
+        const errorLog = job.logs && job.logs.length > 0 ? job.logs[job.logs.length - 1] : 'Unknown error';
+        alert('BACKEND CRASH LOG: ' + errorLog);
         showToast('Discovery Engine failed.', 'error');
         resetWizard();
       }
