@@ -121,12 +121,19 @@ async function processDiscoveryJob(jobId, appId, urls, appName, providedSupabase
       }
     `;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Use mini for speed and cost in this simulated step
-      messages: [{ role: "system", content: systemPrompt }],
-      temperature: 0.7,
-      response_format: { type: "json_object" }
-    });
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error("OpenAI API Timeout")), 15000)
+    );
+
+    const response = await Promise.race([
+      openai.chat.completions.create({
+        model: "gpt-4o-mini", // Use mini for speed and cost in this simulated step
+        messages: [{ role: "system", content: systemPrompt }],
+        temperature: 0.7,
+        response_format: { type: "json_object" }
+      }),
+      timeoutPromise
+    ]);
 
     const discoveryData = JSON.parse(response.choices[0].message.content);
     
