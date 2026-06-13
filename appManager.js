@@ -36,13 +36,41 @@ export function renderAppSelectorDropdown() {
   apps.forEach(app => {
     const div = document.createElement('div');
     div.className = 'app-option';
-    // Use onclick directly to bypass data-on-click which requires global scope
-    div.onclick = () => selectActiveApp(app.id);
+    div.style.display = 'flex';
+    div.style.justifyContent = 'space-between';
+    div.style.alignItems = 'center';
     
-    div.innerHTML = `
+    // Main container for selection
+    const selectDiv = document.createElement('div');
+    selectDiv.style.flex = '1';
+    selectDiv.style.display = 'flex';
+    selectDiv.style.alignItems = 'center';
+    selectDiv.onclick = () => selectActiveApp(app.id);
+    
+    selectDiv.innerHTML = `
       <span class="app-dot" style="background: ${app.logoColor || '#666'}; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px;"></span>
       ${app.name} <span style="opacity: 0.6; font-size: 0.8em; margin-left: 4px;">(${app.category || 'App'})</span>
     `;
+    
+    const deleteBtn = document.createElement('button');
+    deleteBtn.innerHTML = '🗑️';
+    deleteBtn.title = 'Delete Business';
+    deleteBtn.style.background = 'none';
+    deleteBtn.style.border = 'none';
+    deleteBtn.style.cursor = 'pointer';
+    deleteBtn.style.padding = '4px 8px';
+    deleteBtn.style.opacity = '0.6';
+    deleteBtn.style.transition = 'opacity 0.2s';
+    deleteBtn.onmouseover = () => deleteBtn.style.opacity = '1';
+    deleteBtn.onmouseout = () => deleteBtn.style.opacity = '0.6';
+    
+    deleteBtn.onclick = (e) => {
+      e.stopPropagation();
+      deleteBusiness(app.id);
+    };
+    
+    div.appendChild(selectDiv);
+    div.appendChild(deleteBtn);
     
     container.appendChild(div);
   });
@@ -185,5 +213,40 @@ export async function fetchUserApps() {
     }
   } catch (err) {
     console.warn("Could not fetch apps from Supabase", err);
+  }
+}
+
+// Delete an app from Supabase and local state
+export async function deleteBusiness(appId) {
+  if (!confirm('Are you sure you want to delete this business? This action cannot be undone.')) return;
+  
+  try {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      const { error } = await supabase.from('businesses').delete().eq('business_id', appId);
+      if (error) throw error;
+      
+      showToast('Business deleted successfully');
+      
+      // Update local state
+      delete state.appsData[appId];
+      if (state.customRoadmapItems) delete state.customRoadmapItems[appId];
+      
+      // Switch to another app or null
+      const keys = Object.keys(state.appsData);
+      if (state.currentActiveApp === appId) {
+        if (keys.length > 0) {
+          selectActiveApp(keys[0]);
+        } else {
+          selectActiveApp(null);
+        }
+      }
+      
+      // Re-render dropdown
+      renderAppSelectorDropdown();
+    }
+  } catch (err) {
+    console.error('Failed to delete business', err);
+    showToast('Failed to delete business', 'error');
   }
 }
