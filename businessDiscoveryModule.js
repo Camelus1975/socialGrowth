@@ -2,7 +2,7 @@
 import { state } from './state.js';
 import { requestApi, showToast, closeModal } from './common.js';
 import { renderAppSelectorDropdown } from './appManager.js';
-import { selectActiveApp } from './app.js';
+import { selectActiveApp, switchView } from './app.js';
 import { getTemplateForBusiness } from './industryTemplates.js';
 
 let discoveryPollingInterval = null;
@@ -18,6 +18,7 @@ export function initBusinessDiscovery() {
   if (finishBtn) {
     finishBtn.addEventListener('click', () => {
       closeModal('discovery-wizard-modal');
+      switchView('dashboard');
     });
   }
 }
