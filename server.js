@@ -886,6 +886,21 @@ app.get('/health', (req, res) => {
   res.json({ status: "healthy", database: "connected", workers: "running" });
 });
 
+// Debug endpoint for logs
+app.get('/api/admin/debug-jobs', async (req, res) => {
+  try {
+    const adminSupabase = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_KEY || config.SUPABASE_ANON_KEY);
+    const { data, error } = await adminSupabase
+      .from('discovery_jobs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(5);
+    res.json({ data, error });
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Catch-all: serve index.html for any non-API route (SPA support)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
