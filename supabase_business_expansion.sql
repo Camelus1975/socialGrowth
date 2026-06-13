@@ -19,6 +19,11 @@ ADD COLUMN IF NOT EXISTS metrics_history JSONB DEFAULT '{}'::jsonb;
 
 DO $$ 
 BEGIN
+  -- businesses
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='businesses' AND column_name='app_id') THEN
+    ALTER TABLE public.businesses RENAME COLUMN app_id TO business_id;
+  END IF;
+
   -- discovery_jobs
   IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='discovery_jobs' AND column_name='app_id') THEN
     ALTER TABLE public.discovery_jobs RENAME COLUMN app_id TO business_id;
@@ -107,3 +112,6 @@ CREATE POLICY "Users can update crm deals for their businesses"
             AND businesses.user_id = auth.uid()
         )
     );
+
+-- 5. Force PostgREST to reload its schema cache so the API recognizes the 'businesses' table immediately
+NOTIFY pgrst, 'reload schema';

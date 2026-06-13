@@ -1,6 +1,7 @@
 // App Founder Growth Suite - AI Content Studio & Strategy Module
 import { state } from './state.js';
 import { requestApi, showToast, createSafeElement } from './common.js';
+import { getTemplateForBusiness, formatMetric } from './industryTemplates.js';
 
 let releaseAssetsData = {};
 
@@ -675,6 +676,15 @@ export function renderExecutiveInsights() {
   const app = state.appsData[state.currentActiveApp];
   if (!app) return;
   
+  const template = getTemplateForBusiness(app.businessType);
+  const kpi1 = template.kpis[0] || { id: 'mrr', label: 'Revenue', format: 'currency' };
+  const kpi2 = template.kpis[1] || { id: 'roi', label: 'ROI', format: 'percent' };
+  
+  const title1 = document.getElementById('exec-kpi1-title');
+  const title2 = document.getElementById('exec-kpi2-title');
+  if (title1) title1.textContent = `${kpi1.label} Trends`;
+  if (title2) title2.textContent = `${kpi2.label} Trends`;
+  
   const execMrr = document.getElementById('exec-mrr-trend-chart');
   const execRoi = document.getElementById('exec-roi-trend-chart');
   
@@ -682,47 +692,49 @@ export function renderExecutiveInsights() {
     execMrr.innerHTML = '';
     execRoi.innerHTML = '';
     
-    const history = app.analytics;
-    const maxMrr = Math.max(...history.mrr) * 1.1;
-    const maxRoi = Math.max(...history.roi) * 1.1;
+    // In actual use, fetch from metrics. If missing, use empty arrays.
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    const kpi1Data = app.metrics && app.metrics[kpi1.id] ? app.metrics[kpi1.id] : [0,0,0,0,0,0];
+    const kpi2Data = app.metrics && app.metrics[kpi2.id] ? app.metrics[kpi2.id] : [0,0,0,0,0,0];
     
-    history.months.forEach((m, idx) => {
-      const mrrVal = history.mrr[idx];
-      const mrrH = Math.round((mrrVal / maxMrr) * 100);
+    const maxKpi1 = Math.max(...kpi1Data, 1) * 1.1;
+    const maxKpi2 = Math.max(...kpi2Data, 1) * 1.1;
+    
+    months.forEach((m, idx) => {
+      const val1 = kpi1Data[idx] || 0;
+      const h1 = Math.max(5, Math.round((val1 / maxKpi1) * 100)); // ensure a min height
       
-      const barColMrr = createSafeElement('div', ['chart-bar-column']);
-      const fillMrr = createSafeElement('div', ['chart-bar-fill']);
-      fillMrr.style.height = `${mrrH}%`;
-      fillMrr.style.background = 'var(--primary)';
-      const tooltipMrr = createSafeElement('div', ['chart-bar-tooltip'], `$${mrrVal.toLocaleString()}`);
-      fillMrr.appendChild(tooltipMrr);
-      const labelMrr = createSafeElement('div', ['chart-label'], m);
-      barColMrr.appendChild(fillMrr);
-      barColMrr.appendChild(labelMrr);
-      execMrr.appendChild(barColMrr);
+      const barCol1 = createSafeElement('div', ['chart-bar-column']);
+      const fill1 = createSafeElement('div', ['chart-bar-fill']);
+      fill1.style.height = `${h1}%`;
+      fill1.style.background = 'var(--primary)';
+      const tooltip1 = createSafeElement('div', ['chart-bar-tooltip'], formatMetric(val1, kpi1.format));
+      fill1.appendChild(tooltip1);
+      const label1 = createSafeElement('div', ['chart-label'], m);
+      barCol1.appendChild(fill1);
+      barCol1.appendChild(label1);
+      execMrr.appendChild(barCol1);
       
-      const roiVal = history.roi[idx];
-      const roiH = Math.round((roiVal / maxRoi) * 100);
+      const val2 = kpi2Data[idx] || 0;
+      const h2 = Math.max(5, Math.round((val2 / maxKpi2) * 100));
       
-      const barColRoi = createSafeElement('div', ['chart-bar-column']);
-      const fillRoi = createSafeElement('div', ['chart-bar-fill']);
-      fillRoi.style.height = `${roiH}%`;
-      fillRoi.style.background = 'var(--secondary)';
-      const tooltipRoi = createSafeElement('div', ['chart-bar-tooltip'], `${roiVal}%`);
-      fillRoi.appendChild(tooltipRoi);
-      const labelRoi = createSafeElement('div', ['chart-label'], m);
-      barColRoi.appendChild(fillRoi);
-      barColRoi.appendChild(labelRoi);
-      execRoi.appendChild(barColRoi);
+      const barCol2 = createSafeElement('div', ['chart-bar-column']);
+      const fill2 = createSafeElement('div', ['chart-bar-fill']);
+      fill2.style.height = `${h2}%`;
+      fill2.style.background = 'var(--secondary)';
+      const tooltip2 = createSafeElement('div', ['chart-bar-tooltip'], formatMetric(val2, kpi2.format));
+      fill2.appendChild(tooltip2);
+      const label2 = createSafeElement('div', ['chart-label'], m);
+      barCol2.appendChild(fill2);
+      barCol2.appendChild(label2);
+      execRoi.appendChild(barCol2);
     });
   }
   
   const textEl = document.getElementById('exec-strategic-text');
   if (textEl) {
-    textEl.textContent = `MRR growth is stable at `;
-    const strong = createSafeElement('strong', [], app.socialGrowth);
-    textEl.appendChild(strong);
-    textEl.appendChild(document.createTextNode('. Check WearOS segment.'));
+    textEl.innerHTML = '';
+    textEl.textContent = `${kpi1.label} growth is stable. Strategic focus remains on optimizing ${kpi2.label.toLowerCase()}.`;
   }
 }
 

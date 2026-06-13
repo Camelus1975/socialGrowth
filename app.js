@@ -59,6 +59,7 @@ import {
   copyReleaseToClipboard, 
   toggleRoadmapVisibility, 
   addNewRoadmapItem, 
+  renderExecutiveInsights,
   generateRoadmapAnnouncementPost, 
   recycleContent, 
   generateWeeklyGrowthReport, 
