@@ -30,7 +30,7 @@ export function renderMediaManager() {
   
   const totalCountEl = document.getElementById('media-total-count');
   if (totalCountEl) {
-    totalCountEl.textContent = `${state.mediaState.assets.length} items`;
+    totalCountEl.textContent = `${(state.mediaState.assets || []).length} items`;
   }
   
   assets.forEach(asset => {
