@@ -2148,4 +2148,8 @@ html[dir="rtl"] .stats-grid {
   direction: rtl;
 }
 
-
+/* Discovery Engine Radar Animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

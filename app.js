@@ -107,6 +107,7 @@ import {
   fetchUserApps, 
   renderAppSelectorDropdown 
 } from './appManager.js';
+import { initBusinessDiscovery } from './businessDiscoveryModule.js';
 
 // Initialize Application
 window.addEventListener('DOMContentLoaded', async () => {
@@ -152,6 +153,7 @@ export async function bootApp() {
 
   // Initialize all view modules
   initAppManager();
+  initBusinessDiscovery();
   initDashboard();
   initCalendar();
   initInbox();

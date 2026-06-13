@@ -6,6 +6,7 @@ const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 const config = require('./config');
 const aiGatewayRouter = require('./aiGatewayRouter');
+const { processDiscoveryJob } = require('./discoveryEngine');
 
 const app = express();
 const PORT = config.PORT;
@@ -142,6 +143,59 @@ app.post('/api/auth/session', async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: "Database authentication verification error" });
+  }
+});
+
+// ==========================================
+// BUSINESS DISCOVERY & ONBOARDING ENDPOINTS
+// ==========================================
+
+// Start a new discovery job
+app.post('/api/discovery/start', async (req, res) => {
+  const { urls, appId } = req.body;
+  if (!urls || !appId) return res.status(400).json({ error: "Missing urls or appId" });
+  
+  try {
+    // Insert job into Supabase
+    const { data: job, error } = await supabase
+      .from('discovery_jobs')
+      .insert([{ 
+        app_id: appId, 
+        urls_to_scan: urls,
+        status: 'pending',
+        progress_percent: 0,
+        logs: ['[System] Job queued for discovery engine.']
+      }])
+      .select()
+      .single();
+      
+    if (error) throw error;
+    
+    // Spawn the background worker asynchronously (fire and forget)
+    processDiscoveryJob(job.id, appId, urls);
+    
+    res.json({ jobId: job.id, message: "Discovery job started." });
+  } catch (err) {
+    console.error("Discovery Start Error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Poll job status
+app.get('/api/discovery/status/:jobId', async (req, res) => {
+  const { jobId } = req.params;
+  try {
+    const { data: job, error } = await supabase
+      .from('discovery_jobs')
+      .select('*')
+      .eq('id', jobId)
+      .single();
+      
+    if (error) throw error;
+    res.json(job);
+  } catch (err) {
+    console.error("Discovery Status Error:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 

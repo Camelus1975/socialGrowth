@@ -108,7 +108,7 @@
             
             <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 8px 0;"></div>
             
-            <div class="app-option" data-on-click="openModal('app-create-modal')" style="justify-content: center; color: var(--accent-green);">
+            <div class="app-option" data-on-click="openModal('discovery-wizard-modal')" style="justify-content: center; color: var(--accent-green);">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
               Add New App
             </div>
@@ -1974,37 +1974,86 @@
     </div>
   </div>
 
-  <!-- Create App Modal -->
-  <div id="app-create-modal" class="custom-modal-overlay">
-    <div class="modal-content" style="max-width: 400px;">
-      <div class="modal-header">
-        <h3 style="margin: 0;">Add New Application</h3>
-        <button class="modal-close" data-on-click="closeModal('app-create-modal')">×</button>
+  <!-- Discovery Engine Onboarding Wizard Modal -->
+  <div id="discovery-wizard-modal" class="custom-modal-overlay">
+    <div class="modal-content" style="max-width: 600px; padding: 0;">
+      <!-- Header -->
+      <div class="modal-header" style="border-bottom: 1px solid var(--border-glass); padding: 20px;">
+        <h3 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+          <i class="fa-solid fa-radar"></i> AI Business Discovery Engine
+        </h3>
+        <button class="modal-close" data-on-click="closeModal('discovery-wizard-modal')">×</button>
       </div>
-      <div class="modal-body" style="padding: 20px;">
-        <div class="form-group" style="margin-bottom:12px;">
-          <label for="new-app-name">App Name</label>
-          <input type="text" id="new-app-name" placeholder="e.g. SocialGrowth" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:8px; border-radius:4px;">
+
+      <!-- Step 1: Input -->
+      <div id="discovery-step-1" style="padding: 20px;">
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+          Enter your URLs below. Our AI will automatically analyze your website, extract your brand identity, and generate a complete marketing foundation.
+        </p>
+        
+        <div class="form-group" style="margin-bottom:15px;">
+          <label>Website URL *</label>
+          <input type="url" id="discovery-url-website" placeholder="https://yourwebsite.com" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:10px; border-radius:4px;">
         </div>
-        <div class="form-group" style="margin-bottom:12px;">
-          <label for="new-app-tagline">Tagline</label>
-          <input type="text" id="new-app-tagline" placeholder="e.g. AI Marketing Tool" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:8px; border-radius:4px;">
+        
+        <div class="form-group" style="margin-bottom:15px;">
+          <label>Instagram URL</label>
+          <input type="url" id="discovery-url-ig" placeholder="https://instagram.com/yourhandle" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:10px; border-radius:4px;">
         </div>
-        <div class="form-group" style="margin-bottom:12px;">
-          <label for="new-app-category">Category</label>
-          <select id="new-app-category" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:8px; border-radius:4px;">
-            <option value="Marketing">Marketing</option>
-            <option value="Health & Fitness">Health & Fitness</option>
-            <option value="Productivity">Productivity</option>
-            <option value="DevTools">Developer Tools</option>
-            <option value="Finance">Finance</option>
-            <option value="Other">Other</option>
-          </select>
+
+        <div class="form-group" style="margin-bottom:15px;">
+          <label>LinkedIn URL</label>
+          <input type="url" id="discovery-url-linkedin" placeholder="https://linkedin.com/company/yourcompany" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:10px; border-radius:4px;">
+        </div>
+
+        <div class="modal-footer" style="padding: 20px 0 0 0; border: none;">
+          <button class="btn btn-secondary" data-on-click="closeModal('discovery-wizard-modal')">Cancel</button>
+          <button class="btn btn-primary" id="discovery-start-btn" style="background: var(--accent-green); color: black;">
+            <i class="fa-solid fa-bolt"></i> Start Discovery
+          </button>
         </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-on-click="closeModal('app-create-modal')">Cancel</button>
-        <button class="btn btn-primary" id="app-modal-save-btn">Create App</button>
+
+      <!-- Step 2: Scanning / Loading -->
+      <div id="discovery-step-2" style="padding: 40px 20px; text-align: center; display: none;">
+        <div class="radar-spinner" style="margin: 0 auto 20px auto; width: 60px; height: 60px; border: 4px solid var(--border-glass); border-top: 4px solid var(--accent-blue); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <h3 id="discovery-status-title" style="margin-bottom: 10px;">Scanning Business Footprint...</h3>
+        <p id="discovery-status-text" style="color: var(--text-secondary); font-family: monospace;"></p>
+        
+        <div style="width: 100%; height: 8px; background: var(--bg-dark); border-radius: 4px; margin-top: 20px; overflow: hidden;">
+          <div id="discovery-progress-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); transition: width 0.3s ease;"></div>
+        </div>
+      </div>
+
+      <!-- Step 3: Success Presentation -->
+      <div id="discovery-step-3" style="padding: 20px; display: none;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <div style="width: 60px; height: 60px; background: rgba(34, 197, 94, 0.2); color: var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 15px auto;">
+            <i class="fa-solid fa-check"></i>
+          </div>
+          <h3>Brand Intelligence Complete!</h3>
+          <p style="color: var(--text-secondary);">We've successfully generated your brand foundation.</p>
+        </div>
+        
+        <div style="background: var(--bg-dark); padding: 15px; border-radius: 8px; border: 1px solid var(--border-glass); margin-bottom: 20px;">
+          <h4 id="discovery-result-name" style="margin-top: 0; margin-bottom: 5px;">Brand Name</h4>
+          <p id="discovery-result-summary" style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 15px; line-height: 1.4;">Summary...</p>
+          
+          <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <div style="flex: 1; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 4px;">
+              <span style="font-size: 0.8em; color: var(--text-secondary); display: block; margin-bottom: 4px;">Brand Tone</span>
+              <strong id="discovery-result-tone">Professional</strong>
+            </div>
+            <div style="flex: 1; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 4px;">
+              <span style="font-size: 0.8em; color: var(--text-secondary); display: block; margin-bottom: 4px;">Readiness Score</span>
+              <strong id="discovery-result-score" style="color: var(--accent-green);">0/100</strong>
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-footer" style="padding: 0; border: none;">
+          <button class="btn btn-primary" id="discovery-finish-btn" style="width: 100%;">Enter Dashboard</button>
+        </div>
       </div>
     </div>
   </div>
