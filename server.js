@@ -894,7 +894,12 @@ app.get('/admin/debug-jobs', async (req, res) => {
       .select('*')
       .order('created_at', { ascending: false })
       .limit(5);
-    res.json({ data, error });
+    res.json({ 
+      data, 
+      error,
+      hasOpenAIKey: !!process.env.OPENAI_API_KEY,
+      hasServiceKey: !!process.env.SUPABASE_SERVICE_KEY
+    });
   } catch(err) {
     res.status(500).json({ error: err.message });
   }
