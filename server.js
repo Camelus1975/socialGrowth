@@ -155,10 +155,21 @@ app.post('/api/discovery/start', async (req, res) => {
   const { urls, appId, businessType, name } = req.body;
   if (!urls || !appId) return res.status(400).json({ error: "Missing urls or appId" });
   
+  // Create an authenticated Supabase client for this request
+  const token = req.headers.authorization?.split(' ')[1];
+  let userSupabase = supabase;
+  
+  if (token && token !== 'mock-supabase-jwt-token') {
+    userSupabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: `Bearer ${token}` } }
+    });
+  }
+  
   try {
     // 1. Insert business stub to satisfy foreign key constraint
-    const { error: bizError } = await supabase.from('businesses').insert([{
+    const { error: bizError } = await userSupabase.from('businesses').insert([{
       business_id: appId,
+      user_id: req.user.id,
       name: name || 'Discovered Business',
       business_type: businessType || 'saas',
       category: 'Discovered',
@@ -169,7 +180,7 @@ app.post('/api/discovery/start', async (req, res) => {
     if (bizError && bizError.code !== '23505') throw bizError;
 
     // 2. Insert job into Supabase
-    const { data: job, error } = await supabase
+    const { data: job, error } = await userSupabase
       .from('discovery_jobs')
       .insert([{ 
         business_id: appId, 
