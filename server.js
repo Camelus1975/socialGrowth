@@ -819,9 +819,24 @@ Recommend cross-promoting FitPulse's workout planners inside TaskFlow's calendar
 [ ] Add screenshots to feature update draft posts.
 [ ] Recycle high-scoring Twitter posts into LinkedIn variants.
 `;
-  res.json({ report: reportContent });
 });
 
+// --- Advertising API Routes ---
+app.get('/api/advertising/campaigns/:appId', (req, res) => {
+  res.json({
+    campaigns: [
+      { id: 'camp1', name: 'Meta Lookalike Acquisition', status: 'active', spend: 450, total_budget: 1500, roas: 2.1, platform: 'Meta', objective: 'Conversions' },
+      { id: 'camp2', name: 'Google Search Intent', status: 'active', spend: 890, total_budget: 2000, roas: 3.4, platform: 'Google', objective: 'Lead Gen' },
+      { id: 'camp3', name: 'TikTok Influencer Spark', status: 'pending_approval', spend: 0, total_budget: 3000, roas: 0, platform: 'TikTok', objective: 'Awareness' },
+      { id: 'camp4', name: 'LinkedIn B2B Retargeting', status: 'completed', spend: 500, total_budget: 500, roas: 1.8, platform: 'LinkedIn', objective: 'Sales' }
+    ]
+  });
+});
+
+app.post('/api/advertising/approve', (req, res) => {
+  const { campaignId } = req.body;
+  res.json({ status: 'success', message: `Campaign ${campaignId} approved and launched.` });
+});
 // Default status probe
 app.get('/health', (req, res) => {
   res.json({ status: "healthy", database: "connected", workers: "running" });
