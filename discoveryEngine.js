@@ -122,7 +122,7 @@ async function processDiscoveryJob(jobId, appId, urls, appName, providedSupabase
     `;
 
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error("OpenAI API Timeout")), 15000)
+      setTimeout(() => reject(new Error("OpenAI API Timeout")), 60000)
     );
 
     const response = await Promise.race([
@@ -137,8 +137,11 @@ async function processDiscoveryJob(jobId, appId, urls, appName, providedSupabase
 
     const discoveryData = JSON.parse(response.choices[0].message.content);
     
-    // Add a generated logo placeholder
-    discoveryData.brandKit.logoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(discoveryData.businessProfile.name)}&background=${discoveryData.brandKit.colors.primary.replace('#','')}&color=fff&size=512`;
+    // Add a generated logo placeholder safely
+    const appNameEncoded = encodeURIComponent(discoveryData?.businessProfile?.name || name || 'App');
+    const primaryColor = (discoveryData?.brandKit?.colors?.primary || '#8B5CF6').replace('#', '');
+    discoveryData.brandKit = discoveryData.brandKit || { colors: { primary: '#8B5CF6' } };
+    discoveryData.brandKit.logoUrl = `https://ui-avatars.com/api/?name=${appNameEncoded}&background=${primaryColor}&color=fff&size=512`;
 
     // Save to the businesses table
     await supabase
