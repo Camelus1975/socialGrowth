@@ -218,7 +218,17 @@ app.post('/api/discovery/start', async (req, res) => {
 app.get('/api/discovery/status/:jobId', async (req, res) => {
   const { jobId } = req.params;
   try {
-    const { data: job, error } = await supabase
+    const token = req.headers.authorization?.split(' ')[1];
+    let userSupabase = supabase;
+    if (token && token !== 'mock-supabase-jwt-token') {
+      userSupabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
+        global: { headers: { Authorization: `Bearer ${token}` } }
+      });
+    } else if (config.SUPABASE_SERVICE_KEY) {
+      userSupabase = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_KEY);
+    }
+    
+    const { data: job, error } = await userSupabase
       .from('discovery_jobs')
       .select('*')
       .eq('id', jobId)
