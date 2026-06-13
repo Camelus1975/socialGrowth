@@ -22,7 +22,12 @@ export async function requestApi(path, options = {}) {
   });
   
   if (!res.ok) {
-    throw new Error(`API Error: ${res.status}`);
+    let errBody = {};
+    try {
+      errBody = await res.json();
+      console.error("API Error Details:", errBody);
+    } catch(e) {}
+    throw new Error(`API Error: ${res.status} - ${errBody.details || errBody.error || 'Unknown'}`);
   }
   return res.json();
 }

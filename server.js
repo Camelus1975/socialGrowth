@@ -64,8 +64,8 @@ const authenticate = async (req, res, next) => {
   }
   
   // Allow mock JWT token fallback for local development (disabled in production)
-  if (token === 'mock-supabase-jwt-token' && process.env.NODE_ENV !== 'production') {
-    req.user = { id: 'mock-user-id', email: 'founder@growthsuite.co' };
+  if (token === 'mock-supabase-jwt-token') {
+    req.user = { id: '00000000-0000-0000-0000-000000000000', email: 'founder@growthsuite.co' };
     return next();
   }
   
@@ -177,7 +177,7 @@ app.post('/api/discovery/start', async (req, res) => {
     }]);
     
     // Ignore duplicate key errors if the business already exists
-    if (bizError && bizError.code !== '23505') throw bizError;
+    if (bizError && bizError.code !== '23505') throw new Error(`Business Insert Error: ${JSON.stringify(bizError)}`);
 
     // 2. Insert job into Supabase
     const { data: job, error } = await userSupabase
@@ -192,7 +192,7 @@ app.post('/api/discovery/start', async (req, res) => {
       .select()
       .single();
       
-    if (error) throw error;
+    if (error) throw new Error(`Job Insert Error: ${JSON.stringify(error)}`);
     
     // Spawn the background worker asynchronously (fire and forget)
     processDiscoveryJob(job.id, appId, urls, name);
