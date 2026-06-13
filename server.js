@@ -886,8 +886,7 @@ app.get('/health', (req, res) => {
   res.json({ status: "healthy", database: "connected", workers: "running" });
 });
 
-// Debug endpoint for logs
-app.get('/api/admin/debug-jobs', async (req, res) => {
+app.get('/admin/debug-jobs', async (req, res) => {
   try {
     const adminSupabase = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_KEY || config.SUPABASE_ANON_KEY);
     const { data, error } = await adminSupabase
