@@ -12,16 +12,20 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function updateJobStatus(supabase, jobId, status, progress, logMessage) {
   try {
-    const { data: job } = await supabase
+    const { data: job, error: selectErr } = await supabase
       .from('discovery_jobs')
       .select('logs')
       .eq('id', jobId)
       .single();
+      
+    if (selectErr && selectErr.code !== 'PGRST116') {
+      console.error(`[Discovery Engine] Error fetching job logs:`, selectErr);
+    }
 
     const currentLogs = job?.logs || [];
     if (logMessage) currentLogs.push(`[${new Date().toISOString()}] ${logMessage}`);
 
-    await supabase
+    const { error: updateErr } = await supabase
       .from('discovery_jobs')
       .update({
         status,
@@ -30,6 +34,10 @@ async function updateJobStatus(supabase, jobId, status, progress, logMessage) {
         updated_at: new Date().toISOString()
       })
       .eq('id', jobId);
+      
+    if (updateErr) {
+      console.error(`[Discovery Engine] Error updating job:`, updateErr);
+    }
       
     console.log(`[Discovery Engine] Job ${jobId}: ${status} (${progress}%) - ${logMessage}`);
   } catch (err) {
@@ -43,10 +51,13 @@ async function updateJobStatus(supabase, jobId, status, progress, logMessage) {
  * We simulate scraping by asking GPT to hallucinate a realistic brand profile based on the URLs.
  * In a real-world scenario, this would use Apify or Puppeteer to extract HTML/CSS before sending to GPT.
  */
-async function processDiscoveryJob(jobId, appId, urls, appName) {
-  const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_KEY);
-  
+async function processDiscoveryJob(jobId, appId, urls, appName, providedSupabase = null) {
+  let supabase = providedSupabase;
   try {
+    if (!supabase) {
+      supabase = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_KEY || config.SUPABASE_ANON_KEY);
+    }
+    
     await updateJobStatus(supabase, jobId, 'scanning', 10, 'Initializing Headless Browsers...');
     await sleep(2000); // Simulate boot
     

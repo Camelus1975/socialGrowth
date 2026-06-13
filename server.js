@@ -205,7 +205,7 @@ app.post('/api/discovery/start', async (req, res) => {
     if (error) throw new Error(`Job Insert Error: ${JSON.stringify(error)}`);
     
     // Spawn the background worker asynchronously (fire and forget)
-    processDiscoveryJob(job.id, appId, urls, name);
+    processDiscoveryJob(job.id, appId, urls, name, userSupabase);
     
     res.json({ jobId: job.id, message: "Discovery job started." });
   } catch (err) {
