@@ -180,6 +180,8 @@ export async function fetchUserApps() {
           }
         });
       }
+      // Re-render the dropdown list with the fetched apps
+      renderAppSelectorDropdown();
     }
   } catch (err) {
     console.warn("Could not fetch apps from Supabase", err);
