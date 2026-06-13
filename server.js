@@ -180,14 +180,15 @@ app.post('/api/discovery/start', async (req, res) => {
     if (bizError && bizError.code !== '23505') throw new Error(`Business Insert Error: ${JSON.stringify(bizError)}`);
 
     // 1.5. Fetch the UUID id of the business
-    const { data: bizRow, error: fetchErr } = await userSupabase
+    const { data: bizRows, error: fetchErr } = await userSupabase
       .from('businesses')
       .select('id')
       .eq('business_id', appId)
       .eq('user_id', req.user.id)
-      .single();
+      .limit(1);
       
-    if (fetchErr || !bizRow) throw new Error(`Could not find business UUID for ${appId}`);
+    if (fetchErr || !bizRows || bizRows.length === 0) throw new Error(`Could not find business UUID for ${appId}`);
+    const bizRow = bizRows[0];
 
     // 2. Insert job into Supabase
     const { data: job, error } = await userSupabase
