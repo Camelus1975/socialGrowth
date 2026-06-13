@@ -29,9 +29,17 @@ function generateAppId(url) {
 }
 
 async function startDiscovery() {
+  const appNameInput = document.getElementById('discovery-app-name');
   const websiteInput = document.getElementById('discovery-url-website');
   const igInput = document.getElementById('discovery-url-ig');
   const linkedInInput = document.getElementById('discovery-url-linkedin');
+  
+  const appName = appNameInput ? appNameInput.value.trim() : '';
+  
+  if (!appName) {
+    showToast('App / Business Name is required.', 'error');
+    return;
+  }
   
   if (!websiteInput.value.trim()) {
     showToast('Website URL is required.', 'error');
@@ -54,7 +62,10 @@ async function startDiscovery() {
   document.getElementById('discovery-step-2').style.display = 'block';
   
   try {
-    const res = await requestApi('/api/discovery/start', 'POST', { urls, appId, businessType });
+    const res = await requestApi('/api/discovery/start', {
+      method: 'POST',
+      body: JSON.stringify({ urls, appId, businessType, name: appName })
+    });
     if (!res || !res.jobId) throw new Error("Failed to start discovery job.");
     
     // Start Polling
@@ -109,9 +120,12 @@ async function finalizeDiscovery(appId, businessType) {
   
   // Because we are simulating without a full backend DB refresh in state.js:
   // We'll mock the injected data into state.
+  const appNameInput = document.getElementById('discovery-app-name');
+  const appName = appNameInput ? appNameInput.value.trim() : "Discovered Brand";
+  
   const mockDiscoveryProfile = {
     businessProfile: {
-      name: "Discovered Brand",
+      name: appName,
       summary: "AI-generated brand summary based on the provided website."
     },
     brandVoice: { tone: "Professional & Authoritative" },

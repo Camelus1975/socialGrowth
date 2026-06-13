@@ -152,11 +152,23 @@ app.post('/api/auth/session', async (req, res) => {
 
 // Start a new discovery job
 app.post('/api/discovery/start', async (req, res) => {
-  const { urls, appId } = req.body;
+  const { urls, appId, businessType, name } = req.body;
   if (!urls || !appId) return res.status(400).json({ error: "Missing urls or appId" });
   
   try {
-    // Insert job into Supabase
+    // 1. Insert business stub to satisfy foreign key constraint
+    const { error: bizError } = await supabase.from('businesses').insert([{
+      business_id: appId,
+      name: name || 'Discovered Business',
+      business_type: businessType || 'saas',
+      category: 'Discovered',
+      metrics_history: {}
+    }]);
+    
+    // Ignore duplicate key errors if the business already exists
+    if (bizError && bizError.code !== '23505') throw bizError;
+
+    // 2. Insert job into Supabase
     const { data: job, error } = await supabase
       .from('discovery_jobs')
       .insert([{ 
@@ -172,7 +184,7 @@ app.post('/api/discovery/start', async (req, res) => {
     if (error) throw error;
     
     // Spawn the background worker asynchronously (fire and forget)
-    processDiscoveryJob(job.id, appId, urls);
+    processDiscoveryJob(job.id, appId, urls, name);
     
     res.json({ jobId: job.id, message: "Discovery job started." });
   } catch (err) {

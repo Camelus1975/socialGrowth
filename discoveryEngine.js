@@ -43,7 +43,7 @@ async function updateJobStatus(supabase, jobId, status, progress, logMessage) {
  * We simulate scraping by asking GPT to hallucinate a realistic brand profile based on the URLs.
  * In a real-world scenario, this would use Apify or Puppeteer to extract HTML/CSS before sending to GPT.
  */
-async function processDiscoveryJob(jobId, appId, urls) {
+async function processDiscoveryJob(jobId, appId, urls, appName) {
   const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_KEY);
   
   try {
@@ -63,9 +63,13 @@ async function processDiscoveryJob(jobId, appId, urls) {
     
     // Call OpenAI to generate the JSON payload
     const systemPrompt = `
-      You are an expert AI Brand Intelligence Engine. 
-      The user provided these URLs: ${JSON.stringify(urls)}.
-      Generate a comprehensive JSON Brand Profile. Make it highly realistic, insightful, and detailed.
+    You are an AI brand strategist and marketing expert.
+    Analyze the following brand footprint:
+    - App/Business Name: ${appName || 'Not provided'}
+    - Website: ${urls.website || 'Not provided'}
+    - Instagram: ${urls.instagram || 'Not provided'}
+    - LinkedIn: ${urls.linkedin || 'Not provided'}
+    JSON Brand Profile. Make it highly realistic, insightful, and detailed.
       Return ONLY valid JSON.
       
       Structure exactly like this:
