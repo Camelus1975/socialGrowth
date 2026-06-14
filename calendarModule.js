@@ -44,6 +44,7 @@ export async function fetchCalendarPosts() {
           platform: dbPost.platform,
           text: dbPost.content,
           status: dbPost.status,
+          media_url: dbPost.media_url,
           approval: "Approved"
         }));
       }
@@ -110,6 +111,16 @@ function showCalendarPostDetailsModal(postId) {
   document.getElementById('modal-post-status').textContent = post.status.toUpperCase();
   document.getElementById('modal-post-date').textContent = `${post.date} @ ${post.time}`;
   document.getElementById('modal-post-body').textContent = post.text;
+  
+  const mediaContainer = document.getElementById('modal-post-media-container');
+  const mediaImg = document.getElementById('modal-post-media');
+  if (post.media_url) {
+    mediaImg.src = post.media_url;
+    mediaContainer.style.display = 'block';
+  } else {
+    mediaImg.src = '';
+    mediaContainer.style.display = 'none';
+  }
   
   openModal('calendar-details-modal');
 }
