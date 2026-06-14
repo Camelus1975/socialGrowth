@@ -205,23 +205,31 @@ async function runMarketingOrchestration(appId, goal, authHeader, language = 'en
         if (creativeDirector && creativeDirector.result && creativeDirector.result.image_prompts) {
           steps.push({ agent: "Creative Director", log: "Generating media assets for organic posts via DALL-E..." });
           
-          const imagePromises = creativeDirector.result.image_prompts.slice(0, contentWriter.result.copy_variants.length).map(async (promptText) => {
+          const totalImages = Math.min(creativeDirector.result.image_prompts.length, contentWriter.result.copy_variants.length);
+          for (let i = 0; i < totalImages; i++) {
+            const promptText = creativeDirector.result.image_prompts[i];
             try {
+              // Prepend app context to ensure the image is relevant
+              const enhancedPrompt = `A high-quality social media graphic for a ${businessType} business. ${promptText.substring(0, 800)}`;
+              
               const response = await openai.images.generate({
                 model: "dall-e-3", // High quality generation
-                prompt: promptText.substring(0, 1000),
+                prompt: enhancedPrompt,
                 n: 1,
                 size: "1024x1024",
               });
-              return response.data[0].url;
+              generatedImages.push(response.data[0].url);
             } catch (err) {
-              console.error("DALL-E generation failed:", err);
-              // Fallback to a placeholder if rate-limited
-              return "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop";
+              console.error(`DALL-E generation failed for prompt ${i}:`, err);
+              // Fallback to null if rate-limited so we don't show an unrelated image
+              generatedImages.push(null);
             }
-          });
-          
-          generatedImages = await Promise.all(imagePromises);
+            
+            // Add a 1.5 second delay between requests to avoid OpenAI rate limits
+            if (i < totalImages - 1) {
+              await new Promise(resolve => setTimeout(resolve, 1500));
+            }
+          }
         }
 
         const postsToInsert = contentWriter.result.copy_variants.map((v, i) => {
