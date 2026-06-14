@@ -202,12 +202,15 @@ async function runMarketingOrchestration(appId, goal, authHeader, language = 'en
         const postsToInsert = contentWriter.result.copy_variants.map((v, i) => {
           const date = new Date();
           date.setDate(date.getDate() + i + 1); // schedule 1 per day starting tomorrow
+          const dateString = date.toISOString().split('T')[0];
+          
           return {
             user_id: uid,
-            business_id: appId,
+            app_id: appId,
             platform: v.platform || 'linkedin',
-            scheduled_time: date.toISOString(),
-            content_text: v.text,
+            scheduled_date: dateString,
+            scheduled_time: '12:00',
+            content: v.text,
             status: 'draft' // Draft status, awaiting CEO approval
           };
         });
