@@ -199,6 +199,31 @@ async function runMarketingOrchestration(appId, goal, authHeader, language = 'en
       try {
         const uid = userId || 'd9b7b9f3-8c43-4f11-b01a-8c48a735c029'; // fallback
         
+        // Find creative director output to generate images
+        const creativeDirector = agentResults.find(r => r.agent === 'CreativeDirector' || r.agent === 'Creative Director');
+        let generatedImages = [];
+        if (creativeDirector && creativeDirector.result && creativeDirector.result.image_prompts) {
+          steps.push({ agent: "Creative Director", log: "Generating media assets for organic posts via DALL-E..." });
+          
+          const imagePromises = creativeDirector.result.image_prompts.slice(0, contentWriter.result.copy_variants.length).map(async (promptText) => {
+            try {
+              const response = await openai.images.generate({
+                model: "dall-e-3", // High quality generation
+                prompt: promptText.substring(0, 1000),
+                n: 1,
+                size: "1024x1024",
+              });
+              return response.data[0].url;
+            } catch (err) {
+              console.error("DALL-E generation failed:", err);
+              // Fallback to a placeholder if rate-limited
+              return "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop";
+            }
+          });
+          
+          generatedImages = await Promise.all(imagePromises);
+        }
+
         const postsToInsert = contentWriter.result.copy_variants.map((v, i) => {
           const date = new Date();
           date.setDate(date.getDate() + i + 1); // schedule 1 per day starting tomorrow
@@ -211,6 +236,7 @@ async function runMarketingOrchestration(appId, goal, authHeader, language = 'en
             scheduled_date: dateString,
             scheduled_time: '12:00',
             content: v.text,
+            media_url: generatedImages[i] || null,
             status: 'draft' // Draft status, awaiting CEO approval
           };
         });
