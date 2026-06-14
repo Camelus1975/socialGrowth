@@ -91,8 +91,9 @@ Output JSON format: { "simulation_report": { "expected_reach": 10000, "expected_
  * @param {string} language - User's language preference
  * @param {string} businessType - The category of business
  * @param {string} campaignType - User preference (organic, paid, or both)
+ * @param {string} userId - The user ID to assign generated posts to
  */
-async function runMarketingOrchestration(appId, goal, authHeader, language = 'en', businessType = 'saas', campaignType = 'both') {
+async function runMarketingOrchestration(appId, goal, authHeader, language = 'en', businessType = 'saas', campaignType = 'both', userId = null) {
   const steps = [];
   
   const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
@@ -196,14 +197,13 @@ async function runMarketingOrchestration(appId, goal, authHeader, language = 'en
     if (contentWriter && contentWriter.result && contentWriter.result.copy_variants) {
       steps.push({ agent: "Publishing Agent", log: "Pushing organic draft posts to your Content Calendar." });
       try {
-        const { data: userAuth } = await supabase.auth.getUser();
-        const userId = userAuth?.user?.id || 'd9b7b9f3-8c43-4f11-b01a-8c48a735c029'; // fallback
+        const uid = userId || 'd9b7b9f3-8c43-4f11-b01a-8c48a735c029'; // fallback
         
         const postsToInsert = contentWriter.result.copy_variants.map((v, i) => {
           const date = new Date();
           date.setDate(date.getDate() + i + 1); // schedule 1 per day starting tomorrow
           return {
-            user_id: userId,
+            user_id: uid,
             business_id: appId,
             platform: v.platform || 'linkedin',
             scheduled_time: date.toISOString(),
