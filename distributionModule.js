@@ -63,11 +63,40 @@ export async function executeAutonomousGrowth() {
   successCard.style.marginTop = '20px';
   successCard.style.borderRadius = '8px';
   
+  const app = state.appsData[state.currentActiveApp];
+  const type = app?.type || 'generic';
+  
+  let targetPlatforms = 'LinkedIn, X, and Email';
+  let metricLabel = 'Expected Signups';
+  let score = Math.floor(Math.random() * 15) + 80; // 80-94
+  let metricValue = Math.floor(Math.random() * 200) + 50;
+
+  if (type === 'ecommerce') {
+    targetPlatforms = 'Instagram, TikTok, and Email';
+    metricLabel = 'Expected Purchases';
+    metricValue = Math.floor(Math.random() * 50) + 20;
+  } else if (type === 'local') {
+    targetPlatforms = 'Facebook, Instagram, and Local SEO';
+    metricLabel = 'Expected Leads/Walk-ins';
+    metricValue = Math.floor(Math.random() * 30) + 10;
+  } else if (type === 'creator') {
+    targetPlatforms = 'YouTube, Instagram, and TikTok';
+    metricLabel = 'Expected Engagement';
+    metricValue = Math.floor(Math.random() * 5000) + 1000;
+  } else if (type === 'agency') {
+    targetPlatforms = 'LinkedIn, Email, and Facebook';
+    metricLabel = 'Expected Consultations';
+    metricValue = Math.floor(Math.random() * 10) + 2;
+  } else if (type === 'saas') {
+    targetPlatforms = 'LinkedIn, X, and Email';
+    metricLabel = 'Expected Trial Signups';
+  }
+
   successCard.innerHTML = `
     <h4 style="color: #10b981; margin-bottom: 10px;">Pipeline Scheduled Successfully!</h4>
-    <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Target:</strong> LinkedIn, X, and Email</p>
-    <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Predicted Success Score:</strong> 88/100</p>
-    <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Expected Downloads:</strong> 145</p>
+    <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Target:</strong> ${targetPlatforms}</p>
+    <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Predicted Success Score:</strong> ${score}/100</p>
+    <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>${metricLabel}:</strong> ${metricValue}</p>
     <p style="font-size: 0.8rem; color: #9ca3af; margin-top: 15px;">The Distribution Engine will automatically execute these posts according to the predicted optimal timing.</p>
   `;
   
