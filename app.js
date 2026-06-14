@@ -846,7 +846,8 @@ function callFunction(name, args, element, event) {
     runSuccessPrediction,
     runSaaSContentRecycle,
     askContentCoach,
-    downloadWeeklyReport
+    downloadWeeklyReport,
+    deleteCalendarPost: window.deleteCalendarPost
   };
   
   const fn = functionMap[name];
