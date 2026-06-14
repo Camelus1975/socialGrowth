@@ -191,6 +191,34 @@ async function runMarketingOrchestration(appId, goal, authHeader, language = 'en
       }
     }
 
+    // Process Organic Content
+    const contentWriter = agentResults.find(r => r.agent === 'ContentWriter' || r.agent === 'Content Writer');
+    if (contentWriter && contentWriter.result && contentWriter.result.copy_variants) {
+      steps.push({ agent: "Publishing Agent", log: "Pushing organic draft posts to your Content Calendar." });
+      try {
+        const { data: userAuth } = await supabase.auth.getUser();
+        const userId = userAuth?.user?.id || 'd9b7b9f3-8c43-4f11-b01a-8c48a735c029'; // fallback
+        
+        const postsToInsert = contentWriter.result.copy_variants.map((v, i) => {
+          const date = new Date();
+          date.setDate(date.getDate() + i + 1); // schedule 1 per day starting tomorrow
+          return {
+            user_id: userId,
+            business_id: appId,
+            platform: v.platform || 'linkedin',
+            scheduled_time: date.toISOString(),
+            content_text: v.text,
+            status: 'draft' // Draft status, awaiting CEO approval
+          };
+        });
+
+        await supabase.from('scheduled_posts').insert(postsToInsert);
+        steps.push({ agent: "Publishing Agent", log: `${postsToInsert.length} organic posts successfully queued in Draft mode.` });
+      } catch (err) {
+        console.error("Failed to queue organic posts", err);
+      }
+    }
+
     // In a fully autonomous mode, this would pass to the PublishingAgent.
     // For safety, we pause here and present the plan to the Founder (CEO).
     steps.push({ agent: "System", log: "Awaiting CEO Approval before execution." });
