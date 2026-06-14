@@ -102,10 +102,14 @@ export function renderCalendarView() {
   }
 }
 
-function showCalendarPostDetailsModal(postId) {
+let currentViewedPostId = null;
+
+window.showCalendarPostDetailsModal = function(postId) {
   const posts = state.calendarState[state.currentActiveApp] || [];
   const post = posts.find(p => p.id === postId);
   if (!post) return;
+  
+  currentViewedPostId = postId;
   
   document.getElementById('modal-post-platform').textContent = post.platform.toUpperCase();
   document.getElementById('modal-post-status').textContent = post.status.toUpperCase();
@@ -133,6 +137,30 @@ window.openSchedulePostModal = function(dateStr, textStr, platformStr, mediaUrlS
     document.getElementById('modal-create-media').value = mediaUrlStr;
   }
   openModal('calendar-create-modal');
+}
+
+window.deleteCalendarPost = async function() {
+  if (!currentViewedPostId) return;
+  if (!confirm("Are you sure you want to permanently delete this scheduled post?")) return;
+  
+  try {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      const { error } = await supabase
+        .from('scheduled_posts')
+        .delete()
+        .eq('id', currentViewedPostId);
+      
+      if (error) throw error;
+      
+      showToast("Post deleted successfully", "success");
+      closeModal('calendar-details-modal');
+      await fetchCalendarPosts(); // Refresh calendar view
+    }
+  } catch (err) {
+    console.error("Error deleting post:", err);
+    showToast("Failed to delete post", "error");
+  }
 }
 
 async function saveCalendarPostFromModal() {
