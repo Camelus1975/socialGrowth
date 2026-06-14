@@ -175,6 +175,9 @@ export async function fetchUserApps() {
       if (error) throw error;
       
       if (data && data.length > 0) {
+        // Clear mock data so the dashboard doesn't aggregate it
+        state.appsData = {};
+        
         data.forEach(dbApp => {
           const industryTemplate = getTemplateForBusiness(dbApp.business_type || 'saas');
     

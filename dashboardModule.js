@@ -19,6 +19,7 @@ export function initDashboard() {
   
   state.on('viewChanged', (viewId) => {
     if (viewId === 'founder-dash') renderDashboard();
+    if (viewId === 'war-room') renderWarRoom();
   });
 }
 
@@ -170,6 +171,65 @@ export function renderDashboard() {
   });
   
   renderDashboardChart();
+  });
+}
+
+export function renderWarRoom() {
+  const container = document.getElementById('war-room-cards-container');
+  if (!container) return;
+  container.innerHTML = '';
+  
+  const apps = Object.values(state.appsData);
+  if (apps.length === 0) {
+    container.innerHTML = `<div style="color:var(--text-muted); font-size:0.9rem;">No active apps found in your portfolio.</div>`;
+    return;
+  }
+  
+  const cardClasses = ['card-primary', 'card-secondary', 'card-green'];
+  
+  apps.forEach((app, index) => {
+    const template = getTemplateForBusiness(app.businessType || 'saas');
+    const primaryKpi = template.kpis[0];
+    const secondaryKpi = template.kpis[1] || template.kpis[0];
+    
+    const primaryHistory = app.metrics[primaryKpi.id] || [0];
+    const secondaryHistory = app.metrics[secondaryKpi.id] || [0];
+    const primaryVal = primaryHistory[primaryHistory.length - 1] || 0;
+    const secondaryVal = secondaryHistory[secondaryHistory.length - 1] || 0;
+    
+    const cardClass = cardClasses[index % cardClasses.length];
+    
+    const card = createSafeElement('div', ['glass-card', cardClass]);
+    
+    const title = createSafeElement('h4', [], app.name);
+    title.style.color = 'white';
+    title.style.marginBottom = '8px';
+    
+    const kpiDisplay = createSafeElement('div', [], `${formatMetric(primaryVal, primaryKpi.format)} ${primaryKpi.label}`);
+    kpiDisplay.style.fontSize = '1.4rem';
+    kpiDisplay.style.fontWeight = '700';
+    kpiDisplay.style.color = 'white';
+    
+    const subKpiDisplay = createSafeElement('div', [], `${secondaryKpi.label}: ${formatMetric(secondaryVal, secondaryKpi.format)} | Rating: ${app.rating}★`);
+    subKpiDisplay.style.fontSize = '0.75rem';
+    subKpiDisplay.style.color = 'var(--text-muted)';
+    subKpiDisplay.style.marginTop = '4px';
+    
+    const campaignBox = createSafeElement('div', [], `Active Campaign: autonomous_growth_engine`);
+    campaignBox.style.marginTop = '12px';
+    campaignBox.style.fontSize = '0.78rem';
+    campaignBox.style.background = 'rgba(255,255,255,0.03)';
+    campaignBox.style.padding = '8px';
+    campaignBox.style.borderRadius = '4px';
+    campaignBox.style.color = 'white';
+    
+    card.appendChild(title);
+    card.appendChild(kpiDisplay);
+    card.appendChild(subKpiDisplay);
+    card.appendChild(campaignBox);
+    
+    container.appendChild(card);
+  });
 }
 
 function renderDashboardChart() {
@@ -214,3 +274,4 @@ function renderDashboardChart() {
     container.appendChild(barCol);
   });
 }
+
