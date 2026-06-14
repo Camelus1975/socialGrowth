@@ -171,7 +171,6 @@ export function renderDashboard() {
   });
   
   renderDashboardChart();
-  });
 }
 
 export function renderWarRoom() {
