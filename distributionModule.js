@@ -44,13 +44,16 @@ export async function executeAutonomousGrowth() {
   loadingEl.style.color = 'var(--text-muted)';
   block.appendChild(loadingEl);
 
+  const campaignType = document.getElementById('autonomous-campaign-type')?.value || 'both';
+
   try {
     const data = await requestApi('/api/agents/orchestration/trigger', {
       method: 'POST',
       body: JSON.stringify({ 
         goal: promptText, 
         appId: state.currentActiveApp,
-        businessType: type
+        businessType: type,
+        campaignType: campaignType
       })
     });
 

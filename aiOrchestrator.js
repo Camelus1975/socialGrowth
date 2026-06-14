@@ -90,8 +90,9 @@ Output JSON format: { "simulation_report": { "expected_reach": 10000, "expected_
  * @param {string} authHeader - JWT token for Supabase RLS
  * @param {string} language - User's language preference
  * @param {string} businessType - The category of business
+ * @param {string} campaignType - User preference (organic, paid, or both)
  */
-async function runMarketingOrchestration(appId, goal, authHeader, language = 'en', businessType = 'saas') {
+async function runMarketingOrchestration(appId, goal, authHeader, language = 'en', businessType = 'saas', campaignType = 'both') {
   const steps = [];
   
   const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
@@ -120,10 +121,17 @@ async function runMarketingOrchestration(appId, goal, authHeader, language = 'en
       ? "CRITICAL: The user's language is Arabic. ALL generated output, text, copy, strategies, and plans MUST be written strictly in Arabic. Do not use English."
       : "";
 
+    let typeDirective = "";
+    if (campaignType === 'organic') {
+      typeDirective = "CRITICAL: The user has requested ORGANIC POSTS ONLY. Do NOT delegate any tasks to the AdStrategist. Focus exclusively on organic content creation (ContentWriter).";
+    } else if (campaignType === 'paid') {
+      typeDirective = "CRITICAL: The user has requested PAID ADS ONLY. Focus entirely on paid advertising strategy and delegate only to the AdStrategist. Do NOT delegate to the ContentWriter for organic posts.";
+    }
+
     const cmoResponse = await openai.chat.completions.create({
       model: "gpt-4o", // Strategy requires deep reasoning
       messages: [
-        { role: "system", content: AGENT_PROMPTS.CMO + "\n" + langDirective },
+        { role: "system", content: AGENT_PROMPTS.CMO + "\n" + langDirective + "\n" + typeDirective },
         { role: "user", content: `Business Type: ${businessType}\nApp/Business ID: ${appId}\nGoal: ${goal}\n\n${memoryContext}` }
       ],
       response_format: { type: "json_object" }

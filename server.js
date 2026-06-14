@@ -643,7 +643,8 @@ app.post('/api/agents/orchestration/trigger', async (req, res) => {
   const authHeader = req.headers.authorization;
   const language = req.headers['x-app-language'] || 'en';
   const businessType = req.body.businessType || 'saas';
-  const result = await runMarketingOrchestration(appId, goal, authHeader, language, businessType);
+  const campaignType = req.body.campaignType || 'both';
+  const result = await runMarketingOrchestration(appId, goal, authHeader, language, businessType, campaignType);
   
   if (result.success) {
     res.json(result);
