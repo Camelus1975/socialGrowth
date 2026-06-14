@@ -137,6 +137,9 @@ export function handleMediaUploadSelect(event) {
       console.warn("Express media upload offline. Parsing metadata via local tags client.");
     }
     
+    if (!state.mediaState.assets) {
+      state.mediaState.assets = [];
+    }
     state.mediaState.assets.push(newAsset);
     showToast("AI descriptive tag generated and saved to database!", "success");
     renderMediaManager();

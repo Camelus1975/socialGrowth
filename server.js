@@ -554,7 +554,9 @@ app.post('/api/inbox/reply', async (req, res) => {
 
 // Priority 7: Media Asset upload simulation (saving record in media table)
 app.post('/api/media/upload', async (req, res) => {
-  const { name, file_type, file_size } = req.body;
+  const name = req.body.name;
+  const file_type = req.body.file_type || req.body.type;
+  const file_size = req.body.file_size || req.body.size;
   if (!name || !file_type || !file_size) {
     return res.status(400).json({ error: "File metadata parameters missing." });
   }
