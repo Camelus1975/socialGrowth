@@ -147,7 +147,7 @@ async function processDiscoveryJob(jobId, appId, urls, appName, providedSupabase
     await supabase
       .from('businesses')
       .update({ discovery_profile: discoveryData })
-      .eq('business_id', appId);
+      .eq('id', appId);
 
     // Complete Job
     await updateJobStatus(supabase, jobId, 'complete', 100, 'Brand Intelligence Profile generated successfully.');
