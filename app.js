@@ -568,11 +568,23 @@ export function renderAuthTeamView() {
     statusTd.appendChild(statusSpan);
     
     const actionsTd = createSafeElement('td');
+    actionsTd.style.display = 'flex';
+    actionsTd.style.gap = '8px';
+    
     const editBtn = createSafeElement('button', ['btn', 'btn-secondary'], 'Edit Role');
     editBtn.style.padding = '4px 8px';
     editBtn.style.fontSize = '0.7rem';
     editBtn.setAttribute('data-on-click', `changeMemberRoleSim('${mem.id}')`);
+    
+    const removeBtn = createSafeElement('button', ['btn', 'btn-secondary'], 'Remove');
+    removeBtn.style.padding = '4px 8px';
+    removeBtn.style.fontSize = '0.7rem';
+    removeBtn.style.color = '#f87171';
+    removeBtn.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+    removeBtn.setAttribute('data-on-click', `removeTeamMemberSim('${mem.id}')`);
+    
     actionsTd.appendChild(editBtn);
+    actionsTd.appendChild(removeBtn);
     
     row.appendChild(nameTd);
     row.appendChild(emailTd);
@@ -651,6 +663,18 @@ export function changeMemberRoleSim(memberId) {
   if (role) {
     member.role = role;
     showToast(`Role updated to ${role}`, "success");
+    renderAuthTeamView();
+  }
+}
+
+export function removeTeamMemberSim(memberId) {
+  const memberIndex = state.authState.teamMembers.findIndex(m => m.id === memberId);
+  if (memberIndex === -1) return;
+  
+  const member = state.authState.teamMembers[memberIndex];
+  if (confirm(`Are you sure you want to remove ${member.name} from the team?`)) {
+    state.authState.teamMembers.splice(memberIndex, 1);
+    showToast(`${member.name} removed successfully`, "success");
     renderAuthTeamView();
   }
 }
@@ -774,6 +798,7 @@ function callFunction(name, args, element, event) {
     simulateSbAuthSignout,
     inviteNewTeamMember,
     changeMemberRoleSim,
+    removeTeamMemberSim,
     connectOAuthPlatform,
     
     // Inbox
