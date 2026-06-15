@@ -16,6 +16,17 @@ export function initCalendar() {
   if (createFormBtn) {
     createFormBtn.addEventListener('click', saveCalendarPostFromModal);
   }
+  
+  // Click overlay background to close calendar details modal
+  const detailsModal = document.getElementById('calendar-details-modal');
+  if (detailsModal) {
+    detailsModal.addEventListener('click', (e) => {
+      // Only close if clicking the overlay itself, not content inside it
+      if (e.target === detailsModal) {
+        closeModal('calendar-details-modal');
+      }
+    });
+  }
 }
 
 export async function fetchCalendarPosts() {
