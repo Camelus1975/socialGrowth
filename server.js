@@ -803,9 +803,18 @@ app.get('/api/content-intelligence/performance', async (req, res) => {
   const appId = req.query.appId;
   let mvData = null;
   let realPosts = [];
+  let businessName = 'Your App';
 
   try {
     if (!isDummyDb && appId) {
+      // Fetch business name
+      const { data: bData } = await supabase
+        .from('businesses')
+        .select('business_name')
+        .eq('business_id', appId)
+        .single();
+      if (bData && bData.business_name) businessName = bData.business_name;
+
       // Fetch real SQL-aggregated stats from the Materialized View (Tier 4 Cost Optimization)
       const { data } = await supabase
         .from('mv_app_analytics_rollup')
@@ -826,44 +835,43 @@ app.get('/api/content-intelligence/performance', async (req, res) => {
     console.log("Materialized view fetch error:", err.message);
   }
 
-  // Serve real DB data if available, otherwise fallback to UI placeholders
+  // If no real posts exist, return zero/empty states instead of mock data
+  const hasData = realPosts.length > 0;
+
   res.json({
-    averageScore: mvData?.avg_success_score ? Number(mvData.avg_success_score).toFixed(1) : 74.5,
-    totalRevenue: mvData?.total_revenue || 28450.00,
-    totalDownloads: mvData?.total_conversions || 12450,
-    totalLeads: mvData?.total_engagement || 3100,
-    topPosts: realPosts.length > 0 ? realPosts : [
-      { id: "hist_1", platform: "twitter", type: "Founder Story", caption: "Why we bootstrapped FitPulse to $10k MRR in 6 months as indie creators. 🧵", success_score: 92.00, reach: 45000, likes: 1200, ctr: 4.80, downloads: 350, revenue: 1200.00 },
-      { id: "hist_2", platform: "linkedin", type: "Review/Testimonial", caption: "Elena Rostova saved 6 hours/week tracking workout routines using our WearOS widgets. Read her story:", success_score: 88.00, reach: 28000, likes: 980, ctr: 5.20, downloads: 210, revenue: 840.00 },
-      { id: "hist_3", platform: "twitter", type: "Product Launch", caption: "The wait is over. FitPulse smartwatch workout trackers are officially live! 🚀", success_score: 78.00, reach: 35000, likes: 850, ctr: 3.90, downloads: 410, revenue: 1640.00 }
-    ],
+    businessName: businessName,
+    averageScore: mvData?.avg_success_score ? Number(mvData.avg_success_score).toFixed(1) : (hasData ? 74.5 : 0),
+    totalRevenue: mvData?.total_revenue || (hasData ? 28450.00 : 0),
+    totalDownloads: mvData?.total_conversions || (hasData ? 12450 : 0),
+    totalLeads: mvData?.total_engagement || (hasData ? 3100 : 0),
+    topPosts: realPosts,
     postingTimes: {
-      best: [
+      best: hasData ? [
         { platform: "twitter", time: "Tuesday 10:00 AM", score: 88 },
         { platform: "linkedin", time: "Wednesday 09:00 AM", score: 92 },
         { platform: "instagram", time: "Friday 08:00 PM", score: 85 }
-      ],
-      worst: [
+      ] : [],
+      worst: hasData ? [
         { platform: "twitter", time: "Sunday 11:00 PM", score: 18 },
         { platform: "linkedin", time: "Saturday 04:00 PM", score: 12 }
-      ]
+      ] : []
     },
     hashtags: {
-      best: [
+      best: hasData ? [
         { hashtag: "#IndieHacker", impact: "+24% Reach" },
         { hashtag: "#SaaSGrowth", impact: "+18% Clicks" },
         { hashtag: "#FitnessTech", impact: "+32% Downloads" }
-      ],
-      worst: [
+      ] : [],
+      worst: hasData ? [
         { hashtag: "#FitnessInspiration", impact: "-4% Reach" },
         { hashtag: "#WorkoutGoals", impact: "-2% Clicks" }
-      ]
+      ] : []
     },
-    ctas: [
+    ctas: hasData ? [
       { cta: "Try Free", ctr: "5.4%", conversions: "3.2%", downloads: 1450, revenue: 5800.00 },
       { cta: "Download Now", ctr: "4.8%", conversions: "2.8%", downloads: 1210, revenue: 4840.00 },
       { cta: "Learn More", ctr: "3.2%", conversions: "1.1%", downloads: 340, revenue: 1360.00 }
-    ]
+    ] : []
   });
 });
 
