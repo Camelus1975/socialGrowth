@@ -195,7 +195,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
     }
 
     const cmoResponse = await openai.chat.completions.create({
-      model: "gpt-4o", // Strategy requires deep reasoning
+      model: "gpt-4o-mini",
       messages: [
         { role: "system", content: AGENT_PROMPTS.CMO + "\n" + langDirective + "\n" + typeDirective },
         { role: "user", content: `${businessContext}\nBusiness Name: ${appName || 'Unknown'}\nBusiness Type: ${businessType}\nFounder's Goal: ${goal}\n\n${memoryContext}` }
@@ -354,14 +354,14 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
             // Fallback: DALL-E (if Replicate failed and DALL-E is available)
             if (!imageUrl) {
               try {
-                console.log(`[Orchestrator] Trying OpenAI gpt-image-1 fallback for image ${i+1}...`);
+                console.log(`[Orchestrator] Trying OpenAI gpt-image-2 fallback for image ${i+1}...`);
                 const response = await openai.images.generate({
-                  model: "gpt-image-1",
+                  model: "gpt-image-2",
                   prompt: enhancedPrompt,
                   n: 1,
                   size: "1024x1024",
                 });
-                // gpt-image-1 returns base64 by default
+                // gpt-image-2 returns base64 by default
                 if (response.data[0].url) {
                   imageUrl = response.data[0].url;
                 } else if (response.data[0].b64_json) {
@@ -384,9 +384,9 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
                     console.error('[Orchestrator] Storage upload exception:', uploadEx.message);
                   }
                 }
-                console.log(`[Orchestrator] gpt-image-1 success for image ${i+1}`);
+                console.log(`[Orchestrator] gpt-image-2 success for image ${i+1}`);
               } catch (oaiErr) {
-                console.error(`[Orchestrator] gpt-image-1 also failed for image ${i+1}:`, oaiErr.message);
+                console.error(`[Orchestrator] gpt-image-2 also failed for image ${i+1}:`, oaiErr.message);
               }
             }
             
