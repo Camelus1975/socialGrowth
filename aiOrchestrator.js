@@ -294,7 +294,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
           for (let i = 0; i < totalImages; i++) {
             const promptText = imagePrompts[i];
             const postText = contentWriter.result.copy_variants[i]?.text || '';
-            const enhancedPrompt = `A polished, professional social media graphic for "${appName || businessType}" business. The post is about: "${postText.substring(0, 200)}". Visual direction: ${promptText.substring(0, 600)}. Style: Modern, clean, engaging, suitable for social media. No text overlays.`;
+            const enhancedPrompt = `A photographic, professional social media visual for "${appName || businessType}" business. Theme: "${postText.substring(0, 150)}". Visual direction: ${promptText.substring(0, 400)}. Style: Clean modern photography or illustration, vibrant colors, high quality. CRITICAL RULE: Do NOT include ANY text, letters, words, numbers, logos, watermarks, typography, or written characters anywhere in the image. The image must be purely visual with ZERO text elements.`;
             
             let imageUrl = null;
             
