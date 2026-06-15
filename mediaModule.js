@@ -86,56 +86,122 @@ export function renderMediaManager() {
     totalCountEl.textContent = `${(state.mediaState.assets || []).length} items`;
   }
   
+  if (assets.length === 0) {
+    const empty = createSafeElement('div', []);
+    empty.style.cssText = 'grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-muted); font-size:0.9rem;';
+    empty.textContent = state.activeMediaFolder === 'all' 
+      ? 'No media assets yet. Upload or run AI orchestration to generate images.'
+      : `No assets in "${state.activeMediaFolder}" folder.`;
+    grid.appendChild(empty);
+    return;
+  }
+  
   assets.forEach(asset => {
     const card = createSafeElement('div', ['media-asset-card']);
+    card.style.cursor = 'pointer';
     
     const preview = createSafeElement('div', ['media-preview-box']);
-    const emoji = createSafeElement('span', [], '📁');
-    emoji.style.fontSize = '2.5rem';
+    preview.style.position = 'relative';
+    preview.style.overflow = 'hidden';
     
-    const typeLabel = createSafeElement('span', [], asset.type);
-    typeLabel.style.fontSize = '0.65rem';
-    typeLabel.style.color = 'var(--text-sub)';
-    typeLabel.style.position = 'absolute';
-    typeLabel.style.bottom = '8px';
-    typeLabel.style.right = '8px';
+    const isImage = (asset.type || '').startsWith('image') || (asset.url || '').match(/\.(png|jpg|jpeg|webp|gif|svg)/i);
     
-    preview.appendChild(emoji);
+    if (isImage && asset.url) {
+      const img = createSafeElement('img', []);
+      img.src = asset.url;
+      img.alt = asset.name || 'Media asset';
+      img.style.cssText = 'width:100%; height:100%; object-fit:cover; border-radius:8px 8px 0 0;';
+      img.onerror = function() { this.style.display='none'; this.parentNode.innerHTML='<span style="font-size:2.5rem">🖼️</span>'; };
+      preview.style.height = '160px';
+      preview.style.display = 'flex';
+      preview.style.alignItems = 'center';
+      preview.style.justifyContent = 'center';
+      preview.style.background = '#0a0e1a';
+      preview.appendChild(img);
+    } else {
+      const emoji = createSafeElement('span', [], '📁');
+      emoji.style.fontSize = '2.5rem';
+      preview.appendChild(emoji);
+    }
+    
+    const typeLabel = createSafeElement('span', [], asset.type || '');
+    typeLabel.style.cssText = 'font-size:0.6rem; color:var(--text-sub); position:absolute; bottom:6px; right:6px; background:rgba(0,0,0,0.6); padding:2px 6px; border-radius:4px;';
     preview.appendChild(typeLabel);
     
+    // Click to open lightbox
+    card.addEventListener('click', () => openMediaLightbox(asset));
+    
     const info = createSafeElement('div');
-    info.style.padding = '12px';
+    info.style.padding = '10px 12px';
     
-    const name = createSafeElement('h5', [], asset.name);
-    name.style.color = 'white';
-    name.style.fontSize = '0.8rem';
-    name.style.overflow = 'hidden';
-    name.style.textOverflow = 'ellipsis';
-    name.style.whiteSpace = 'nowrap';
+    const name = createSafeElement('h5', [], asset.name || 'Untitled');
+    name.style.cssText = 'color:white; font-size:0.8rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin:0 0 4px 0;';
     
-    const tag = createSafeElement('span', [], asset.tag);
-    tag.style.fontSize = '0.65rem';
-    tag.style.background = 'rgba(99,102,241,0.15)';
-    tag.style.color = '#a5b4fc';
-    tag.style.padding = '2px 6px';
-    tag.style.borderRadius = '4px';
-    tag.style.marginTop = '6px';
-    tag.style.display = 'inline-block';
+    const tagEl = createSafeElement('span', [], asset.tag || asset.folder || '');
+    tagEl.style.cssText = 'font-size:0.65rem; background:rgba(99,102,241,0.15); color:#a5b4fc; padding:2px 6px; border-radius:4px; display:inline-block;';
     
-    const desc = createSafeElement('p', [], `"${asset.description}"`);
-    desc.style.fontSize = '0.72rem';
-    desc.style.color = 'var(--text-muted)';
-    desc.style.marginTop = '8px';
-    desc.style.lineHeight = '1.3';
+    const desc = createSafeElement('p', [], asset.description ? `"${asset.description}"` : '');
+    desc.style.cssText = 'font-size:0.7rem; color:var(--text-muted); margin:6px 0 0 0; line-height:1.3; overflow:hidden; max-height:2.6em;';
     
     info.appendChild(name);
-    info.appendChild(tag);
-    info.appendChild(desc);
+    info.appendChild(tagEl);
+    if (asset.description) info.appendChild(desc);
     
     card.appendChild(preview);
     card.appendChild(info);
     grid.appendChild(card);
   });
+}
+
+function openMediaLightbox(asset) {
+  // Remove existing lightbox if any
+  const existing = document.getElementById('media-lightbox');
+  if (existing) existing.remove();
+  
+  const overlay = document.createElement('div');
+  overlay.id = 'media-lightbox';
+  overlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(4,7,17,0.92); backdrop-filter:blur(12px); z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column; cursor:pointer;';
+  overlay.addEventListener('click', () => overlay.remove());
+  
+  const container = document.createElement('div');
+  container.style.cssText = 'max-width:90vw; max-height:80vh; display:flex; flex-direction:column; align-items:center; gap:16px;';
+  container.addEventListener('click', e => e.stopPropagation());
+  
+  const isImage = (asset.type || '').startsWith('image') || (asset.url || '').match(/\.(png|jpg|jpeg|webp|gif|svg)/i);
+  
+  if (isImage && asset.url) {
+    const img = document.createElement('img');
+    img.src = asset.url;
+    img.alt = asset.name || 'Media';
+    img.style.cssText = 'max-width:90vw; max-height:70vh; object-fit:contain; border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,0.5);';
+    container.appendChild(img);
+  }
+  
+  const info = document.createElement('div');
+  info.style.cssText = 'text-align:center; color:white; max-width:500px;';
+  info.innerHTML = `
+    <h3 style="margin:0 0 8px 0; font-size:1rem;">${(asset.name || 'Untitled').replace(/</g,'&lt;')}</h3>
+    <p style="margin:0; font-size:0.8rem; color:var(--text-muted);">${(asset.description || '').replace(/</g,'&lt;')}</p>
+    <div style="margin-top:12px; display:flex; gap:8px; justify-content:center;">
+      <span style="font-size:0.7rem; background:rgba(99,102,241,0.2); color:#a5b4fc; padding:3px 8px; border-radius:4px;">${(asset.folder || '').replace(/</g,'&lt;')}</span>
+      <span style="font-size:0.7rem; background:rgba(99,102,241,0.2); color:#a5b4fc; padding:3px 8px; border-radius:4px;">${(asset.tag || '').replace(/</g,'&lt;')}</span>
+    </div>
+  `;
+  container.appendChild(info);
+  
+  // Close button
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕ Close';
+  closeBtn.style.cssText = 'margin-top:12px; padding:8px 20px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; border-radius:8px; cursor:pointer; font-size:0.85rem;';
+  closeBtn.addEventListener('click', () => overlay.remove());
+  container.appendChild(closeBtn);
+  
+  overlay.appendChild(container);
+  document.body.appendChild(overlay);
+  
+  // Close on Escape key
+  const escHandler = (e) => { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', escHandler); } };
+  document.addEventListener('keydown', escHandler);
 }
 
 export function selectMediaFolder(folder) {
@@ -144,6 +210,7 @@ export function selectMediaFolder(folder) {
   const folders = {
     'all': 'media-folder-all',
     'Brand Assets': 'media-folder-brand',
+    'AI Generated': 'media-folder-ai',
     'Promotions': 'media-folder-promo',
     'Screenshots': 'media-folder-screens'
   };
