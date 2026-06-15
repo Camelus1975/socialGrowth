@@ -230,13 +230,30 @@ export function simulateMediaUploadClick() {
   if (fileInput) fileInput.click();
 }
 
-export function handleMediaUploadSelect(event) {
+export async function handleMediaUploadSelect(event) {
   const file = event.target.files[0];
   if (!file) return;
   
-  showToast("Uploading media asset binary...", "success");
+  showToast("Uploading media asset...", "success");
   
-  setTimeout(async () => {
+  try {
+    const supabase = getSupabaseClient();
+    let fileUrl = `uploads/${file.name}`; // Fallback if no supabase
+
+    if (supabase) {
+      const fileName = `uploads/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`;
+      const { data: uploadData, error: uploadErr } = await supabase.storage
+        .from('media')
+        .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+      if (uploadErr) throw uploadErr;
+
+      const { data: urlData } = supabase.storage.from('media').getPublicUrl(fileName);
+      if (urlData && urlData.publicUrl) {
+        fileUrl = urlData.publicUrl;
+      }
+    }
+    
     const insertPayload = {
       app_id: state.currentActiveApp || 'default',
       name: file.name,
@@ -244,44 +261,41 @@ export function handleMediaUploadSelect(event) {
       file_size: file.size || 0,
       folder: state.activeMediaFolder === 'all' ? 'Brand Assets' : state.activeMediaFolder,
       tag: 'Upload',
-      description: `AI description: Mobile layout design for ${state.currentActiveApp || 'app'} showing active features.`,
-      storage_path: `uploads/${file.name}`
+      description: `User uploaded asset for ${state.currentActiveApp || 'app'}.`,
+      storage_path: fileUrl
     };
-    
-    try {
-      const supabase = getSupabaseClient();
-      if (supabase) {
-        const { data, error } = await supabase
-          .from('media')
-          .insert([insertPayload])
-          .select();
-          
-        if (error) throw error;
-        showToast("Asset uploaded successfully!", "success");
-        await fetchMediaAssets();
-      } else {
-        // Fallback to localStorage if no Supabase client
-        const localAsset = {
-          id: 'media_' + Date.now(),
-          name: file.name,
-          type: file.type || 'image/png',
-          size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-          folder: insertPayload.folder,
-          tag: 'Upload',
-          description: insertPayload.description,
-          url: insertPayload.storage_path
-        };
-        if (!state.mediaState.assets) state.mediaState.assets = [];
-        state.mediaState.assets.push(localAsset);
-        localStorage.setItem('socialgrowth_media_assets', JSON.stringify(state.mediaState.assets));
-        showToast("Asset saved locally!", "success");
-        renderMediaManager();
-      }
-    } catch (err) {
-      console.error("Upload failed", err);
-      showToast("Failed to upload asset.", "error");
+
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('media')
+        .insert([insertPayload])
+        .select();
+        
+      if (error) throw error;
+      showToast("Asset uploaded successfully!", "success");
+      await fetchMediaAssets();
+    } else {
+      // Fallback to localStorage if no Supabase client
+      const localAsset = {
+        id: 'media_' + Date.now(),
+        name: file.name,
+        type: file.type || 'image/png',
+        size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+        folder: insertPayload.folder,
+        tag: 'Upload',
+        description: insertPayload.description,
+        url: insertPayload.storage_path
+      };
+      if (!state.mediaState.assets) state.mediaState.assets = [];
+      state.mediaState.assets.push(localAsset);
+      localStorage.setItem('socialgrowth_media_assets', JSON.stringify(state.mediaState.assets));
+      showToast("Asset saved locally!", "success");
+      renderMediaManager();
     }
-  }, 1500);
+  } catch (err) {
+    console.error("Upload failed", err);
+    showToast("Failed to upload asset.", "error");
+  }
 }
 
 // ------------------------------------------
