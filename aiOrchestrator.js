@@ -273,7 +273,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
         
         if (imagePrompts.length > 0) {
           const totalImages = Math.min(imagePrompts.length, contentWriter.result.copy_variants.length);
-          steps.push({ agent: "Creative Director", log: `Generating ${totalImages} images for posts...` });
+          steps.push({ agent: "Creative Director", log: `Generating ${totalImages} images via FLUX AI...` });
           
           for (let i = 0; i < totalImages; i++) {
             const promptText = imagePrompts[i];
@@ -282,63 +282,72 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
             
             let imageUrl = null;
             
-            // Try DALL-E 3 first
-            try {
-              console.log(`[Orchestrator] DALL-E 3 attempt for image ${i+1}/${totalImages}...`);
-              const response = await openai.images.generate({
-                model: "dall-e-3",
-                prompt: enhancedPrompt,
-                n: 1,
-                size: "1024x1024",
-              });
-              imageUrl = response.data[0].url;
-              console.log(`[Orchestrator] DALL-E 3 success for image ${i+1}`);
-            } catch (dalleErr) {
-              console.error(`[Orchestrator] DALL-E 3 failed for image ${i+1}:`, dalleErr.message);
-              
-              // Fallback to Replicate FLUX
-              if (config.REPLICATE_API_TOKEN) {
-                try {
-                  console.log(`[Orchestrator] Falling back to Replicate FLUX for image ${i+1}...`);
-                  const replicateRes = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions', {
-                    method: 'POST',
-                    headers: {
-                      'Authorization': `Bearer ${config.REPLICATE_API_TOKEN}`,
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      input: {
-                        prompt: enhancedPrompt.substring(0, 1000),
-                        num_outputs: 1,
-                        aspect_ratio: "1:1",
-                        output_format: "webp",
-                        output_quality: 90
-                      }
-                    })
-                  });
-                  const prediction = await replicateRes.json();
-                  
-                  // Poll for result (max 30 seconds)
-                  if (prediction.urls?.get) {
-                    for (let attempt = 0; attempt < 15; attempt++) {
-                      await new Promise(r => setTimeout(r, 2000));
-                      const pollRes = await fetch(prediction.urls.get, {
-                        headers: { 'Authorization': `Bearer ${config.REPLICATE_API_TOKEN}` }
-                      });
-                      const pollData = await pollRes.json();
-                      if (pollData.status === 'succeeded' && pollData.output) {
-                        imageUrl = Array.isArray(pollData.output) ? pollData.output[0] : pollData.output;
-                        console.log(`[Orchestrator] Replicate FLUX success for image ${i+1}`);
-                        break;
-                      } else if (pollData.status === 'failed') {
-                        console.error(`[Orchestrator] Replicate failed:`, pollData.error);
-                        break;
-                      }
+            // Primary: Replicate FLUX (confirmed working)
+            if (config.REPLICATE_API_TOKEN) {
+              try {
+                console.log(`[Orchestrator] Replicate FLUX generating image ${i+1}/${totalImages}...`);
+                const replicateRes = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions', {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${config.REPLICATE_API_TOKEN}`,
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    input: {
+                      prompt: enhancedPrompt.substring(0, 1000),
+                      num_outputs: 1,
+                      aspect_ratio: "1:1",
+                      output_format: "webp",
+                      output_quality: 90
+                    }
+                  })
+                });
+                const prediction = await replicateRes.json();
+                
+                // Handle sync response
+                if (prediction.output) {
+                  imageUrl = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output;
+                  console.log(`[Orchestrator] FLUX success (sync) for image ${i+1}`);
+                }
+                // Handle async response - poll for result
+                else if (prediction.urls?.get) {
+                  for (let attempt = 0; attempt < 15; attempt++) {
+                    await new Promise(r => setTimeout(r, 2000));
+                    const pollRes = await fetch(prediction.urls.get, {
+                      headers: { 'Authorization': `Bearer ${config.REPLICATE_API_TOKEN}` }
+                    });
+                    const pollData = await pollRes.json();
+                    if (pollData.status === 'succeeded' && pollData.output) {
+                      imageUrl = Array.isArray(pollData.output) ? pollData.output[0] : pollData.output;
+                      console.log(`[Orchestrator] FLUX success (async) for image ${i+1}`);
+                      break;
+                    } else if (pollData.status === 'failed') {
+                      console.error(`[Orchestrator] FLUX failed:`, pollData.error);
+                      break;
                     }
                   }
-                } catch (repErr) {
-                  console.error(`[Orchestrator] Replicate FLUX also failed:`, repErr.message);
+                } else if (prediction.error) {
+                  console.error(`[Orchestrator] FLUX error:`, prediction.error);
                 }
+              } catch (repErr) {
+                console.error(`[Orchestrator] Replicate FLUX failed for image ${i+1}:`, repErr.message);
+              }
+            }
+            
+            // Fallback: DALL-E (if Replicate failed and DALL-E is available)
+            if (!imageUrl) {
+              try {
+                console.log(`[Orchestrator] Trying DALL-E fallback for image ${i+1}...`);
+                const response = await openai.images.generate({
+                  model: "dall-e-3",
+                  prompt: enhancedPrompt,
+                  n: 1,
+                  size: "1024x1024",
+                });
+                imageUrl = response.data[0].url;
+                console.log(`[Orchestrator] DALL-E success for image ${i+1}`);
+              } catch (dalleErr) {
+                console.error(`[Orchestrator] DALL-E also failed for image ${i+1}:`, dalleErr.message);
               }
             }
             
@@ -346,12 +355,12 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
             if (imageUrl) {
               steps.push({ agent: "Creative Director", log: `Image ${i+1}/${totalImages} generated ✓` });
             } else {
-              steps.push({ agent: "Creative Director", log: `Image ${i+1}/${totalImages} could not be generated. Post will be text-only.` });
+              steps.push({ agent: "Creative Director", log: `Image ${i+1}/${totalImages} could not be generated.` });
             }
             
             // Delay between requests
             if (i < totalImages - 1) {
-              await new Promise(resolve => setTimeout(resolve, 2000));
+              await new Promise(resolve => setTimeout(resolve, 1000));
             }
           }
         }
