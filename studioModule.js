@@ -46,7 +46,7 @@ export function prefillLaunchPrompt(type) {
   }
 }
 
-export function generateLaunchCampaign() {
+export async function generateLaunchCampaign() {
   const app = state.appsData[state.currentActiveApp];
   if (!app) return;
   const promptEl = document.getElementById('launch-prompt');
@@ -60,54 +60,70 @@ export function generateLaunchCampaign() {
   
   showToast("AI Launch Copilot is formulating growth blueprints...", "success");
   
-  const summary = document.getElementById('launch-strategy-summary');
-  if (summary) {
-    summary.innerHTML = '';
-    const wrapper = createSafeElement('div');
-    wrapper.style.display = 'flex';
-    wrapper.style.flexDirection = 'column';
-    wrapper.style.gap = '10px';
+  try {
+    const aiPrompt = `Generate a launch campaign strategy. Return ONLY a valid JSON object matching this structure: {"channels": "Target channels...", "timeline": [{"date": "Day -X", "title": "Step", "text": "Details"}], "calendar": [{"platform": "Twitter", "date": "Day X", "post": "Content"}]}. Do not include markdown formatting or backticks. App: ${app.name}. Goal: ${prompt}`;
     
-    const title = createSafeElement('h5', [], `Strategic Summary: Release of ${app.name}`);
-    title.style.color = 'white';
-    title.style.fontSize = '0.95rem';
+    const response = await requestApi('/api/ai-gateway/generate', {
+      method: 'POST',
+      body: JSON.stringify({
+        prompt: aiPrompt,
+        taskType: 'strategy',
+        tone: 'professional'
+      })
+    });
     
-    const details = createSafeElement('p');
-    details.innerHTML = `<strong>Recommended Target Channels:</strong> Twitter/X, Product Hunt, email announcement campaign.`;
+    let rawContent = response.content || response.data?.content || '';
+    rawContent = rawContent.replace(/```json/g, '').replace(/```/g, '').trim();
+    const strategy = JSON.parse(rawContent);
     
-    wrapper.appendChild(title);
-    wrapper.appendChild(details);
-    summary.appendChild(wrapper);
-  }
-  
-  const timeline = document.getElementById('launch-timeline-container');
-  if (timeline) {
-    timeline.innerHTML = '';
+    const summary = document.getElementById('launch-strategy-summary');
+    if (summary) {
+      summary.innerHTML = '';
+      const wrapper = createSafeElement('div');
+      wrapper.style.display = 'flex';
+      wrapper.style.flexDirection = 'column';
+      wrapper.style.gap = '10px';
+      
+      const title = createSafeElement('h5', [], `Strategic Summary: Release of ${app.name}`);
+      title.style.color = 'white';
+      title.style.fontSize = '0.95rem';
+      
+      const details = createSafeElement('p');
+      details.innerHTML = `<strong>Recommended Target Channels:</strong> ${strategy.channels}`;
+      
+      wrapper.appendChild(title);
+      wrapper.appendChild(details);
+      summary.appendChild(wrapper);
+    }
     
-    const item1 = createSafeElement('div', ['timeline-item', 'completed']);
-    item1.innerHTML = `<div class="timeline-dot"></div><div class="timeline-content"><div class="timeline-date">Day -7</div><div class="timeline-title">Assets Prep</div><div class="timeline-text">Media logs constructed.</div></div>`;
+    const timeline = document.getElementById('launch-timeline-container');
+    if (timeline) {
+      timeline.innerHTML = '';
+      (strategy.timeline || []).forEach((t, i) => {
+        const item = createSafeElement('div', ['timeline-item', i === 0 ? 'completed' : 'active']);
+        item.innerHTML = `<div class="timeline-dot"></div><div class="timeline-content"><div class="timeline-date">${t.date}</div><div class="timeline-title">${t.title}</div><div class="timeline-text">${t.text}</div></div>`;
+        timeline.appendChild(item);
+      });
+    }
     
-    const item2 = createSafeElement('div', ['timeline-item', 'active']);
-    item2.innerHTML = `<div class="timeline-dot"></div><div class="timeline-content"><div class="timeline-date">Day -3</div><div class="timeline-title">Teasers</div><div class="timeline-text">X teasers scheduling.</div></div>`;
-    
-    timeline.appendChild(item1);
-    timeline.appendChild(item2);
-  }
-  
-  const cal = document.getElementById('content-calendar-container');
-  if (cal) {
-    cal.innerHTML = `
-      <div class="calendar-post-card">
-        <div class="post-header">
-          <span class="post-platform">Twitter</span>
-          <span class="post-timing">Day -3</span>
+    const cal = document.getElementById('content-calendar-container');
+    if (cal) {
+      cal.innerHTML = (strategy.calendar || []).map(c => `
+        <div class="calendar-post-card">
+          <div class="post-header">
+            <span class="post-platform">${c.platform}</span>
+            <span class="post-timing">${c.date}</span>
+          </div>
+          <div class="post-body">${c.post}</div>
         </div>
-        <div class="post-body">Building something special. Launching soon.</div>
-      </div>
-    `;
+      `).join('');
+    }
+    
+    showToast("Launch blueprints generated!", "success");
+  } catch (err) {
+    console.error("AI Launch Error:", err);
+    showToast("Launch generation failed. Using basic fallback.", "error");
   }
-  
-  showToast("Launch blueprints generated!", "success");
 }
 
 // ------------------------------------------
