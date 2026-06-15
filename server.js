@@ -3,6 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
 const path = require('path');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const compression = require('compression');
 const { createClient } = require('@supabase/supabase-js');
 const config = require('./config');
 const aiGatewayRouter = require('./aiGatewayRouter');
@@ -10,10 +13,49 @@ const { processDiscoveryJob } = require('./discoveryEngine');
 
 const app = express();
 const PORT = config.PORT;
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
-// Enable CORS and JSON parsing
-app.use(cors());
-app.use(express.json());
+// Security: HTTP headers
+app.use(helmet({
+  contentSecurityPolicy: false,  // Disabled because we serve inline scripts in index.html
+  crossOriginEmbedderPolicy: false
+}));
+
+// Security: Rate limiting
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // limit each IP to 200 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please try again later.' }
+});
+
+const aiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 20, // limit AI endpoints to 20 requests per minute
+  message: { error: 'AI rate limit exceeded. Please wait a moment.' }
+});
+
+// Security: CORS restricted to production domain
+const ALLOWED_ORIGINS = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',')
+  : ['https://socialgrowth-production.up.railway.app', 'http://localhost:3000'];
+
+app.use(cors({
+  origin: IS_PRODUCTION ? ALLOWED_ORIGINS : true,
+  credentials: true
+}));
+
+// Performance: Compression
+app.use(compression());
+app.use(express.json({ limit: '5mb' }));
+
+// Rate limit all API routes
+app.use('/api', apiLimiter);
+app.use('/api/ai-gateway', aiLimiter);
+
+// Trust Railway's proxy for accurate IP-based rate limiting
+if (IS_PRODUCTION) app.set('trust proxy', 1);
 
 // Serve static frontend files (HTML, CSS, JS modules)
 app.use(express.static(path.join(__dirname, '.'), {
@@ -63,8 +105,8 @@ const authenticate = async (req, res, next) => {
     return res.status(401).json({ error: 'Unauthorized: Missing token credentials' });
   }
   
-  // Allow mock JWT token fallback for local development (disabled in production)
-  if (token === 'mock-supabase-jwt-token') {
+  // Allow mock JWT token fallback for LOCAL DEVELOPMENT ONLY
+  if (token === 'mock-supabase-jwt-token' && !IS_PRODUCTION) {
     req.user = { id: '00000000-0000-0000-0000-000000000000', email: 'founder@growthsuite.co' };
     return next();
   }
@@ -129,6 +171,18 @@ app.post('/api/auth/session', async (req, res) => {
       return res.status(401).json({ error: "Invalid auth credentials session" });
     }
     
+    // Fetch user's first business to use as org context
+    let orgName = data.user.user_metadata?.company || 'My Business';
+    try {
+      const { data: bizData } = await supabase
+        .from('businesses')
+        .select('name')
+        .eq('owner_id', data.user.id)
+        .limit(1)
+        .single();
+      if (bizData) orgName = bizData.name;
+    } catch (e) { /* use default */ }
+    
     res.json({
       user: {
         email: data.user.email,
@@ -137,8 +191,8 @@ app.post('/api/auth/session', async (req, res) => {
         avatar: data.user.user_metadata?.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
       },
       organization: {
-        id: "org_default_1",
-        name: "CyberVentures Ltd"
+        id: data.user.id,
+        name: orgName
       }
     });
   } catch (err) {
@@ -247,7 +301,7 @@ app.get('/api/discovery/status/:jobId', async (req, res) => {
 // 1.5. OAuth Integrations (Meta - Facebook/Instagram)
 // ==========================================
 
-const META_REDIRECT_URI = 'https://socialgrowth-production.up.railway.app/api/auth/meta/callback';
+const META_REDIRECT_URI = process.env.META_REDIRECT_URI || 'https://socialgrowth-production.up.railway.app/api/auth/meta/callback';
 
 app.get('/api/auth/meta', (req, res) => {
   const { projectId } = req.query;
@@ -403,7 +457,7 @@ app.post('/api/calendar/schedule', async (req, res) => {
     const { data, error } = await supabase
       .from('scheduled_posts')
       .insert([{
-        user_id: req.user?.id || 'd9b7b9f3-8c43-4f11-b01a-8c48a735c029',
+        user_id: req.user?.id,
         app_id: projectId || 'default',
         platform: platform,
         content: text,
@@ -545,76 +599,117 @@ app.post('/api/inbox/reply', async (req, res) => {
   }
 });
 
-// Priority 7: Media Asset retrieval
+// Priority 7: Media Asset retrieval (now uses production schema with app_id)
 app.get('/api/media/assets', async (req, res) => {
+  const appId = req.query.appId;
   try {
     if (isDummyDb) throw new Error("Offline Mode");
-    // Only return mock data immediately to avoid crashing since media table is unstable
-    throw new Error("Bypassing media table due to 500 error from Supabase");
+    const { data, error } = await supabase
+      .from('media')
+      .select('*')
+      .eq('app_id', appId || '');
+    if (error) throw error;
+    res.json({ assets: data || [] });
   } catch (err) {
-    res.json({
-      assets: []
-    });
+    res.json({ assets: [] });
   }
 });
 
-// Priority 8: Media Asset upload simulation (saving record in media table)
+// Priority 8: Media Asset upload (now writes to production schema)
 app.post('/api/media/upload', async (req, res) => {
-  const { name, file_type, file_size, folder } = req.body;
+  const { name, file_type, file_size, folder, appId } = req.body;
   if (!name) {
     return res.status(400).json({ error: "File metadata parameters missing." });
   }
   
   try {
     if (isDummyDb) throw new Error("Offline Mode");
-    
-    // We bypass insertion because the schema `media` table is corrupted/missing on Supabase
-    // and throws 500 errors. We'll return the formatted object back to the client so it can hold it in memory.
-    throw new Error("Bypassing db insert due to 500 error");
-    
+    const { data, error } = await supabase.from('media').insert([{
+      app_id: appId || 'default',
+      name: name,
+      file_type: file_type || 'image/png',
+      file_size: file_size || 0,
+      folder: folder || 'Brand Assets',
+      storage_path: `uploads/${name}`,
+      description: `Uploaded asset: ${name}`
+    }]).select();
+    if (error) throw error;
+    res.json(data?.[0] || { id: 'new', name });
   } catch (err) {
-    // Return mock success so the frontend updates its state
+    console.error('Media upload error:', err);
     res.json({
       id: "as_new_" + Date.now(),
       name: name,
       file_type: file_type || 'image/png',
-      file_size: file_size || 1024,
-      storage_path: `uploads/${name}`,
-      tag: folder || 'Brand Assets',
-      description: `AI Description: Mobile screen graphic layout depicting ${name} interfaces.`
+      storage_path: `uploads/${name}`
     });
   }
 });
 
-// Priority 10: App Store Sync Connect
+// Priority 10: App Store Sync Connect (placeholder — no real store API yet)
 app.post('/api/store/sync', async (req, res) => {
   const { store } = req.body;
-  res.json({ success: true, message: `${store} metadata rankings and reviews synchronized successfully.` });
+  res.json({ success: true, message: `${store} sync initiated. Real store API integration coming soon.` });
 });
 
-// Priority 13: AI Content Studio Campaign generator
-app.post('/api/ai/studio/generate', (req, res) => {
+// Priority 13: AI Content Studio Campaign generator (real OpenAI)
+app.post('/api/ai/studio/generate', async (req, res) => {
   const { prompt, platform, tone, enable_ab } = req.body;
   if (!prompt || !platform) {
     return res.status(400).json({ error: "Prompt and platform parameters required." });
   }
   
-  const generatedCopy = {
-    variant_a: `🚀 [Variant A - CTR focus] Announcing new feature update! We just launched smartwatch tracker syncing support. Optimize gym tracking: [Link]`,
-    variant_b: `🔥 [Variant B - Direct Conversion focus] Stop losing workout logs. Smartwatch sync is officially live. Download today: [Link]`
-  };
-  
-  res.json({ copy: generatedCopy });
+  try {
+    if (!config.OPENAI_API_KEY) throw new Error('OpenAI key not configured');
+    const OpenAI = require('openai');
+    const openai = new OpenAI({ apiKey: config.OPENAI_API_KEY });
+    const systemPrompt = `You are a world-class social media copywriter. Generate ${enable_ab ? 'two A/B variants' : 'one variant'} of a ${platform} post. Tone: ${tone || 'professional'}. Return JSON with keys variant_a and variant_b (if A/B). Each variant should be ready-to-post copy with emojis, hashtags, and a CTA.`;
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: prompt }
+      ],
+      response_format: { type: 'json_object' }
+    });
+    const copy = JSON.parse(completion.choices[0].message.content);
+    res.json({ copy });
+  } catch (err) {
+    console.error('AI Studio error:', err.message);
+    res.json({ copy: {
+      variant_a: `🚀 ${prompt.substring(0, 200)}... [Generated offline — OpenAI key needed for live generation]`,
+      variant_b: enable_ab ? `🔥 ${prompt.substring(0, 200)}... [A/B variant — configure OpenAI for real generation]` : undefined
+    }});
+  }
 });
 
-// Priority 12: AI Cross-App Growth Opportunity Analyzer
-app.get('/api/ai/growth-intelligence', (req, res) => {
-  res.json({
-    overlapScore: 78,
-    bundleRecommendation: "Combine FitPulse wellness tips with TaskFlow calendar scheduling cards to capture busy startup founders segment.",
-    promotionalPitch: "Healthy Workspaces: Sync task completions with recovery exercises.",
-    growthOpportunityScore: "85/100"
-  });
+// Priority 12: AI Cross-App Growth Opportunity Analyzer (real OpenAI)
+app.get('/api/ai/growth-intelligence', async (req, res) => {
+  const appId = req.query.appId;
+  try {
+    if (!config.OPENAI_API_KEY) throw new Error('No OpenAI key');
+    // Fetch user's businesses for context
+    const { data: businesses } = await supabase.from('businesses').select('name, category, business_type');
+    const OpenAI = require('openai');
+    const openai = new OpenAI({ apiKey: config.OPENAI_API_KEY });
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'Analyze cross-app growth opportunities. Return JSON with keys: overlapScore (number 0-100), bundleRecommendation (string), promotionalPitch (string), growthOpportunityScore (string like "85/100").' },
+        { role: 'user', content: `Analyze growth synergies for this portfolio: ${JSON.stringify(businesses || [])}` }
+      ],
+      response_format: { type: 'json_object' }
+    });
+    res.json(JSON.parse(completion.choices[0].message.content));
+  } catch (err) {
+    console.warn('Growth intelligence fallback:', err.message);
+    res.json({
+      overlapScore: 0,
+      bundleRecommendation: "Add more businesses to your portfolio to unlock cross-promotion insights.",
+      promotionalPitch: "Connect your apps to discover synergies.",
+      growthOpportunityScore: "--/100"
+    });
+  }
 });
 
 // Priority 11: Multi-Agent Orchestration Stepper
@@ -813,81 +908,122 @@ app.post('/api/content-intelligence/predict', (req, res) => {
   });
 });
 
-app.post('/api/content-intelligence/recycle', (req, res) => {
+app.post('/api/content-intelligence/recycle', async (req, res) => {
   const { caption, platform } = req.body;
   if (!caption) return res.status(400).json({ error: "Caption copy required." });
   
-  res.json({
-    recycled: {
-      email: `Subject: Crucial lessons from our SaaS growth journey\n\nHey Founder,\n\nWe wanted to share how we took FitPulse to $10k MRR: \n\n${caption.replace(/#/g, '')}\n\nHope this inspires your launch!`,
-      thread: `🧵 1/ How we took FitPulse to $10k MRR in 6 months:\n\n${caption}\n\n2/ It wasn't about complex marketing. It was about solving one painful problem.\n\n3/ Check out our roadmap for the next updates: [Link]`,
-      linkedin: `Acquisition is the lifeline of startups.\n\nWe bootstrapped FitPulse to $10k MRR. Here is what we learned:\n\n${caption}\n\nWhat is your core marketing loop? #IndieHackers #SaaS`,
-      shortForm: `How we hit $10k MRR in 6 months! 🚀\n\nNo marketing budgets, just building in public and solving real problems.\n\nRead our roadmap details here: [Link]`
+  try {
+    if (!config.OPENAI_API_KEY) throw new Error('No OpenAI key');
+    const OpenAI = require('openai');
+    const openai = new OpenAI({ apiKey: config.OPENAI_API_KEY });
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'You are a content recycling expert. Take the given post and repurpose it into 4 formats. Return JSON with keys: email (newsletter version), thread (Twitter thread), linkedin (LinkedIn post), shortForm (TikTok/Reels caption). Keep the core message but optimize each for its platform.' },
+        { role: 'user', content: `Original ${platform || 'social'} post: ${caption}` }
+      ],
+      response_format: { type: 'json_object' }
+    });
+    res.json({ recycled: JSON.parse(completion.choices[0].message.content) });
+  } catch (err) {
+    console.warn('Content recycle fallback:', err.message);
+    res.json({
+      recycled: {
+        email: `Subject: Key insights from our journey\n\n${caption.replace(/#/g, '')}`,
+        thread: `🧵 1/ ${caption}\n\n2/ Here's what we learned...\n\n3/ More details: [Link]`,
+        linkedin: `${caption}\n\nWhat are your thoughts? #Growth #SaaS`,
+        shortForm: `${caption.substring(0, 150)}... 🚀`
+      }
+    });
+  }
+});
+
+// Weekly Content Strategy Report
+app.get('/api/content-intelligence/report', async (req, res) => {
+  const appId = req.query.appId;
+  try {
+    // Fetch real posts data if available
+    let topPosts = [];
+    if (!isDummyDb && appId) {
+      const { data } = await supabase
+        .from('businesses_posts')
+        .select('platform, content_text, success_score')
+        .eq('business_id', appId)
+        .order('success_score', { ascending: false })
+        .limit(5);
+      if (data) topPosts = data;
     }
-  });
+    const topSection = topPosts.length > 0
+      ? topPosts.map((p, i) => `- ${p.platform}: "${(p.content_text || '').substring(0, 80)}..." (Score: ${p.success_score})`).join('\n')
+      : '- No posts tracked yet. Schedule content via the Calendar to start collecting data.';
+    
+    const reportContent = `=========================================\nWEEKLY CONTENT STRATEGY REPORT\n=========================================\nDate: ${new Date().toLocaleDateString()}\n\n1. TOP PERFORMERS\n${topSection}\n\n2. RECOMMENDATIONS\n- Schedule more content to build performance data.\n- Use the AI Content Studio to generate A/B variants.\n- Track results in Content Intelligence dashboard.\n`;
+    res.send(reportContent);
+  } catch (err) {
+    res.send('Report generation failed. Please try again later.');
+  }
 });
 
-// Removed mock /coach endpoint. Handled by /api/ai-gateway/generate instead!
-
-app.get('/api/content-intelligence/report', (req, res) => {
-  const reportContent = `=========================================
-WEEKLY CONTENT STRATEGY EXECUTIVE REPORT
-=========================================
-Project: FitPulse Portfolio
-Date Range: June 03, 2026 - June 09, 2026
-
-1. TOP PERFORMERS
-------------------
-- Twitter: "Why we bootstrapped FitPulse to $10k MRR..." (Score: 92)
-- LinkedIn: "Elena Rostova saved 6 hours/week..." (Score: 88)
-
-2. CORE CONVERSION METRICS
---------------------------
-- Average Success Score: 74.5 / 100
-- Total Attributed Revenue: $28,450.00
-- Total Attributed Leads: 3,100 signups
-- Highest Performing CTA: "Try Free" (5.4% CTR)
-
-3. PATTERNS DISCOVERED
------------------------
-- Screenshot mockups outperform text posts by 42%.
-- Customer stories produce 31% higher subscriber conversion levels.
-- Best Hour of Week: Wednesday 09:00 AM.
-
-4. PORTFOLIO CROSS-PROMOTIONS
-------------------------------
-Recommend cross-promoting FitPulse's workout planners inside TaskFlow's calendar inbox layouts to target active startup developers.
-
-5. ACTION CHECKLIST
---------------------
-[ ] Draft a testimonial copy variant for next Tuesday's queue.
-[ ] Add screenshots to feature update draft posts.
-[ ] Recycle high-scoring Twitter posts into LinkedIn variants.
-`;
+// --- Advertising API Routes (real Supabase queries) ---
+app.get('/api/advertising/campaigns/:appId', async (req, res) => {
+  const { appId } = req.params;
+  try {
+    if (isDummyDb) throw new Error('Offline');
+    const { data, error } = await supabase
+      .from('ad_campaigns')
+      .select('id, name, status, total_budget, daily_budget, objective, strategy_context, start_date, created_at')
+      .eq('app_id', appId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    
+    // Enrich with spend data from ad_performance_daily
+    const campaigns = await Promise.all((data || []).map(async (camp) => {
+      const { data: perfData } = await supabase
+        .from('ad_performance_daily')
+        .select('spend, revenue')
+        .eq('campaign_id', camp.id);
+      const totalSpend = (perfData || []).reduce((sum, p) => sum + Number(p.spend || 0), 0);
+      const totalRevenue = (perfData || []).reduce((sum, p) => sum + Number(p.revenue || 0), 0);
+      return {
+        ...camp,
+        spend: totalSpend,
+        roas: totalSpend > 0 ? (totalRevenue / totalSpend).toFixed(1) : 0,
+        platform: camp.strategy_context?.platform || 'Multi'
+      };
+    }));
+    res.json({ campaigns });
+  } catch (err) {
+    res.json({ campaigns: [] });
+  }
 });
 
-// --- Advertising API Routes ---
-app.get('/api/advertising/campaigns/:appId', (req, res) => {
-  res.json({
-    campaigns: [
-      { id: 'camp1', name: 'Meta Lookalike Acquisition', status: 'active', spend: 450, total_budget: 1500, roas: 2.1, platform: 'Meta', objective: 'Conversions' },
-      { id: 'camp2', name: 'Google Search Intent', status: 'active', spend: 890, total_budget: 2000, roas: 3.4, platform: 'Google', objective: 'Lead Gen' },
-      { id: 'camp3', name: 'TikTok Influencer Spark', status: 'pending_approval', spend: 0, total_budget: 3000, roas: 0, platform: 'TikTok', objective: 'Awareness' },
-      { id: 'camp4', name: 'LinkedIn B2B Retargeting', status: 'completed', spend: 500, total_budget: 500, roas: 1.8, platform: 'LinkedIn', objective: 'Sales' }
-    ]
-  });
-});
-
-app.post('/api/advertising/approve', (req, res) => {
+app.post('/api/advertising/approve', async (req, res) => {
   const { campaignId } = req.body;
-  res.json({ status: 'success', message: `Campaign ${campaignId} approved and launched.` });
+  try {
+    if (isDummyDb) throw new Error('Offline');
+    const { error } = await supabase
+      .from('ad_campaigns')
+      .update({ status: 'active', start_date: new Date().toISOString() })
+      .eq('id', campaignId);
+    if (error) throw error;
+    res.json({ status: 'success', message: `Campaign ${campaignId} approved and activated.` });
+  } catch (err) {
+    res.json({ status: 'success', message: `Campaign ${campaignId} approved. (Offline mode)` });
+  }
 });
-// Default status probe
-app.get('/health', (req, res) => {
-  res.json({ status: "healthy", database: "connected", workers: "running" });
+// Health check — actually verifies DB connection
+app.get('/health', async (req, res) => {
+  let dbStatus = 'disconnected';
+  try {
+    const { data, error } = await supabase.from('businesses').select('id').limit(1);
+    if (!error) dbStatus = 'connected';
+  } catch (e) { /* ignore */ }
+  res.json({ status: dbStatus === 'connected' ? 'healthy' : 'degraded', database: dbStatus, timestamp: new Date().toISOString() });
 });
 
-app.get('/admin/debug-jobs', async (req, res) => {
+// Admin debug — protected by auth middleware via /api prefix
+app.get('/api/admin/debug-jobs', async (req, res) => {
+  // Only allow in non-production or with valid auth token (auth middleware already applied)
   try {
     const adminSupabase = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_KEY || config.SUPABASE_ANON_KEY);
     const { data, error } = await adminSupabase
@@ -895,12 +1031,7 @@ app.get('/admin/debug-jobs', async (req, res) => {
       .select('*')
       .order('created_at', { ascending: false })
       .limit(5);
-    res.json({ 
-      data, 
-      error,
-      hasOpenAIKey: !!process.env.OPENAI_API_KEY,
-      hasServiceKey: !!process.env.SUPABASE_SERVICE_KEY
-    });
+    res.json({ data, error });
   } catch(err) {
     res.status(500).json({ error: err.message });
   }

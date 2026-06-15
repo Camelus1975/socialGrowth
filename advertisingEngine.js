@@ -95,43 +95,38 @@ async function approveCampaign(campaignId, authHeader) {
 }
 
 /**
- * Simulate daily spend and attribution (cron job simulation)
+ * Record daily performance data.
+ * NOTE: Previously this generated random fake data. Now it's a no-op placeholder
+ * until real Ad API integration (Meta Ads, Google Ads) provides real attribution data.
  */
-async function simulateDailyPerformance(campaignId, budgetAllocated, authHeader) {
+async function recordDailyPerformance(campaignId, performanceData, authHeader) {
+  if (!performanceData) {
+    console.warn(`[Ad Engine] No real performance data available for campaign ${campaignId}. Skipping.`);
+    return { success: true, message: 'No real ad API data to record yet.' };
+  }
+
   const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
     global: { headers: { Authorization: authHeader } }
   });
-
-  const spend = budgetAllocated;
-  const cpa = Math.random() * 5 + 3; // $3 - $8
-  const conversions = Math.floor(spend / cpa);
-  const revenue = conversions * 15; // Assume LTV is $15
-  const roas = (revenue / spend).toFixed(2);
 
   const { data, error } = await supabase
     .from('ad_performance_daily')
     .insert([{
       campaign_id: campaignId,
       date: new Date().toISOString().split('T')[0],
-      spend: spend,
-      impressions: Math.floor(spend / 0.015),
-      clicks: Math.floor(spend / 0.5),
-      conversions: conversions,
-      revenue: revenue,
-      cpa: cpa.toFixed(2),
-      roas: roas
+      ...performanceData
     }]);
 
   if (error) {
-    console.error("Error simulating daily performance:", error);
+    console.error("Error recording daily performance:", error);
     throw error;
   }
-  return { success: true, spend, conversions, cpa: cpa.toFixed(2), roas };
+  return { success: true };
 }
 
 module.exports = {
   createPendingCampaign,
   predictCampaignOutcomes,
   approveCampaign,
-  simulateDailyPerformance
+  recordDailyPerformance
 };

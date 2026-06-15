@@ -101,6 +101,48 @@ async function runMarketingOrchestration(appId, goal, authHeader, language = 'en
   });
 
   try {
+    // 0. Fetch Business Context (discovery_profile with real scraped data)
+    let businessContext = "";
+    let appName = "";
+    try {
+      const { data: bizData } = await supabase
+        .from('businesses')
+        .select('name, category, business_type, website_url, discovery_profile')
+        .eq('id', appId)
+        .single();
+      
+      if (bizData?.discovery_profile) {
+        const dp = bizData.discovery_profile;
+        const profile = dp.businessProfile || {};
+        const voice = dp.brandVoice || {};
+        const strategy = dp.contentStrategy || {};
+        appName = profile.name || bizData.name || '';
+        businessContext = `
+=== BUSINESS INTELLIGENCE (from real website analysis) ===
+Business Name: ${profile.name || bizData.name || 'Unknown'}
+Industry: ${profile.industry || bizData.category || 'Unknown'}
+What they do: ${profile.summary || 'Not available'}
+Value Proposition: ${profile.valueProposition || 'Not available'}
+Target Audience: ${profile.targetAudience || 'Not available'}
+Products/Services: ${(profile.products || []).join(', ') || 'Not specified'}
+Key Messages: ${(profile.keyMessages || []).join('; ') || 'Not available'}
+Brand Voice: ${voice.tone || 'Professional'} / ${voice.personality || 'Not specified'}
+Brand Keywords: ${(voice.keywords || []).join(', ') || 'Not specified'}
+Sample Brand Phrases: ${(voice.samplePhrases || []).join('; ') || 'Not available'}
+Recommended Topics: ${(strategy.recommendedTopics || []).join(', ') || 'Not specified'}
+Content Pillars: ${(strategy.contentPillars || []).join(', ') || 'Not specified'}
+Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
+===
+`;
+        steps.push({ agent: "System", log: `Loaded brand intelligence profile for "${profile.name || bizData.name}". AI agents will use real business context.` });
+      } else {
+        businessContext = `Business Name: ${bizData?.name || appId}\nCategory: ${bizData?.category || businessType}\n`;
+        steps.push({ agent: "System", log: "No discovery profile found. Run Business Discovery first for better results." });
+      }
+    } catch (e) {
+      steps.push({ agent: "System", log: "Could not fetch business profile. Using basic context." });
+    }
+
     // 1. RAG Memory Retrieval Phase
     steps.push({ agent: "System", log: `Searching Growth Memory Engine for past insights on: "${appId}"...` });
     const relevantMemories = await searchGrowthMemory(goal, appId, supabase, 5);
@@ -133,7 +175,7 @@ async function runMarketingOrchestration(appId, goal, authHeader, language = 'en
       model: "gpt-4o", // Strategy requires deep reasoning
       messages: [
         { role: "system", content: AGENT_PROMPTS.CMO + "\n" + langDirective + "\n" + typeDirective },
-        { role: "user", content: `Business Type: ${businessType}\nApp/Business ID: ${appId}\nGoal: ${goal}\n\n${memoryContext}` }
+        { role: "user", content: `${businessContext}\nBusiness Type: ${businessType}\nApp/Business ID: ${appId}\nGoal: ${goal}\n\n${memoryContext}` }
       ],
       response_format: { type: "json_object" }
     });
@@ -150,7 +192,7 @@ async function runMarketingOrchestration(appId, goal, authHeader, language = 'en
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini", // Lower cost model for execution agents
         messages: [
-          { role: "system", content: AGENT_PROMPTS[agentKey] + "\n" + langDirective },
+          { role: "system", content: AGENT_PROMPTS[agentKey] + "\n" + langDirective + "\n" + businessContext },
           { role: "user", content: `CMO Strategy: ${cmoData.strategy_summary}\nYour Task: ${delegation.task}` }
         ],
         response_format: { type: "json_object" }
@@ -197,7 +239,11 @@ async function runMarketingOrchestration(appId, goal, authHeader, language = 'en
     if (contentWriter && contentWriter.result && contentWriter.result.copy_variants) {
       steps.push({ agent: "Publishing Agent", log: "Pushing organic draft posts to your Content Calendar." });
       try {
-        const uid = userId || 'd9b7b9f3-8c43-4f11-b01a-8c48a735c029'; // fallback
+        const uid = userId;
+        if (!uid) {
+          steps.push({ agent: 'Publishing Agent', log: 'Warning: No user ID available. Skipping calendar push.' });
+          return;
+        }
         
         // Find creative director output to generate images
         const creativeDirector = agentResults.find(r => r.agent === 'CreativeDirector' || r.agent === 'Creative Director');
@@ -209,8 +255,9 @@ async function runMarketingOrchestration(appId, goal, authHeader, language = 'en
           for (let i = 0; i < totalImages; i++) {
             const promptText = creativeDirector.result.image_prompts[i];
             try {
-              // Prepend app context to ensure the image is relevant
-              const enhancedPrompt = `A high-quality social media graphic for a ${businessType} business. ${promptText.substring(0, 800)}`;
+              // Build context-rich image prompt using business intelligence
+              const postText = contentWriter.result.copy_variants[i]?.text || '';
+              const enhancedPrompt = `A polished, professional social media graphic for "${appName || businessType}" business. The post is about: "${postText.substring(0, 200)}". Visual direction: ${promptText.substring(0, 600)}. Style: Modern, clean, engaging, suitable for social media. No text overlays.`;
               
               const response = await openai.images.generate({
                 model: "dall-e-3", // High quality generation

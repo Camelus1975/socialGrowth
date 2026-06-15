@@ -2,7 +2,7 @@
   "name": "app-founder-growth-suite",
   "version": "1.0.0",
   "description": "Growth Operating System for App Founders & Startup Creators",
-  "main": "index.html",
+  "main": "server.js",
   "scripts": {
     "dev": "npx -y http-server -p 8080 -o",
     "backend": "node server.js",
@@ -10,14 +10,17 @@
     "start": "node server.js"
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.8",
     "bullmq": "^5.4.0",
+    "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.18.3",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0",
     "ioredis": "^5.3.2",
     "openai": "^6.42.0",
     "pg": "^8.21.0",

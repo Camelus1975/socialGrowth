@@ -4,11 +4,10 @@ const Redis = require('ioredis');
 const dotenv = require('dotenv');
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
+const config = require('./config');
 
-dotenv.config();
-
-// Initialize Encryption Vault
-const ENCRYPTION_KEY = crypto.scryptSync(process.env.ENCRYPTION_SECRET || 'development_fallback_secret_key_123', 'founder_suite_salt_2026', 32);
+// Initialize Encryption Vault — MUST match server.js salt exactly
+const ENCRYPTION_KEY = crypto.scryptSync(config.ENCRYPTION_SECRET, config.ENCRYPTION_SALT, 32);
 
 function decryptToken(encryptedText) {
   if (!encryptedText) return null;
@@ -26,12 +25,10 @@ function decryptToken(encryptedText) {
   }
 }
 
-dotenv.config();
-
 // Initialize Supabase (Use Service Role Key if available, else Anon Key)
 const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
+  config.SUPABASE_URL,
+  config.SUPABASE_SERVICE_KEY || config.SUPABASE_ANON_KEY
 );
 
 // Connect to Redis instance

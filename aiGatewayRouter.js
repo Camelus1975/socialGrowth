@@ -19,8 +19,29 @@ const replicate = new Replicate({
  * and routes it to the cheapest capable tier, enforcing our strict AI Optimization strategy.
  */
 
-// Simple local cache to prevent duplicate expensive LLM calls
+// Simple local cache with TTL and max size to prevent memory leaks
+const AI_CACHE_MAX_SIZE = 500;
+const AI_CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
 const aiResponseCache = new Map();
+
+function getCachedResponse(key) {
+  const entry = aiResponseCache.get(key);
+  if (!entry) return undefined;
+  if (Date.now() - entry.ts > AI_CACHE_TTL_MS) {
+    aiResponseCache.delete(key);
+    return undefined;
+  }
+  return entry.value;
+}
+
+function setCachedResponse(key, value) {
+  // Evict oldest entries if cache is too large
+  if (aiResponseCache.size >= AI_CACHE_MAX_SIZE) {
+    const firstKey = aiResponseCache.keys().next().value;
+    aiResponseCache.delete(firstKey);
+  }
+  aiResponseCache.set(key, { value, ts: Date.now() });
+}
 
 // Helper: Determine the appropriate AI tier based on the requested task type
 function determineModelTier(taskType) {
@@ -77,10 +98,11 @@ router.post('/generate', async (req, res) => {
 
   // 1. Cache Check: Prevent duplicate exact requests
   const cacheKey = `${taskType}_${prompt}_${tone}_${enable_ab}`;
-  if (aiResponseCache.has(cacheKey)) {
+  const cachedResult = getCachedResponse(cacheKey);
+  if (cachedResult) {
     console.log(`[AI Gateway] CACHE HIT for ${taskType}`);
     return res.json({ 
-      copy: aiResponseCache.get(cacheKey),
+      copy: cachedResult,
       meta: { cached: true, tier: 'CACHE' }
     });
   }
@@ -106,7 +128,7 @@ router.post('/generate', async (req, res) => {
     }
 
     // 4. Cache the successful result
-    aiResponseCache.set(cacheKey, formattedResult);
+    setCachedResponse(cacheKey, formattedResult);
     
     // 5. Return payload
     res.json({
