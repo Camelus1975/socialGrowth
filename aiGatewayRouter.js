@@ -138,7 +138,7 @@ router.post('/generate', async (req, res) => {
     
   } catch (err) {
     console.error("[AI Gateway] LLM Execution Error:", err);
-    res.status(500).json({ error: 'AI Gateway failed to process request. Ensure OpenAI keys are valid.' });
+    res.status(500).json({ error: `AI Gateway failed: ${err.message || err.toString()}` });
   }
 });
 
