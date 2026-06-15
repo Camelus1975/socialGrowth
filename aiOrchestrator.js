@@ -119,7 +119,7 @@ async function runMarketingOrchestration(appId, goal, authHeader, language = 'en
       console.log(`[Orchestrator] Looking up business with business_id="${appId}"...`);
       const { data: bizData, error: bizErr } = await supabase
         .from('businesses')
-        .select('name, category, business_type, website_url, discovery_profile')
+        .select('name, category, business_type, discovery_profile')
         .eq('business_id', appId)
         .single();
       
@@ -360,9 +360,30 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
                   prompt: enhancedPrompt,
                   n: 1,
                   size: "1024x1024",
-                  response_format: "url",
                 });
-                imageUrl = response.data[0].url;
+                // gpt-image-1 returns base64 by default
+                if (response.data[0].url) {
+                  imageUrl = response.data[0].url;
+                } else if (response.data[0].b64_json) {
+                  // Upload to Supabase Storage to get a persistent URL
+                  try {
+                    const imgBuffer = Buffer.from(response.data[0].b64_json, 'base64');
+                    const fileName = `generated/${Date.now()}_${i}.png`;
+                    const { data: uploadData, error: uploadErr } = await supabase.storage
+                      .from('media')
+                      .upload(fileName, imgBuffer, { contentType: 'image/png', upsert: true });
+                    
+                    if (!uploadErr && uploadData) {
+                      const { data: urlData } = supabase.storage.from('media').getPublicUrl(fileName);
+                      imageUrl = urlData?.publicUrl || null;
+                      console.log(`[Orchestrator] Uploaded to Supabase storage: ${imageUrl}`);
+                    } else {
+                      console.error('[Orchestrator] Storage upload failed:', uploadErr?.message);
+                    }
+                  } catch (uploadEx) {
+                    console.error('[Orchestrator] Storage upload exception:', uploadEx.message);
+                  }
+                }
                 console.log(`[Orchestrator] gpt-image-1 success for image ${i+1}`);
               } catch (oaiErr) {
                 console.error(`[Orchestrator] gpt-image-1 also failed for image ${i+1}:`, oaiErr.message);
