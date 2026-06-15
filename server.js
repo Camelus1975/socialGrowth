@@ -259,10 +259,10 @@ app.post('/api/discovery/start', async (req, res) => {
       
     if (error) throw new Error(`Job Insert Error: ${JSON.stringify(error)}`);
     
-    // Spawn the background worker asynchronously (fire and forget)
-    processDiscoveryJob(job.id, appId, urls, name, userSupabase);
+    // Spawn the background worker with the UUID (not the url-derived appId)
+    processDiscoveryJob(job.id, bizRow.id, urls, name, userSupabase);
     
-    res.json({ jobId: job.id, message: "Discovery job started." });
+    res.json({ jobId: job.id, bizUuid: bizRow.id, message: "Discovery job started." });
   } catch (err) {
     console.error("Discovery Start Error:", err);
     res.status(500).json({ error: err.message });

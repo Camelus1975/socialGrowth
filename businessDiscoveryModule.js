@@ -1,32 +1,23 @@
-// Business Discovery Engine Module
-import { state } from './state.js';
-import { requestApi, showToast, closeModal } from './common.js';
-import { renderAppSelectorDropdown } from './appManager.js';
-import { selectActiveApp, switchView } from './app.js';
-import { getTemplateForBusiness } from './industryTemplates.js';
+// Business Discovery Module - Frontend
+import { state, renderAppSelectorDropdown, selectActiveApp, getTemplateForBusiness, requestApi, getSupabaseClient } from './app.js';
+import { showToast, switchView, closeModal } from './uiHelpers.js';
 
 let discoveryPollingInterval = null;
 
-export function initBusinessDiscovery() {
+export function initDiscoveryModule() {
   const startBtn = document.getElementById('discovery-start-btn');
-  const finishBtn = document.getElementById('discovery-finish-btn');
-  
   if (startBtn) {
     startBtn.addEventListener('click', startDiscovery);
   }
   
-  if (finishBtn) {
-    finishBtn.addEventListener('click', () => {
+  const closeBtn = document.getElementById('discovery-wizard-close-btn');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      resetWizard();
       closeModal('discovery-wizard-modal');
       switchView('dashboard');
     });
   }
-}
-
-// Generate a random ID for the new app stub
-function generateAppId(url) {
-  const domain = url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
-  return domain.replace(/[^a-z0-9]/g, '') + '_' + Math.floor(Math.random() * 1000);
 }
 
 async function startDiscovery() {
@@ -56,7 +47,8 @@ async function startDiscovery() {
     linkedin: linkedInInput.value.trim()
   };
   
-  const appId = generateAppId(urls.website);
+  // Use a clean slug-based ID (not the URL-derived one)
+  const appId = appName.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '') + '_' + Date.now().toString(36);
   
   // Transition to Step 2
   document.getElementById('discovery-step-1').style.display = 'none';
@@ -69,8 +61,11 @@ async function startDiscovery() {
     });
     if (!res || !res.jobId) throw new Error("Failed to start discovery job.");
     
-    // Start Polling
-    discoveryPollingInterval = setInterval(() => pollJobStatus(res.jobId, appId, businessType), 2000);
+    // Store the UUID returned by the backend for later use
+    const bizUuid = res.bizUuid;
+    
+    // Start Polling — pass appName and bizUuid for finalization
+    discoveryPollingInterval = setInterval(() => pollJobStatus(res.jobId, appId, appName, businessType, bizUuid), 2000);
   } catch (err) {
     alert("DISCOVERY ERROR: " + (err.message || 'Discovery failed to start.'));
     showToast(err.message || 'Discovery failed to start.', 'error');
@@ -78,7 +73,7 @@ async function startDiscovery() {
   }
 }
 
-async function pollJobStatus(jobId, appId, businessType) {
+async function pollJobStatus(jobId, appId, appName, businessType, bizUuid) {
   try {
     const job = await requestApi(`/api/discovery/status/${jobId}`, 'GET');
     
@@ -87,7 +82,7 @@ async function pollJobStatus(jobId, appId, businessType) {
       
       if (job.status === 'complete') {
         clearInterval(discoveryPollingInterval);
-        await finalizeDiscovery(appId, businessType);
+        await finalizeDiscovery(appId, appName, businessType, bizUuid);
       } else if (job.status === 'failed') {
         clearInterval(discoveryPollingInterval);
         const errorLog = job.logs && job.logs.length > 0 ? job.logs[job.logs.length - 1] : 'Unknown error';
@@ -109,38 +104,52 @@ function updateProgressUI(percent, latestLog) {
   if (statusText && latestLog) statusText.innerText = latestLog.replace(/\[.*?\] /, ''); // Clean timestamp
 }
 
-async function finalizeDiscovery(appId, businessType) {
-  // In a real app, we would fetch the newly updated app data from Supabase.
-  // Since we don't have a real db fetch endpoint for a single app in this demo context,
-  // we will manually simulate fetching it by fetching the job again (which doesn't have the payload).
-  // Wait, let's just create a mock state object for now so the UI works, 
-  // because the backend updated Supabase, but our frontend needs to load it.
+async function finalizeDiscovery(appId, appName, businessType, bizUuid) {
+  showToast('Discovery Complete! Loading brand intelligence...', 'success');
   
-  showToast('Discovery Complete!', 'success');
+  // Fetch the REAL discovery profile from Supabase
+  let discoveryProfile = null;
+  try {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('businesses')
+        .select('discovery_profile, name')
+        .eq('id', bizUuid)
+        .single();
+      if (!error && data?.discovery_profile) {
+        discoveryProfile = data.discovery_profile;
+      }
+    }
+  } catch (e) {
+    console.warn('Could not fetch discovery profile from DB:', e);
+  }
+  
+  // Fallback if DB fetch fails
+  if (!discoveryProfile) {
+    discoveryProfile = {
+      businessProfile: {
+        name: appName,
+        summary: "Brand profile generated. Refresh to see full details."
+      },
+      brandVoice: { tone: "Professional" },
+      audits: { marketingReadinessScore: 0 },
+      brandKit: { logoColor: "#4F46E5" }
+    };
+  }
   
   // Transition to Step 3
   document.getElementById('discovery-step-2').style.display = 'none';
   document.getElementById('discovery-step-3').style.display = 'block';
   
-  // Because we are simulating without a full backend DB refresh in state.js:
-  // We'll mock the injected data into state.
-  const appNameInput = document.getElementById('discovery-app-name');
-  const appName = appNameInput ? appNameInput.value.trim() : "Discovered Brand";
+  // Display REAL data from the discovery profile
+  const profile = discoveryProfile.businessProfile || {};
+  const displayName = profile.name || appName;
   
-  const mockDiscoveryProfile = {
-    businessProfile: {
-      name: appName,
-      summary: "AI-generated brand summary based on the provided website."
-    },
-    brandVoice: { tone: "Professional & Authoritative" },
-    audits: { marketingReadinessScore: 88 },
-    brandKit: { logoColor: "#4F46E5" }
-  };
-  
-  document.getElementById('discovery-result-name').innerText = mockDiscoveryProfile.businessProfile.name;
-  document.getElementById('discovery-result-summary').innerText = mockDiscoveryProfile.businessProfile.summary;
-  document.getElementById('discovery-result-tone').innerText = mockDiscoveryProfile.brandVoice.tone;
-  document.getElementById('discovery-result-score').innerText = mockDiscoveryProfile.audits.marketingReadinessScore + '/100';
+  document.getElementById('discovery-result-name').innerText = displayName;
+  document.getElementById('discovery-result-summary').innerText = profile.summary || 'Brand profile generated.';
+  document.getElementById('discovery-result-tone').innerText = discoveryProfile.brandVoice?.tone || 'Professional';
+  document.getElementById('discovery-result-score').innerText = (discoveryProfile.audits?.marketingReadinessScore || 0) + '/100';
   
   const template = getTemplateForBusiness(businessType);
   const kpiData = {};
@@ -148,14 +157,15 @@ async function finalizeDiscovery(appId, businessType) {
     kpiData[kpi.id] = [0, 0, 0, 0, 0, 0];
   });
 
-  // Add to state and re-render dropdown
+  // Add to state with the REAL discovery profile and the clean display name
   state.appsData[appId] = {
     id: appId,
-    name: mockDiscoveryProfile.businessProfile.name,
-    category: "Discovered Business",
+    bizUuid: bizUuid, // Store the Supabase UUID for DB operations
+    name: displayName,
+    category: profile.industry || "Discovered Business",
     businessType: businessType,
-    logoColor: mockDiscoveryProfile.brandKit.logoColor,
-    discoveryProfile: mockDiscoveryProfile,
+    logoColor: discoveryProfile.brandKit?.colors?.primary || discoveryProfile.brandKit?.logoColor || "#4F46E5",
+    discoveryProfile: discoveryProfile,
     metrics: kpiData,
     analytics: { months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"] }
   };
