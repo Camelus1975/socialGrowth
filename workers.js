@@ -100,7 +100,7 @@ const publishingWorker = new Worker('scheduled_publishing', async (job) => {
       const { data: accounts, error: accountErr } = await supabase
         .from('social_accounts')
         .select('access_token_encrypted, handle')
-        .eq('project_id', post.app_id)
+        .eq('app_id', post.app_id)
         .eq('platform', post.platform);
 
       if (accountErr || !accounts || accounts.length === 0) {

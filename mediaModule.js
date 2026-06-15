@@ -29,11 +29,35 @@ export function initMedia() {
 
 export async function fetchMediaAssets() {
   try {
-    const savedAssets = localStorage.getItem('socialgrowth_media_assets');
-    if (savedAssets) {
-      state.mediaState.assets = JSON.parse(savedAssets);
+    const supabase = getSupabaseClient();
+    if (supabase && state.currentActiveApp) {
+      const { data, error } = await supabase
+        .from('media')
+        .select('*')
+        .eq('app_id', state.currentActiveApp);
+        
+      if (error) throw error;
+      
+      if (data) {
+        state.mediaState.assets = data.map(m => ({
+          id: m.id,
+          name: m.name,
+          type: m.file_type || 'image/png',
+          size: m.file_size ? `${(m.file_size / 1024).toFixed(1)} KB` : '0 KB',
+          folder: m.folder || 'Brand Assets',
+          tag: m.tag,
+          description: m.description,
+          url: m.storage_path
+        }));
+      }
     } else {
-      state.mediaState.assets = [];
+      // Fallback to localStorage if no Supabase client
+      const savedAssets = localStorage.getItem('socialgrowth_media_assets');
+      if (savedAssets) {
+        state.mediaState.assets = JSON.parse(savedAssets);
+      } else {
+        state.mediaState.assets = [];
+      }
     }
     
     if (state.currentActiveView === 'media-asset') {
@@ -41,7 +65,9 @@ export async function fetchMediaAssets() {
     }
   } catch (err) {
     console.error("Error fetching media assets:", err);
-    state.mediaState.assets = [];
+    // Fallback to localStorage on error
+    const savedAssets = localStorage.getItem('socialgrowth_media_assets');
+    state.mediaState.assets = savedAssets ? JSON.parse(savedAssets) : [];
   }
 }
 
@@ -144,28 +170,46 @@ export function handleMediaUploadSelect(event) {
   showToast("Uploading media asset binary...", "success");
   
   setTimeout(async () => {
-    let newAsset = {
-      id: "media_" + Date.now(),
+    const insertPayload = {
+      app_id: state.currentActiveApp || 'default',
       name: file.name,
-      type: file.type || "image/png",
-      size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+      file_type: file.type || 'image/png',
+      file_size: file.size || 0,
       folder: state.activeMediaFolder === 'all' ? 'Brand Assets' : state.activeMediaFolder,
-      tag: "Mockup",
+      tag: 'Upload',
       description: `AI description: Mobile layout design for ${state.currentActiveApp || 'app'} showing active features.`,
-      url: `uploads/${file.name}`
+      storage_path: `uploads/${file.name}`
     };
     
     try {
-      if (!state.mediaState.assets) {
-        state.mediaState.assets = [];
+      const supabase = getSupabaseClient();
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('media')
+          .insert([insertPayload])
+          .select();
+          
+        if (error) throw error;
+        showToast("Asset uploaded successfully!", "success");
+        await fetchMediaAssets();
+      } else {
+        // Fallback to localStorage if no Supabase client
+        const localAsset = {
+          id: 'media_' + Date.now(),
+          name: file.name,
+          type: file.type || 'image/png',
+          size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+          folder: insertPayload.folder,
+          tag: 'Upload',
+          description: insertPayload.description,
+          url: insertPayload.storage_path
+        };
+        if (!state.mediaState.assets) state.mediaState.assets = [];
+        state.mediaState.assets.push(localAsset);
+        localStorage.setItem('socialgrowth_media_assets', JSON.stringify(state.mediaState.assets));
+        showToast("Asset saved locally!", "success");
+        renderMediaManager();
       }
-      state.mediaState.assets.push(newAsset);
-      
-      // Persist to localStorage
-      localStorage.setItem('socialgrowth_media_assets', JSON.stringify(state.mediaState.assets));
-      
-      showToast("Asset uploaded and saved locally!", "success");
-      renderMediaManager();
     } catch (err) {
       console.error("Upload failed", err);
       showToast("Failed to upload asset.", "error");

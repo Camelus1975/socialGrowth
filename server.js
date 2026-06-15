@@ -288,7 +288,7 @@ app.get('/api/auth/meta/callback', async (req, res) => {
         for (const page of pagesData.data) {
           const encryptedToken = encryptToken(page.access_token);
           await supabase.rpc('insert_social_account', {
-            p_project_id: projectId,
+            p_app_id: projectId,
             p_platform: 'facebook',
             p_account_name: page.name,
             p_handle: page.id,
@@ -399,19 +399,12 @@ app.post('/api/calendar/schedule', async (req, res) => {
   
   try {
     if (isDummyDb) throw new Error("Offline Mode");
-    
-    // Default to the first project if not provided
-    let appId = projectId;
-    if (!appId) {
-      const { data: projects } = await supabase.from('projects').select('id').limit(1);
-      if (projects && projects.length > 0) appId = projects[0].id;
-    }
 
     const { data, error } = await supabase
       .from('scheduled_posts')
       .insert([{
-        user_id: 'd9b7b9f3-8c43-4f11-b01a-8c48a735c029', // Fallback to hardcoded dev UID for local test
-        business_id: appId,
+        user_id: req.user?.id || 'd9b7b9f3-8c43-4f11-b01a-8c48a735c029',
+        app_id: projectId || 'default',
         platform: platform,
         content: text,
         scheduled_date: date,

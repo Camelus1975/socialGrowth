@@ -1,0 +1,438 @@
+-- ==========================================
+-- SocialGrowth Suite - PRODUCTION DATABASE SCHEMA v1.0
+-- Run this ONCE in Supabase SQL Editor to set up a clean production database.
+-- This replaces ALL legacy migration files.
+-- ==========================================
+
+-- Enable required extensions
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+-- Enable vector extension for AI embeddings (if available on your Supabase plan)
+-- CREATE EXTENSION IF NOT EXISTS "vector";
+
+
+-- ==========================================
+-- 1. BUSINESSES (Core Tenant Table)
+-- Every piece of data in the app is scoped to a business.
+-- The frontend generates a text-based `business_id` (e.g. "myapp_123").
+-- ==========================================
+CREATE TABLE IF NOT EXISTS public.businesses (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    business_id TEXT UNIQUE NOT NULL,                         -- Frontend-generated slug ID
+    user_id     UUID NOT NULL,                                -- auth.uid() of the owner
+    name        TEXT NOT NULL,
+    tagline     TEXT,
+    category    TEXT DEFAULT 'General',
+    business_type TEXT DEFAULT 'saas',                        -- 'saas', 'ecommerce', 'agency', etc.
+    logo_color  TEXT,                                         -- CSS gradient string
+    metrics_history   JSONB DEFAULT '{}',                     -- Historical KPI snapshots
+    discovery_profile JSONB DEFAULT '{}',                     -- Discovery engine results
+    social_growth     NUMERIC DEFAULT 0,
+    conversion_rate   NUMERIC DEFAULT 0,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ==========================================
+-- 2. SCHEDULED POSTS (Calendar Module)
+-- Used by calendarModule.js (frontend) and workers.js (auto-publisher).
+-- Standardized on `app_id` as the FK column name (= businesses.business_id).
+-- ==========================================
+CREATE TABLE IF NOT EXISTS public.scheduled_posts (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id         UUID,                                     -- auth.uid() of the creator
+    app_id          TEXT NOT NULL,                             -- FK to businesses.business_id
+    platform        TEXT NOT NULL DEFAULT 'instagram',         -- 'instagram', 'twitter', 'linkedin', etc.
+    content         TEXT,                                      -- Post copy text
+    scheduled_date  DATE NOT NULL,
+    scheduled_time  TEXT DEFAULT '12:00',
+    media_url       TEXT,                                      -- Optional media attachment URL
+    status          TEXT DEFAULT 'scheduled',                  -- 'scheduled', 'processing', 'published', 'failed'
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ==========================================
+-- 3. MEDIA ASSETS (Media Library)
+-- Used by mediaModule.js. Scoped to `app_id` instead of the old `project_id`.
+-- ==========================================
+CREATE TABLE IF NOT EXISTS public.media (
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    app_id        TEXT NOT NULL,                               -- FK to businesses.business_id
+    name          TEXT NOT NULL,
+    file_type     TEXT NOT NULL DEFAULT 'image/png',
+    file_size     BIGINT DEFAULT 0,
+    folder        TEXT DEFAULT 'Brand Assets',
+    tag           TEXT,
+    description   TEXT,
+    storage_path  TEXT NOT NULL DEFAULT '',
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ==========================================
+-- 4. DISCOVERY JOBS (Web Scraper / Onboarding)
+-- Used by discoveryEngine.js. Links to businesses via UUID `business_id`.
+-- ==========================================
+CREATE TABLE IF NOT EXISTS public.discovery_jobs (
+    id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    business_id      UUID NOT NULL REFERENCES public.businesses(id) ON DELETE CASCADE,
+    urls_to_scan     JSONB DEFAULT '[]',
+    status           TEXT DEFAULT 'pending',                    -- 'pending', 'processing', 'completed', 'failed'
+    progress_percent INTEGER DEFAULT 0,
+    logs             JSONB DEFAULT '[]',
+    error_message    TEXT,
+    created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ==========================================
+-- 5. SOCIAL ACCOUNTS (OAuth Connections for Auto-Publisher)
+-- Used by workers.js to retrieve access tokens for posting.
+-- ==========================================
+CREATE TABLE IF NOT EXISTS public.social_accounts (
+    id                     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    app_id                 TEXT NOT NULL,                      -- FK to businesses.business_id
+    platform               TEXT NOT NULL,                      -- 'instagram', 'twitter', 'facebook', etc.
+    account_name           TEXT,
+    handle                 TEXT,
+    access_token_encrypted TEXT,
+    refresh_token_encrypted TEXT,
+    expires_at             TIMESTAMPTZ,
+    health_status          TEXT DEFAULT 'healthy',
+    created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at             TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- RPC function for inserting social accounts (used by server.js)
+CREATE OR REPLACE FUNCTION public.insert_social_account(
+    p_app_id TEXT,
+    p_platform TEXT,
+    p_account_name TEXT,
+    p_handle TEXT,
+    p_access_token_encrypted TEXT
+) RETURNS void AS $$
+BEGIN
+    INSERT INTO public.social_accounts (app_id, platform, account_name, handle, access_token_encrypted)
+    VALUES (p_app_id, p_platform, p_account_name, p_handle, p_access_token_encrypted);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ==========================================
+-- 6. INBOX THREADS (Unified Social Inbox)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS public.inbox_threads (
+    id          TEXT PRIMARY KEY,                               -- Composite key from platform + sender
+    app_id      TEXT,                                          -- FK to businesses.business_id
+    sender      TEXT NOT NULL,
+    platform    TEXT NOT NULL,                                  -- 'instagram', 'whatsapp', 'email', etc.
+    last_text   TEXT,
+    last_date   TIMESTAMPTZ DEFAULT now(),
+    read        BOOLEAN DEFAULT false,
+    resolved    BOOLEAN DEFAULT false,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ==========================================
+-- 7. INBOX MESSAGES (Individual Messages in a Thread)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS public.inbox_messages (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    thread_id   TEXT NOT NULL REFERENCES public.inbox_threads(id) ON DELETE CASCADE,
+    sender_role TEXT NOT NULL DEFAULT 'customer',               -- 'customer', 'agent', 'bot'
+    text        TEXT NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ==========================================
+-- 8. AD CAMPAIGNS (Advertising Engine)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS public.ad_campaigns (
+    id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    app_id           TEXT NOT NULL,                             -- FK to businesses.business_id
+    name             TEXT NOT NULL,
+    objective        TEXT NOT NULL DEFAULT 'installs',          -- 'installs', 'subscribers', 'mrr_growth', 'awareness'
+    total_budget     NUMERIC(10, 2) NOT NULL DEFAULT 0,
+    daily_budget     NUMERIC(10, 2),
+    status           TEXT DEFAULT 'pending_approval',           -- 'pending_approval', 'active', 'paused', 'completed'
+    start_date       TIMESTAMPTZ,
+    end_date         TIMESTAMPTZ,
+    strategy_context JSONB,                                    -- AI strategy blob
+    created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ==========================================
+-- 9. AD PERFORMANCE DAILY (Advertising Metrics)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS public.ad_performance_daily (
+    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    campaign_id  UUID NOT NULL REFERENCES public.ad_campaigns(id) ON DELETE CASCADE,
+    date         DATE NOT NULL DEFAULT CURRENT_DATE,
+    spend        NUMERIC(10, 2) DEFAULT 0,
+    impressions  BIGINT DEFAULT 0,
+    clicks       BIGINT DEFAULT 0,
+    installs     BIGINT DEFAULT 0,
+    conversions  BIGINT DEFAULT 0,
+    revenue      NUMERIC(10, 2) DEFAULT 0,
+    cpa          NUMERIC(10, 2),                               -- Cost per acquisition
+    roas         NUMERIC(10, 2),                               -- Return on ad spend
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE(campaign_id, date)
+);
+
+-- ==========================================
+-- 10. AI CONTENT EMBEDDINGS (RAG Memory Engine)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS public.ai_content_embeddings (
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id       UUID,
+    app_id        TEXT,                                         -- FK to businesses.business_id
+    content_type  TEXT NOT NULL DEFAULT 'post',                 -- 'post', 'memory', 'strategy'
+    content_text  TEXT NOT NULL,
+    embedding     TEXT,                                         -- Store as TEXT; upgrade to vector(1536) if pgvector is enabled
+    metadata      JSONB DEFAULT '{}',
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- RPC function for similarity search (used by aiGatewayRouter.js)
+-- NOTE: This is a placeholder. For real vector search, enable pgvector and use vector ops.
+CREATE OR REPLACE FUNCTION public.match_content_embeddings(
+    query_embedding TEXT,
+    match_threshold FLOAT DEFAULT 0.7,
+    match_count INT DEFAULT 5,
+    search_user_id UUID DEFAULT NULL
+) RETURNS TABLE(id UUID, content_text TEXT, content_type TEXT, metadata JSONB) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT e.id, e.content_text, e.content_type, e.metadata
+    FROM public.ai_content_embeddings e
+    WHERE (search_user_id IS NULL OR e.user_id = search_user_id)
+    LIMIT match_count;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Alias for memoryEngine.js which uses a different RPC name
+CREATE OR REPLACE FUNCTION public.match_embeddings(
+    query_embedding TEXT,
+    match_threshold FLOAT DEFAULT 0.7,
+    match_count INT DEFAULT 5
+) RETURNS TABLE(id UUID, content_text TEXT, content_type TEXT, metadata JSONB) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT e.id, e.content_text, e.content_type, e.metadata
+    FROM public.ai_content_embeddings e
+    LIMIT match_count;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ==========================================
+-- 11. BUSINESSES_POSTS (Content Intelligence View)
+-- A denormalized table for the performance analytics dashboard.
+-- ==========================================
+CREATE TABLE IF NOT EXISTS public.businesses_posts (
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    business_id   TEXT NOT NULL,                                -- FK to businesses.business_id
+    platform      TEXT,
+    content_type  TEXT DEFAULT 'image',                         -- 'image', 'video', 'carousel', 'text'
+    content_text  TEXT,
+    success_score NUMERIC DEFAULT 0,
+    reach         BIGINT DEFAULT 0,
+    likes         BIGINT DEFAULT 0,
+    ctr           NUMERIC DEFAULT 0,
+    conversions   BIGINT DEFAULT 0,
+    revenue       NUMERIC(10, 2) DEFAULT 0,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ==========================================
+-- 12. ANALYTICS ROLLUP (Materialized View for Executive War Room)
+-- ==========================================
+CREATE MATERIALIZED VIEW IF NOT EXISTS public.mv_app_analytics_rollup AS
+SELECT
+    bp.business_id,
+    AVG(bp.success_score) AS avg_success_score,
+    SUM(bp.revenue)       AS total_revenue,
+    SUM(bp.conversions)   AS total_conversions,
+    SUM(bp.reach)         AS total_engagement
+FROM public.businesses_posts bp
+GROUP BY bp.business_id;
+
+-- RPC to refresh the materialized view (used by workers.js)
+CREATE OR REPLACE FUNCTION public.refresh_mv_app_analytics()
+RETURNS void AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW public.mv_app_analytics_rollup;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ==========================================
+-- 13. AUDIT LOGS (System Activity Tracking)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS public.audit_logs (
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id    UUID,
+    app_id     TEXT,                                            -- FK to businesses.business_id
+    action     TEXT NOT NULL,
+    entity     TEXT,
+    ip_address TEXT,
+    details    JSONB DEFAULT '{}',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+
+-- ==========================================
+-- ROW LEVEL SECURITY (RLS) POLICIES
+-- ==========================================
+
+-- Enable RLS on all tables
+ALTER TABLE public.businesses          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.scheduled_posts     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.media               ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.discovery_jobs      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.social_accounts     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.inbox_threads       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.inbox_messages      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ad_campaigns        ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ad_performance_daily ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ai_content_embeddings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.businesses_posts    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.audit_logs          ENABLE ROW LEVEL SECURITY;
+
+-- ==============================
+-- Businesses: Users can only see/modify their own businesses
+-- ==============================
+CREATE POLICY "Users can manage their own businesses" ON public.businesses
+    FOR ALL TO authenticated
+    USING (user_id = auth.uid())
+    WITH CHECK (user_id = auth.uid());
+
+-- ==============================
+-- Scheduled Posts: Users can manage posts for their businesses
+-- ==============================
+CREATE POLICY "Users can manage their scheduled posts" ON public.scheduled_posts
+    FOR ALL TO authenticated
+    USING (
+        app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
+    )
+    WITH CHECK (
+        app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
+    );
+
+-- ==============================
+-- Media: Users can manage media for their businesses
+-- ==============================
+CREATE POLICY "Users can manage their media" ON public.media
+    FOR ALL TO authenticated
+    USING (
+        app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
+    )
+    WITH CHECK (
+        app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
+    );
+
+-- ==============================
+-- Discovery Jobs: Users can manage discovery jobs for their businesses
+-- ==============================
+CREATE POLICY "Users can manage their discovery jobs" ON public.discovery_jobs
+    FOR ALL TO authenticated
+    USING (
+        business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid())
+    )
+    WITH CHECK (
+        business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid())
+    );
+
+-- ==============================
+-- Social Accounts: Users can manage social accounts for their businesses
+-- ==============================
+CREATE POLICY "Users can manage their social accounts" ON public.social_accounts
+    FOR ALL TO authenticated
+    USING (
+        app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
+    )
+    WITH CHECK (
+        app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
+    );
+
+-- ==============================
+-- Inbox: Users can manage inbox for their businesses
+-- ==============================
+CREATE POLICY "Users can manage their inbox threads" ON public.inbox_threads
+    FOR ALL TO authenticated
+    USING (true)
+    WITH CHECK (true);
+
+CREATE POLICY "Users can manage their inbox messages" ON public.inbox_messages
+    FOR ALL TO authenticated
+    USING (true)
+    WITH CHECK (true);
+
+-- ==============================
+-- Ad Campaigns: Users can manage ads for their businesses
+-- ==============================
+CREATE POLICY "Users can manage their ad campaigns" ON public.ad_campaigns
+    FOR ALL TO authenticated
+    USING (
+        app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
+    )
+    WITH CHECK (
+        app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
+    );
+
+CREATE POLICY "Users can read their ad performance" ON public.ad_performance_daily
+    FOR ALL TO authenticated
+    USING (
+        campaign_id IN (
+            SELECT id FROM public.ad_campaigns
+            WHERE app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
+        )
+    );
+
+-- ==============================
+-- AI Embeddings: Users can manage their own embeddings
+-- ==============================
+CREATE POLICY "Users can manage their embeddings" ON public.ai_content_embeddings
+    FOR ALL TO authenticated
+    USING (user_id = auth.uid() OR user_id IS NULL)
+    WITH CHECK (true);
+
+-- ==============================
+-- Business Posts & Audit Logs: Read access for business owners
+-- ==============================
+CREATE POLICY "Users can read their business posts" ON public.businesses_posts
+    FOR ALL TO authenticated
+    USING (
+        business_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
+    );
+
+CREATE POLICY "Users can manage audit logs" ON public.audit_logs
+    FOR ALL TO authenticated
+    USING (
+        app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
+        OR app_id IS NULL
+    );
+
+
+-- ==========================================
+-- INDEXES for Performance
+-- ==========================================
+CREATE INDEX IF NOT EXISTS idx_businesses_user_id ON public.businesses(user_id);
+CREATE INDEX IF NOT EXISTS idx_businesses_business_id ON public.businesses(business_id);
+CREATE INDEX IF NOT EXISTS idx_scheduled_posts_app_id ON public.scheduled_posts(app_id);
+CREATE INDEX IF NOT EXISTS idx_scheduled_posts_date ON public.scheduled_posts(scheduled_date);
+CREATE INDEX IF NOT EXISTS idx_scheduled_posts_status ON public.scheduled_posts(status);
+CREATE INDEX IF NOT EXISTS idx_media_app_id ON public.media(app_id);
+CREATE INDEX IF NOT EXISTS idx_discovery_jobs_business_id ON public.discovery_jobs(business_id);
+CREATE INDEX IF NOT EXISTS idx_social_accounts_app_id ON public.social_accounts(app_id);
+CREATE INDEX IF NOT EXISTS idx_inbox_threads_last_date ON public.inbox_threads(last_date);
+CREATE INDEX IF NOT EXISTS idx_ad_campaigns_app_id ON public.ad_campaigns(app_id);
+CREATE INDEX IF NOT EXISTS idx_ai_embeddings_user_id ON public.ai_content_embeddings(user_id);
+CREATE INDEX IF NOT EXISTS idx_ai_embeddings_app_id ON public.ai_content_embeddings(app_id);
+CREATE INDEX IF NOT EXISTS idx_businesses_posts_business_id ON public.businesses_posts(business_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_app_id ON public.audit_logs(app_id);
+
+
+-- ==========================================
+-- DONE! Your production database is ready.
+-- ==========================================
