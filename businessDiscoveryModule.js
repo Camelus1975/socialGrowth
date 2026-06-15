@@ -1,10 +1,14 @@
 // Business Discovery Module - Frontend
-import { state, renderAppSelectorDropdown, selectActiveApp, getTemplateForBusiness, requestApi, getSupabaseClient } from './app.js';
-import { showToast, switchView, closeModal } from './uiHelpers.js';
+import { state } from './state.js';
+import { showToast, closeModal, requestApi } from './common.js';
+import { selectActiveApp, switchView } from './app.js';
+import { renderAppSelectorDropdown } from './appManager.js';
+import { getTemplateForBusiness } from './industryTemplates.js';
+import { getSupabaseClient } from './auth.js';
 
 let discoveryPollingInterval = null;
 
-export function initDiscoveryModule() {
+export function initBusinessDiscovery() {
   const startBtn = document.getElementById('discovery-start-btn');
   if (startBtn) {
     startBtn.addEventListener('click', startDiscovery);
