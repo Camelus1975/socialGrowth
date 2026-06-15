@@ -163,6 +163,35 @@ window.deleteCalendarPost = async function() {
   }
 }
 
+window.clearAllCalendarPosts = async function() {
+  if (!state.currentActiveApp) return;
+  if (!confirm("Are you sure you want to permanently delete ALL scheduled posts for this app? This action cannot be undone.")) return;
+  
+  try {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      const { error } = await supabase
+        .from('scheduled_posts')
+        .delete()
+        .eq('business_id', state.currentActiveApp);
+      
+      // Also try deleting by app_id if schema is slightly mismatched
+      await supabase
+        .from('scheduled_posts')
+        .delete()
+        .eq('app_id', state.currentActiveApp);
+        
+      if (error) throw error;
+      
+      showToast("All scheduled posts deleted successfully", "success");
+      await fetchCalendarPosts(); // Refresh calendar view
+    }
+  } catch (err) {
+    console.error("Error clearing posts:", err);
+    showToast("Failed to clear posts", "error");
+  }
+}
+
 async function saveCalendarPostFromModal() {
   const text = document.getElementById('modal-create-text').value.trim();
   const date = document.getElementById('modal-create-date').value;
