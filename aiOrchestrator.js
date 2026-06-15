@@ -116,12 +116,24 @@ async function runMarketingOrchestration(appId, goal, authHeader, language = 'en
     let businessContext = "";
     let appName = "";
     try {
-      const { data: bizData } = await supabase
+      console.log(`[Orchestrator] Looking up business with business_id="${appId}"...`);
+      const { data: bizData, error: bizErr } = await supabase
         .from('businesses')
         .select('name, category, business_type, website_url, discovery_profile')
         .eq('business_id', appId)
         .single();
       
+      if (bizErr) {
+        console.error(`[Orchestrator] Business lookup FAILED:`, bizErr.message, bizErr.code);
+        steps.push({ agent: "System", log: `Business lookup error: ${bizErr.message}. Using basic context.` });
+      } else if (!bizData) {
+        console.log(`[Orchestrator] No business found for business_id="${appId}"`);
+        steps.push({ agent: "System", log: "No business found in database. Run Business Discovery first." });
+      } else {
+        console.log(`[Orchestrator] Found business: name="${bizData.name}", has_profile=${!!bizData.discovery_profile}`);
+        appName = bizData.name || '';
+      }
+
       if (bizData?.discovery_profile) {
         const dp = bizData.discovery_profile;
         const profile = dp.businessProfile || {};
@@ -247,11 +259,14 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
 
     // Process Organic Content
     const contentWriter = agentResults.find(r => r.agent === 'ContentWriter' || r.agent === 'Content Writer');
+    console.log(`[Orchestrator] ContentWriter found: ${!!contentWriter}, has copy_variants: ${!!(contentWriter?.result?.copy_variants)}, count: ${contentWriter?.result?.copy_variants?.length || 0}`);
+    
     if (contentWriter && contentWriter.result && contentWriter.result.copy_variants) {
       steps.push({ agent: "Publishing Agent", log: "Pushing organic draft posts to your Content Calendar." });
       try {
         const uid = userId;
         if (!uid) {
+          console.log('[Orchestrator] WARNING: No userId, skipping calendar push');
           steps.push({ agent: 'Publishing Agent', log: 'Warning: No user ID available. Skipping calendar push.' });
           return;
         }
@@ -262,6 +277,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
         
         // Get image prompts from CreativeDirector, or generate them from post content
         let imagePrompts = creativeDirector?.result?.image_prompts || [];
+        console.log(`[Orchestrator] CreativeDirector found: ${!!creativeDirector}, image_prompts count: ${imagePrompts.length}`);
         
         if (imagePrompts.length === 0) {
           // Fallback: generate image prompts from the actual post content
@@ -283,6 +299,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
             let imageUrl = null;
             
             // Primary: Replicate FLUX (confirmed working)
+            console.log(`[Orchestrator] REPLICATE_API_TOKEN present: ${!!config.REPLICATE_API_TOKEN}`);
             if (config.REPLICATE_API_TOKEN) {
               try {
                 console.log(`[Orchestrator] Replicate FLUX generating image ${i+1}/${totalImages}...`);
