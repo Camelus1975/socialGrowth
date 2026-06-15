@@ -1,6 +1,7 @@
 // App Founder Growth Suite - Media Asset Module
 import { state } from './state.js';
 import { requestApi, showToast, createSafeElement } from './common.js';
+import { getSupabaseClient } from './auth.js';
 
 export function initMedia() {
   state.on('appChanged', () => {
@@ -8,13 +9,52 @@ export function initMedia() {
   });
   
   state.on('viewChanged', (viewId) => {
-    if (viewId === 'media-asset') renderMediaManager();
+    if (viewId === 'media-asset') {
+      fetchMediaAssets();
+      renderMediaManager();
+    }
   });
+
+  // Fetch initial assets if already on the view
+  if (state.currentActiveView === 'media-asset') {
+    fetchMediaAssets();
+  }
 
   // Setup input listener for file uploads
   const fileInput = document.getElementById('media-upload-dummy-input');
   if (fileInput) {
     fileInput.addEventListener('change', handleMediaUploadSelect);
+  }
+}
+
+export async function fetchMediaAssets() {
+  try {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('media')
+        .select('*');
+        
+      if (error) throw error;
+      
+      if (data) {
+        state.mediaState.assets = data.map(m => ({
+          id: m.id,
+          name: m.name,
+          type: m.file_type || 'image/png',
+          size: `${m.file_size} KB`,
+          folder: m.tag || 'Brand Assets',
+          tag: m.tag,
+          description: m.description,
+          url: m.storage_path
+        }));
+        if (state.currentActiveView === 'media-asset') {
+          renderMediaManager();
+        }
+      }
+    }
+  } catch (err) {
+    console.error("Error fetching media assets:", err);
   }
 }
 
@@ -118,31 +158,32 @@ export function handleMediaUploadSelect(event) {
   
   setTimeout(async () => {
     let newAsset = {
-      id: "as_new_" + Date.now(),
       name: file.name,
-      type: file.type || "image/png",
-      size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-      folder: state.activeMediaFolder === 'all' ? 'Brand Assets' : state.activeMediaFolder,
-      tag: "Mockup",
-      description: `AI description: Mobile layout design for ${state.currentActiveApp} showing active features.`
+      file_type: file.type || "image/png",
+      file_size: Math.round(file.size / 1024) || 1024,
+      storage_path: `uploads/${file.name}`,
+      tag: state.activeMediaFolder === 'all' ? 'Brand Assets' : state.activeMediaFolder,
+      description: `AI description: Mobile layout design for ${state.currentActiveApp || 'app'} showing active features.`
     };
     
     try {
-      const data = await requestApi('/api/media/upload', {
-        method: 'POST',
-        body: JSON.stringify(newAsset)
-      });
-      newAsset = data;
+      const supabase = getSupabaseClient();
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('media')
+          .insert([newAsset])
+          .select();
+          
+        if (error) throw error;
+        showToast("Asset uploaded to Supabase successfully!", "success");
+        await fetchMediaAssets();
+      } else {
+        throw new Error("No supabase client");
+      }
     } catch (err) {
-      console.warn("Express media upload offline. Parsing metadata via local tags client.");
+      console.error("Upload failed", err);
+      showToast("Failed to upload asset.", "error");
     }
-    
-    if (!state.mediaState.assets) {
-      state.mediaState.assets = [];
-    }
-    state.mediaState.assets.push(newAsset);
-    showToast("AI descriptive tag generated and saved to database!", "success");
-    renderMediaManager();
   }, 1500);
 }
 
