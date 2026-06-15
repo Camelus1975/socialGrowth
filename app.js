@@ -848,7 +848,8 @@ function callFunction(name, args, element, event) {
     askContentCoach,
     downloadWeeklyReport,
     deleteCalendarPost: window.deleteCalendarPost,
-    clearAllCalendarPosts: window.clearAllCalendarPosts
+    clearAllCalendarPosts: window.clearAllCalendarPosts,
+    clearDayCalendarPosts: window.clearDayCalendarPosts
   };
   
   const fn = functionMap[name];

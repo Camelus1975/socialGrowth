@@ -173,12 +173,6 @@ window.clearAllCalendarPosts = async function() {
       const { error } = await supabase
         .from('scheduled_posts')
         .delete()
-        .eq('business_id', state.currentActiveApp);
-      
-      // Also try deleting by app_id if schema is slightly mismatched
-      await supabase
-        .from('scheduled_posts')
-        .delete()
         .eq('app_id', state.currentActiveApp);
         
       if (error) throw error;
@@ -189,6 +183,33 @@ window.clearAllCalendarPosts = async function() {
   } catch (err) {
     console.error("Error clearing posts:", err);
     showToast("Failed to clear posts", "error");
+  }
+}
+
+window.clearDayCalendarPosts = async function() {
+  if (!state.currentActiveApp) return;
+  const targetDate = document.getElementById('modal-create-date').value;
+  if (!targetDate) return;
+  if (!confirm(`Are you sure you want to permanently delete ALL posts scheduled for ${targetDate}?`)) return;
+  
+  try {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      const { error } = await supabase
+        .from('scheduled_posts')
+        .delete()
+        .eq('app_id', state.currentActiveApp)
+        .eq('scheduled_date', targetDate);
+        
+      if (error) throw error;
+      
+      showToast(`Cleared posts for ${targetDate}`, "success");
+      closeModal('calendar-create-modal');
+      await fetchCalendarPosts();
+    }
+  } catch (err) {
+    console.error("Error clearing day posts:", err);
+    showToast("Failed to clear posts for the selected day", "error");
   }
 }
 
