@@ -6,20 +6,46 @@ export const API_URL = window.location.hostname === 'localhost' || window.locati
   ? 'http://127.0.0.1:3000'
   : '';  // Empty string = same-origin requests (frontend served by Express)
 
-// Secure helper to fetch from Express API
+// Try to refresh the Supabase token
+async function refreshToken() {
+  try {
+    const { getSupabaseClient } = await import('./auth.js');
+    const supabase = getSupabaseClient();
+    if (!supabase) return null;
+    const { data, error } = await supabase.auth.refreshSession();
+    if (!error && data.session) {
+      localStorage.setItem('supabase_jwt_token', data.session.access_token);
+      return data.session.access_token;
+    }
+  } catch (e) {
+    console.warn('Token refresh failed:', e.message);
+  }
+  return null;
+}
+
+// Secure helper to fetch from Express API (with auto-retry on 401)
 export async function requestApi(path, options = {}) {
-  const token = localStorage.getItem('supabase_jwt_token') || 'mock-supabase-jwt-token';
-  const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-    'X-App-Language': state.language || 'en',
-    ...options.headers
+  let token = localStorage.getItem('supabase_jwt_token') || 'mock-supabase-jwt-token';
+  
+  const doFetch = async (authToken) => {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authToken}`,
+      'X-App-Language': state.language || 'en',
+      ...options.headers
+    };
+    return fetch(`${API_URL}${path}`, { ...options, headers });
   };
   
-  const res = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers
-  });
+  let res = await doFetch(token);
+  
+  // If 401, try refreshing the token and retry once
+  if (res.status === 401) {
+    const newToken = await refreshToken();
+    if (newToken) {
+      res = await doFetch(newToken);
+    }
+  }
   
   if (!res.ok) {
     let errBody = {};
