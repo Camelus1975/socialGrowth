@@ -43,13 +43,15 @@ Output JSON format: { "creative_brief": "...", "image_prompts": ["Detailed DALL-
   ContentWriter: `You are the Content Writer Agent.
 Role: Generate specific social media copy variations based on strategy.
 Input: A strategy from the CMO and business intelligence context.
-IMPORTANT: Generate posts for MULTIPLE platforms (twitter, linkedin, instagram). 
-Each post MUST be optimized for its platform:
-- twitter: Max 280 chars, punchy, hashtags, emojis
-- linkedin: Professional tone, 500-1500 chars, thought leadership
-- instagram: Visual-first caption, emojis, 20-30 hashtags
-Generate at least 4-6 variants across different platforms.
-Output JSON format: { "copy_variants": [{ "platform": "twitter", "text": "..." }, { "platform": "linkedin", "text": "..." }, { "platform": "instagram", "text": "..." }] }`,
+IMPORTANT: Follow the CMO's strategy regarding which platforms to target. If the user's goal specifies a platform (e.g. "instagram", "tiktok", "linkedin"), generate posts ONLY for that platform.
+If no specific platform is mentioned, generate for multiple platforms.
+Platform formatting rules:
+- twitter/x: Max 280 chars, punchy, hashtags, emojis
+- linkedin: Professional tone, 500-1500 chars, thought leadership  
+- instagram: Visual-first caption, emojis, 20-30 hashtags, lifestyle tone
+- tiktok: Short, trendy, hook in first line
+Generate 4-6 post variants for the target platform(s).
+Output JSON format: { "copy_variants": [{ "platform": "instagram", "text": "..." }] }`,
 
   ASOAgent: `You are the App Store Optimization Agent.
 Role: Keyword optimization and App Store metadata ranking improvements.
@@ -184,7 +186,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
       model: "gpt-4o", // Strategy requires deep reasoning
       messages: [
         { role: "system", content: AGENT_PROMPTS.CMO + "\n" + langDirective + "\n" + typeDirective },
-        { role: "user", content: `${businessContext}\nBusiness Type: ${businessType}\nApp/Business ID: ${appId}\nGoal: ${goal}\n\n${memoryContext}` }
+        { role: "user", content: `${businessContext}\nBusiness Name: ${appName || 'Unknown'}\nBusiness Type: ${businessType}\nFounder's Goal: ${goal}\n\n${memoryContext}` }
       ],
       response_format: { type: "json_object" }
     });
@@ -270,32 +272,84 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
         }
         
         if (imagePrompts.length > 0) {
-          steps.push({ agent: "Creative Director", log: `Generating ${Math.min(imagePrompts.length, contentWriter.result.copy_variants.length)} media assets via DALL-E 3...` });
-          
           const totalImages = Math.min(imagePrompts.length, contentWriter.result.copy_variants.length);
+          steps.push({ agent: "Creative Director", log: `Generating ${totalImages} images for posts...` });
+          
           for (let i = 0; i < totalImages; i++) {
             const promptText = imagePrompts[i];
+            const postText = contentWriter.result.copy_variants[i]?.text || '';
+            const enhancedPrompt = `A polished, professional social media graphic for "${appName || businessType}" business. The post is about: "${postText.substring(0, 200)}". Visual direction: ${promptText.substring(0, 600)}. Style: Modern, clean, engaging, suitable for social media. No text overlays.`;
+            
+            let imageUrl = null;
+            
+            // Try DALL-E 3 first
             try {
-              // Build context-rich image prompt using business intelligence
-              const postText = contentWriter.result.copy_variants[i]?.text || '';
-              const enhancedPrompt = `A polished, professional social media graphic for "${appName || businessType}" business. The post is about: "${postText.substring(0, 200)}". Visual direction: ${promptText.substring(0, 600)}. Style: Modern, clean, engaging, suitable for social media. No text overlays.`;
-              
-              console.log(`[Orchestrator] Generating DALL-E image ${i+1}/${totalImages}...`);
+              console.log(`[Orchestrator] DALL-E 3 attempt for image ${i+1}/${totalImages}...`);
               const response = await openai.images.generate({
                 model: "dall-e-3",
                 prompt: enhancedPrompt,
                 n: 1,
                 size: "1024x1024",
               });
-              generatedImages.push(response.data[0].url);
-              steps.push({ agent: "Creative Director", log: `Image ${i+1}/${totalImages} generated successfully.` });
-            } catch (err) {
-              console.error(`DALL-E generation failed for prompt ${i}:`, err.message);
-              steps.push({ agent: "Creative Director", log: `Image ${i+1} failed: ${err.message}. Continuing without image.` });
-              generatedImages.push(null);
+              imageUrl = response.data[0].url;
+              console.log(`[Orchestrator] DALL-E 3 success for image ${i+1}`);
+            } catch (dalleErr) {
+              console.error(`[Orchestrator] DALL-E 3 failed for image ${i+1}:`, dalleErr.message);
+              
+              // Fallback to Replicate FLUX
+              if (config.REPLICATE_API_TOKEN) {
+                try {
+                  console.log(`[Orchestrator] Falling back to Replicate FLUX for image ${i+1}...`);
+                  const replicateRes = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions', {
+                    method: 'POST',
+                    headers: {
+                      'Authorization': `Bearer ${config.REPLICATE_API_TOKEN}`,
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      input: {
+                        prompt: enhancedPrompt.substring(0, 1000),
+                        num_outputs: 1,
+                        aspect_ratio: "1:1",
+                        output_format: "webp",
+                        output_quality: 90
+                      }
+                    })
+                  });
+                  const prediction = await replicateRes.json();
+                  
+                  // Poll for result (max 30 seconds)
+                  if (prediction.urls?.get) {
+                    for (let attempt = 0; attempt < 15; attempt++) {
+                      await new Promise(r => setTimeout(r, 2000));
+                      const pollRes = await fetch(prediction.urls.get, {
+                        headers: { 'Authorization': `Bearer ${config.REPLICATE_API_TOKEN}` }
+                      });
+                      const pollData = await pollRes.json();
+                      if (pollData.status === 'succeeded' && pollData.output) {
+                        imageUrl = Array.isArray(pollData.output) ? pollData.output[0] : pollData.output;
+                        console.log(`[Orchestrator] Replicate FLUX success for image ${i+1}`);
+                        break;
+                      } else if (pollData.status === 'failed') {
+                        console.error(`[Orchestrator] Replicate failed:`, pollData.error);
+                        break;
+                      }
+                    }
+                  }
+                } catch (repErr) {
+                  console.error(`[Orchestrator] Replicate FLUX also failed:`, repErr.message);
+                }
+              }
             }
             
-            // Add a 2 second delay between requests to avoid OpenAI rate limits
+            generatedImages.push(imageUrl);
+            if (imageUrl) {
+              steps.push({ agent: "Creative Director", log: `Image ${i+1}/${totalImages} generated ✓` });
+            } else {
+              steps.push({ agent: "Creative Director", log: `Image ${i+1}/${totalImages} could not be generated. Post will be text-only.` });
+            }
+            
+            // Delay between requests
             if (i < totalImages - 1) {
               await new Promise(resolve => setTimeout(resolve, 2000));
             }
