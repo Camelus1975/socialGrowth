@@ -117,7 +117,7 @@ async function runMarketingOrchestration(appId, goal, authHeader, language = 'en
       const { data: bizData } = await supabase
         .from('businesses')
         .select('name, category, business_type, website_url, discovery_profile')
-        .eq('id', appId)
+        .eq('business_id', appId)
         .single();
       
       if (bizData?.discovery_profile) {
@@ -257,33 +257,47 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
         // Find creative director output to generate images
         const creativeDirector = agentResults.find(r => r.agent === 'CreativeDirector' || r.agent === 'Creative Director');
         let generatedImages = [];
-        if (creativeDirector && creativeDirector.result && creativeDirector.result.image_prompts) {
-          steps.push({ agent: "Creative Director", log: "Generating media assets for organic posts via DALL-E..." });
+        
+        // Get image prompts from CreativeDirector, or generate them from post content
+        let imagePrompts = creativeDirector?.result?.image_prompts || [];
+        
+        if (imagePrompts.length === 0) {
+          // Fallback: generate image prompts from the actual post content
+          steps.push({ agent: "Creative Director", log: "No image prompts from agent. Auto-generating visual concepts from post content..." });
+          imagePrompts = contentWriter.result.copy_variants.map(v => 
+            `A modern, professional social media graphic related to: ${(v.text || '').substring(0, 300)}. Clean design, vibrant colors, no text overlay.`
+          );
+        }
+        
+        if (imagePrompts.length > 0) {
+          steps.push({ agent: "Creative Director", log: `Generating ${Math.min(imagePrompts.length, contentWriter.result.copy_variants.length)} media assets via DALL-E 3...` });
           
-          const totalImages = Math.min(creativeDirector.result.image_prompts.length, contentWriter.result.copy_variants.length);
+          const totalImages = Math.min(imagePrompts.length, contentWriter.result.copy_variants.length);
           for (let i = 0; i < totalImages; i++) {
-            const promptText = creativeDirector.result.image_prompts[i];
+            const promptText = imagePrompts[i];
             try {
               // Build context-rich image prompt using business intelligence
               const postText = contentWriter.result.copy_variants[i]?.text || '';
               const enhancedPrompt = `A polished, professional social media graphic for "${appName || businessType}" business. The post is about: "${postText.substring(0, 200)}". Visual direction: ${promptText.substring(0, 600)}. Style: Modern, clean, engaging, suitable for social media. No text overlays.`;
               
+              console.log(`[Orchestrator] Generating DALL-E image ${i+1}/${totalImages}...`);
               const response = await openai.images.generate({
-                model: "dall-e-3", // High quality generation
+                model: "dall-e-3",
                 prompt: enhancedPrompt,
                 n: 1,
                 size: "1024x1024",
               });
               generatedImages.push(response.data[0].url);
+              steps.push({ agent: "Creative Director", log: `Image ${i+1}/${totalImages} generated successfully.` });
             } catch (err) {
-              console.error(`DALL-E generation failed for prompt ${i}:`, err);
-              // Fallback to null if rate-limited so we don't show an unrelated image
+              console.error(`DALL-E generation failed for prompt ${i}:`, err.message);
+              steps.push({ agent: "Creative Director", log: `Image ${i+1} failed: ${err.message}. Continuing without image.` });
               generatedImages.push(null);
             }
             
-            // Add a 1.5 second delay between requests to avoid OpenAI rate limits
+            // Add a 2 second delay between requests to avoid OpenAI rate limits
             if (i < totalImages - 1) {
-              await new Promise(resolve => setTimeout(resolve, 1500));
+              await new Promise(resolve => setTimeout(resolve, 2000));
             }
           }
         }
