@@ -337,17 +337,18 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
             // Fallback: DALL-E (if Replicate failed and DALL-E is available)
             if (!imageUrl) {
               try {
-                console.log(`[Orchestrator] Trying DALL-E fallback for image ${i+1}...`);
+                console.log(`[Orchestrator] Trying OpenAI gpt-image-1 fallback for image ${i+1}...`);
                 const response = await openai.images.generate({
-                  model: "dall-e-3",
+                  model: "gpt-image-1",
                   prompt: enhancedPrompt,
                   n: 1,
                   size: "1024x1024",
+                  response_format: "url",
                 });
                 imageUrl = response.data[0].url;
-                console.log(`[Orchestrator] DALL-E success for image ${i+1}`);
-              } catch (dalleErr) {
-                console.error(`[Orchestrator] DALL-E also failed for image ${i+1}:`, dalleErr.message);
+                console.log(`[Orchestrator] gpt-image-1 success for image ${i+1}`);
+              } catch (oaiErr) {
+                console.error(`[Orchestrator] gpt-image-1 also failed for image ${i+1}:`, oaiErr.message);
               }
             }
             
