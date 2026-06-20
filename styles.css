@@ -1845,12 +1845,23 @@ input[type="text"]:focus, select:focus, textarea:focus {
     left: -var(--sidebar-width);
   }
   
+  html[dir="rtl"] aside {
+    right: -var(--sidebar-width);
+    left: auto;
+  }
+  
   aside.mobile-active {
     left: 0;
   }
   
+  html[dir="rtl"] aside.mobile-active {
+    right: 0;
+    left: auto;
+  }
+  
   main {
     margin-left: 0 !important;
+    margin-right: 0 !important;
     padding: 16px !important;
   }
   
@@ -2147,9 +2158,16 @@ html[dir="rtl"] {
   font-family: 'Inter', sans-serif; /* Fallback. Can inject Cairo later */
 }
 
-html[dir="rtl"] .sidebar {
+html[dir="rtl"] aside {
+  right: 0;
+  left: auto;
   border-right: none;
   border-left: 1px solid var(--border-glass);
+}
+
+html[dir="rtl"] .main-content {
+  margin-left: 0;
+  margin-right: var(--sidebar-width);
 }
 
 html[dir="rtl"] .nav-link svg,
