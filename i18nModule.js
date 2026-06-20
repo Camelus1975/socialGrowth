@@ -67,6 +67,25 @@ function injectTranslationEngine() {
     #goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
     .goog-te-spinner-pos { display: none !important; }
     .VIpgJd-ZVi9od-aZ2wEe-wOHMyf, .VIpgJd-ZVi9od-aZ2wEe { display: none !important; }
+    
+    /* Strict eradication of Google Translate popups & banner rows */
+    .VIpgJd-ZVi9od-ORHb-bN97Pc,
+    .VIpgJd-ZVi9od-ORHb-KE6vqe,
+    .VIpgJd-ZVi9od-LgbsSe,
+    .VIpgJd-ZVi9od-xl07Ob-lTBxed,
+    [id^=":1.prompt"],
+    [id^=":1.progress"],
+    [id^=":1.finish"],
+    [id^=":1.error"] {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      position: absolute !important;
+      z-index: -9999 !important;
+      height: 0 !important;
+      width: 0 !important;
+    }
   `;
   document.head.appendChild(style);
 }
