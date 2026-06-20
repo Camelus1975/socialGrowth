@@ -12,7 +12,62 @@ export function initDatabaseConsole() {
   });
 }
 
+function injectPhase4Schemas() {
+  // Define Phase 4 Business Growth OS tables natively
+  const phase4Tables = {
+    'crm_leads': {
+      rls: "Authenticated users can only view leads for their workspace.",
+      columns: [
+        { name: 'id', type: 'uuid', constraint: 'PRIMARY KEY' },
+        { name: 'workspace_id', type: 'uuid', constraint: 'FOREIGN KEY' },
+        { name: 'contact_name', type: 'varchar(255)', constraint: 'NOT NULL' },
+        { name: 'stage', type: 'varchar(50)', constraint: 'NOT NULL' },
+        { name: 'value', type: 'numeric', constraint: 'DEFAULT 0' },
+        { name: 'created_at', type: 'timestamp', constraint: 'DEFAULT NOW()' }
+      ]
+    },
+    'crm_deals': {
+      rls: "Authenticated users can only view deals for their workspace.",
+      columns: [
+        { name: 'id', type: 'uuid', constraint: 'PRIMARY KEY' },
+        { name: 'lead_id', type: 'uuid', constraint: 'FOREIGN KEY' },
+        { name: 'amount', type: 'numeric', constraint: 'NOT NULL' },
+        { name: 'probability', type: 'integer', constraint: 'DEFAULT 50' },
+        { name: 'expected_close', type: 'date', constraint: '' }
+      ]
+    },
+    'roi_attribution': {
+      rls: "Viewable by workspace admins only.",
+      columns: [
+        { name: 'id', type: 'uuid', constraint: 'PRIMARY KEY' },
+        { name: 'campaign_id', type: 'uuid', constraint: 'FOREIGN KEY' },
+        { name: 'revenue_generated', type: 'numeric', constraint: 'DEFAULT 0' },
+        { name: 'roas', type: 'numeric', constraint: 'DEFAULT 0' }
+      ]
+    },
+    'workflow_executions': {
+      rls: "System table. Users can view their own executions.",
+      columns: [
+        { name: 'id', type: 'uuid', constraint: 'PRIMARY KEY' },
+        { name: 'agent_id', type: 'uuid', constraint: 'FOREIGN KEY' },
+        { name: 'status', type: 'varchar(50)', constraint: 'NOT NULL' },
+        { name: 'logs', type: 'jsonb', constraint: 'DEFAULT {}' }
+      ]
+    }
+  };
+
+  // Merge natively if missing
+  for (const [tableName, schema] of Object.entries(phase4Tables)) {
+    if (!state.dbSchemaState[tableName]) {
+      state.dbSchemaState[tableName] = schema;
+    }
+  }
+}
+
 export function renderDatabaseConsole() {
+  // Inject Phase 4 schemas natively before rendering
+  injectPhase4Schemas();
+
   const tree = document.getElementById('db-tree-tables-list');
   if (!tree) return;
   tree.innerHTML = '';

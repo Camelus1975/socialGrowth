@@ -1,4 +1,4 @@
-// App Founder Growth Suite - Production SaaS Frontend Shell (ES6 Module)
+// Business Growth OS - Production SaaS Frontend Shell (ES6 Module)
 
 import { state } from './state.js';
 import { 
@@ -14,6 +14,11 @@ import {
 import { initDashboard, renderDashboard } from './dashboardModule.js';
 import { initCalendar, fetchCalendarPosts, renderCalendarView, openCalendarPostModal } from './calendarModule.js';
 import { initUniversalCRM } from './crmModule.js';
+import { initRevenueIntelligence } from './revenueIntelligenceModule.js';
+import { initSalesIntelligence } from './salesIntelligenceModule.js';
+import { initCustomerIntelligence } from './customerIntelligenceModule.js';
+import { initReputationCenter } from './reputationModule.js';
+import { initAttributionEngine } from './attributionModule.js';
 import { 
   initInbox, 
   fetchInboxThreads, 
@@ -114,6 +119,8 @@ import {
   renderAppSelectorDropdown 
 } from './appManager.js';
 import { initBusinessDiscovery } from './businessDiscoveryModule.js';
+import { initHealthScore } from './healthScoreModule.js';
+import { initIndustryBenchmarks } from './industryBenchmarkModule.js';
 
 // Initialize Application
 window.addEventListener('DOMContentLoaded', async () => {
@@ -163,6 +170,11 @@ export async function bootApp() {
   initDashboard();
   initCalendar();
   initUniversalCRM();
+  initRevenueIntelligence();
+  initSalesIntelligence();
+  initCustomerIntelligence();
+  initReputationCenter();
+  initAttributionEngine();
   initInbox();
   initMedia();
   initDatabaseConsole();
@@ -171,6 +183,8 @@ export async function bootApp() {
   initDistributionEngine();
   initAgentFramework();
   initContentIntelligence();
+  initHealthScore();
+  initIndustryBenchmarks();
   
   // Render initial page views
   renderAppSelectorDropdown();
@@ -391,7 +405,14 @@ export function switchView(viewId, element) {
     'agent-framework': { title: 'AI Agent Framework', desc: 'Coordinate and simulate automated subagent team collaborations.' },
     'agent-orchestration': { title: 'Agent Orchestration Flow', desc: 'Watch real-time cooperative agent pipelines execute target workflows.' },
     'content-intelligence': { title: 'Content Intelligence & Performance', desc: 'Predict performance, analyze optimal CTAs, run recycling, and get Coach recommendations.' },
-    'ad-dash': { title: 'Advertising Command Center', desc: 'Manage AI Media Buying, approve budgets, and monitor ROAS.' }
+    'ad-dash': { title: 'Advertising Command Center', desc: 'Manage AI Media Buying, approve budgets, and monitor ROAS.' },
+    'revenue-intelligence': { title: 'Revenue Intelligence', desc: 'Track MRR, LTV, CAC, ROAS, and revenue attribution.' },
+    'sales-intelligence': { title: 'Sales Intelligence', desc: 'Analyze leads, deals, conversion rates, and revenue forecasts.' },
+    'attribution-engine': { title: 'Attribution Engine', desc: 'Track Content → Clicks → Leads → Customers → Revenue.' },
+    'customer-intelligence': { title: 'Customer Intelligence', desc: 'Analyze reviews, feedback, sentiment, churn risks, and opportunities.' },
+    'reputation-center': { title: 'Reputation Management', desc: 'Monitor reviews, sentiment, and reputation score.' },
+    'industry-benchmarks': { title: 'Industry Benchmarks', desc: 'Compare performance against industry averages.' },
+    'health-score': { title: 'Business Health Score', desc: 'Universal business health measurement across all categories.' }
   };
   
   if (viewTitles[viewId]) {
@@ -455,6 +476,27 @@ export function refreshViewData() {
       break;
     case 'ad-dash':
       import('./advertisingModule.js?v=2').then(module => module.startAdPolling());
+      break;
+    case 'revenue-intelligence':
+      import('./revenueModule.js').then(module => module.renderRevenueIntelligence());
+      break;
+    case 'sales-intelligence':
+      import('./salesModule.js').then(module => module.renderSalesIntelligence());
+      break;
+    case 'attribution-engine':
+      import('./attributionModule.js').then(module => module.renderAttributionEngine());
+      break;
+    case 'customer-intelligence':
+      import('./customerIntelligenceModule.js').then(module => module.renderCustomerIntelligence());
+      break;
+    case 'reputation-center':
+      import('./reputationModule.js').then(module => module.renderReputationCenter());
+      break;
+    case 'industry-benchmarks':
+      import('./benchmarkModule.js').then(module => module.renderBenchmarks());
+      break;
+    case 'health-score':
+      import('./healthScoreModule.js').then(module => module.renderHealthScore());
       break;
   }
 }

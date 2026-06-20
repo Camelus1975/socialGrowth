@@ -137,12 +137,17 @@ export async function startOrchestrationPipelineSimulation() {
   }
   
   let steps = [
-    { node: 'node-analytics', status: "Analytics Agent Detected MRR drop on FitPulse", desc: "Funnel checks show WearOS segment user drops.", line: 'line-an-gr' },
-    { node: 'node-growth', status: "Growth Agent Auditing Conversion Gaps", desc: "Identified competitor launched WearOS challenge campaigns.", line: 'line-gr-aso' },
-    { node: 'node-aso', status: "ASO Agent Optimizing App Store Subtitles", desc: "Recommended tags updates for 'WearOS fitness sync'.", line: 'line-aso-mkt' },
-    { node: 'node-marketing', status: "Marketing Agent Designing Promo Sequence", desc: "Constructing challenge warm-up countdown posts.", line: 'line-mkt-cnt' },
-    { node: 'node-content', status: "Content Agent Generating Copy Thread Variations", desc: "Created Twitter variant campaign packages.", line: 'line-cnt-sch' },
-    { node: 'node-scheduler', status: "Scheduler Agent Publishing Campaign To Calendar Queue", desc: "BullMQ queue scheduled post. Pipelines finished.", line: null }
+    { node: 'node-strategy', status: "Strategy Agent Analyzing Objective", desc: "Setting KPIs and parsing intent across 11 modules." },
+    { node: 'node-analytics', status: "Analytics Agent Gathering Context", desc: "Pulling historical data and market share." },
+    { node: 'node-seo', status: "SEO/ASO Agent Optimizing Keywords", desc: "Found gaps in search intent. Preparing metadata updates." },
+    { node: 'node-marketing', status: "Marketing Agent Drafting Campaign", desc: "Building paid ad structure and budget." },
+    { node: 'node-content', status: "Content Agent Creating Assets", desc: "Drafting copy, ad variants, and blog outlines." },
+    { node: 'node-video', status: "Video Agent Generating Media", desc: "Rendering b-roll and AI voiceovers." },
+    { node: 'node-social', status: "Social Agent Preparing Distribution", desc: "Scheduling queue for LinkedIn and Twitter." },
+    { node: 'node-reputation', status: "Reputation Agent Syncing", desc: "Flagging potential negative sentiment risks." },
+    { node: 'node-crm', status: "CRM Agent Updating Pipeline", desc: "Building lead tracking webhooks." },
+    { node: 'node-retention', status: "Retention Agent Drafting Follow-ups", desc: "Queueing onboarding email sequences." },
+    { node: 'node-growth', status: "Growth Agent Finalizing Pipeline", desc: "Pipeline completely activated and deployed." }
   ];
   
   try {
@@ -154,14 +159,19 @@ export async function startOrchestrationPipelineSimulation() {
         businessType: state.appsData[state.currentActiveApp]?.businessType || 'saas'
       }) 
     });
-    if (data && data.steps && data.steps.length >= 6) {
+    if (data && data.steps && data.steps.length >= 11) {
       steps = [
-        { node: 'node-analytics', status: data.steps[1]?.log || "Analytics Agent checking stats.", desc: "Funnel checks show active user drops.", line: 'line-an-gr' },
-        { node: 'node-growth', status: data.steps[2]?.log || "Growth agent identifying gaps.", desc: "Identified competitor launched campaign updates.", line: 'line-gr-aso' },
-        { node: 'node-aso', status: data.steps[3]?.log || "ASO Agent checking metadata.", desc: "Recommended keyword metadata tags.", line: 'line-aso-mkt' },
-        { node: 'node-marketing', status: data.steps[4]?.log || "Marketing agent planning.", desc: "Constructing launch calendar sequences.", line: 'line-mkt-cnt' },
-        { node: 'node-content', status: data.steps[5]?.log || "Content writer generating text.", desc: "Created copy variant campaigns packages.", line: 'line-cnt-sch' },
-        { node: 'node-scheduler', status: data.steps[6]?.log || "System awaiting CEO approval.", desc: "Dispatched posts in queue scheduler.", line: null }
+        { node: 'node-strategy', status: data.steps[0]?.log || "Strategy Agent Analyzing Objective", desc: "Setting KPIs and parsing intent." },
+        { node: 'node-analytics', status: data.steps[1]?.log || "Analytics Agent Gathering Context", desc: "Pulling historical data." },
+        { node: 'node-seo', status: data.steps[2]?.log || "SEO Agent Optimizing Keywords", desc: "Found gaps in search intent." },
+        { node: 'node-marketing', status: data.steps[3]?.log || "Marketing Agent Drafting Campaign", desc: "Building ad structure." },
+        { node: 'node-content', status: data.steps[4]?.log || "Content Agent Creating Assets", desc: "Drafting copy." },
+        { node: 'node-video', status: data.steps[5]?.log || "Video Agent Generating Media", desc: "Rendering b-roll." },
+        { node: 'node-social', status: data.steps[6]?.log || "Social Agent Preparing Distribution", desc: "Scheduling queue." },
+        { node: 'node-reputation', status: data.steps[7]?.log || "Reputation Agent Syncing", desc: "Flagging risks." },
+        { node: 'node-crm', status: data.steps[8]?.log || "CRM Agent Updating Pipeline", desc: "Building lead tracking." },
+        { node: 'node-retention', status: data.steps[9]?.log || "Retention Agent Drafting Follow-ups", desc: "Queueing emails." },
+        { node: 'node-growth', status: data.steps[10]?.log || "Growth Agent Finalizing Pipeline", desc: "Pipeline deployed." }
       ];
     }
   } catch (err) {
@@ -170,9 +180,6 @@ export async function startOrchestrationPipelineSimulation() {
   
   const nodes = document.querySelectorAll('.agent-flow-node');
   nodes.forEach(n => n.className = 'agent-flow-node');
-  
-  const lines = document.querySelectorAll('.agent-flow-line');
-  lines.forEach(l => l.className = 'agent-flow-line');
   
   let index = 0;
   const statusText = document.getElementById('orch-status-text');
@@ -203,10 +210,7 @@ export async function startOrchestrationPipelineSimulation() {
       }
     }
     
-    if (step.line) {
-      const lineEl = document.getElementById(step.line);
-      if (lineEl) lineEl.className = 'agent-flow-line active';
-    }
+    
     
     if (statusText) {
       statusText.textContent = step.status;

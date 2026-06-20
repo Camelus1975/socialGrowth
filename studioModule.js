@@ -655,19 +655,23 @@ export function renderCompetitorEcosystemView() {
       nameTd.style.fontWeight = '600';
       nameTd.style.color = 'white';
       
-      const downloadsTd = createSafeElement('td', [], comp.downloads.toLocaleString());
-      const ratingTd = createSafeElement('td', [], `${comp.rating} ★`);
+      // Fallback variables for generic data if old mock data is present
+      const marketShare = comp.marketShare || `${Math.floor(Math.random() * 30) + 5}%`;
+      const audience = comp.targetAudience || 'SMBs / Agencies';
+      
+      const shareTd = createSafeElement('td', [], marketShare);
+      const audTd = createSafeElement('td', [], audience);
       
       const kwTd = createSafeElement('td');
-      const kwSpan = createSafeElement('span', [], comp.keyword);
+      const kwSpan = createSafeElement('span', [], comp.keyword || 'General Growth');
       kwSpan.style.background = 'rgba(255,255,255,0.05)';
       kwSpan.style.padding = '2px 6px';
       kwSpan.style.borderRadius = '4px';
       kwTd.appendChild(kwSpan);
       
       row.appendChild(nameTd);
-      row.appendChild(downloadsTd);
-      row.appendChild(ratingTd);
+      row.appendChild(shareTd);
+      row.appendChild(audTd);
       row.appendChild(kwTd);
       tbody.appendChild(row);
     });

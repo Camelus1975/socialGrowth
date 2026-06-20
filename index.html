@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>App Founder Growth Suite - Growth OS</title>
+  <title>Business Growth OS — Growth Operating System</title>
   <link rel="stylesheet" href="/styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <meta name="description" content="Ultimate Growth Operating System & Marketing Scheduler for SaaS, Startups & Indie Creators.">
+  <meta name="description" content="Business Growth Operating System — Generate leads, acquire customers, increase revenue, and scale efficiently with AI-powered automation.">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -22,8 +22,8 @@
       <!-- Logo -->
       <div style="text-align:center; margin-bottom:32px;">
         <div style="width:56px; height:56px; background:linear-gradient(135deg, #6366f1, #8b5cf6); border-radius:14px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px; color:white; font-weight:800;">▲</div>
-        <h1 style="color:white; font-size:1.5rem; font-weight:700; margin:0;">Growth Suite</h1>
-        <p style="color:rgba(148,163,184,0.8); font-size:0.85rem; margin-top:4px;">Founder Growth Operating System</p>
+        <h1 style="color:white; font-size:1.5rem; font-weight:700; margin:0;">Business Growth OS</h1>
+        <p style="color:rgba(148,163,184,0.8); font-size:0.85rem; margin-top:4px;">Growth Operating System</p>
       </div>
 
       <!-- Error message -->
@@ -90,8 +90,8 @@
         <div class="logo-container">
           <div class="logo-icon">▲</div>
           <div>
-            <div class="logo-text">Growth Suite</div>
-            <div class="logo-tag">Founder OS</div>
+            <div class="logo-text">Growth OS</div>
+            <div class="logo-tag">Business Growth</div>
           </div>
         </div>
         
@@ -118,7 +118,7 @@
       
       <!-- Nav List -->
       <nav class="sidebar-nav">
-        <div class="nav-section-title">Overview</div>
+        <div class="nav-section-title">Command Center</div>
         <ul class="nav-list">
           <li class="nav-item">
             <div class="nav-link active" data-on-click="switchView('founder-dash', this)">
@@ -128,92 +128,52 @@
           </li>
           <li class="nav-item">
             <div class="nav-link" data-on-click="switchView('war-room', this)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5L6.863 12a1 1 0 00.867 1.5h4.54a1 1 0 00.867-1.5l-2.27-4.5A1 1 0 0010 7z" /></svg>
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
               Executive War Room
             </div>
           </li>
           <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('insights', this)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-              Executive Insights
+            <div class="nav-link" data-on-click="switchView('health-score', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.952 11.952 0 01-7.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+              Business Health Score
+            </div>
+          </li>
+        </ul>
+
+        <div class="nav-section-title">Revenue & Sales</div>
+        <ul class="nav-list">
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('revenue-intelligence', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              Revenue Intelligence
             </div>
           </li>
           <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('growth-memory', this)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-              Growth Memory Engine
+            <div class="nav-link" data-on-click="switchView('sales-intelligence', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+              Sales Intelligence
             </div>
           </li>
           <li class="nav-item">
             <div class="nav-link" data-on-click="switchView('universal-crm', this)">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-              Universal CRM
-            </div>
-          </li>
-        </ul>
-        
-        <div class="nav-section-title">Growth & Listings</div>
-        <ul class="nav-list">
-          <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('launch-center', this)" data-i18n="nav.launch_center">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-              Launch Command Center
+              Business CRM
             </div>
           </li>
           <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('video-factory', this)" data-i18n="nav.video_factory">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-              AI Video Factory
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('autonomous-growth', this)" data-i18n="nav.autonomous_growth">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-              Autonomous Growth
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('aso-center', this)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-              ASO Optimization
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('store-integrations', this)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-              App Store Connect
-            </div>
-          </li>
-        </ul>
-        
-        <div class="nav-section-title">Inbox & Testimonials</div>
-        <ul class="nav-list">
-          <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('review-engine', this)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-              Review Marketing
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('social-inbox', this)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-4M4 13h4m0 0v1a2 2 0 002 2h4a2 2 0 002-2v-1" /></svg>
-              Unified Social Inbox
+            <div class="nav-link" data-on-click="switchView('attribution-engine', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+              Attribution Engine
             </div>
           </li>
         </ul>
 
-        <div class="nav-section-title">Content & Scheduling</div>
+        <div class="nav-section-title">Marketing & Content</div>
         <ul class="nav-list">
           <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('social-integrations', this)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-              Social Integrations
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('social-calendar', this)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-              Social Calendar
+            <div class="nav-link" data-on-click="switchView('launch-center', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              Launch Command Center
             </div>
           </li>
           <li class="nav-item">
@@ -224,72 +184,98 @@
           </li>
           <li class="nav-item">
             <div class="nav-link" data-on-click="switchView('content-intelligence', this)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
               Content Intelligence
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('media-asset', this)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-              Media Asset Manager
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('release-automator', this)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.2" /></svg>
-              Release Automation
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('roadmap-center', this)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
-              Roadmap Manager
             </div>
           </li>
           <li class="nav-item">
             <div class="nav-link" data-on-click="switchView('content-recycler', this)">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.2" /></svg>
-              Content Recycler & Copilot
+              Content Recycler
             </div>
           </li>
           <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('competitor-ecosystem', this)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-              Ecosystem & Competitors
+            <div class="nav-link" data-on-click="switchView('social-calendar', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              Social Calendar
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('social-inbox', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-4M4 13h4m0 0v1a2 2 0 002 2h4a2 2 0 002-2v-1" /></svg>
+              Unified Inbox
             </div>
           </li>
         </ul>
 
-        <div class="nav-section-title">Team & Data Settings</div>
+        <div class="nav-section-title">Advertising</div>
         <ul class="nav-list">
-          <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('auth-team', this)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-              Auth & Team Settings
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('db-console', this)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
-              Database & Jobs Console
-            </div>
-          </li>
-        </ul>
-
-        <div class="nav-section-title">Autonomous Agents</div>
-        <ul class="nav-list">
-          <li class="nav-item">
-            <div class="nav-link" data-on-click="switchView('autonomous', this)" data-i18n="nav.autonomous">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
-              Autonomous Growth
-            </div>
-          </li>
           <li class="nav-item">
             <div class="nav-link" data-on-click="switchView('ad-dash', this)">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
               Ad Command Center
             </div>
           </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('autonomous-growth', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              Autonomous Growth
+            </div>
+          </li>
+        </ul>
+
+        <div class="nav-section-title">Media & Creative</div>
+        <ul class="nav-list">
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('media-asset', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              Media Assets
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('video-factory', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+              Video Factory
+            </div>
+          </li>
+        </ul>
+
+        <div class="nav-section-title">Intelligence</div>
+        <ul class="nav-list">
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('customer-intelligence', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+              Customer Intelligence
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('competitor-ecosystem', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+              Competitor Intelligence
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('reputation-center', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+              Reputation Management
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('industry-benchmarks', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+              Industry Benchmarks
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('growth-memory', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+              Growth Memory
+            </div>
+          </li>
+        </ul>
+
+        <div class="nav-section-title">Agents & Automation</div>
+        <ul class="nav-list">
           <li class="nav-item">
             <div class="nav-link" data-on-click="switchView('agent-framework', this)">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
@@ -299,7 +285,29 @@
           <li class="nav-item">
             <div class="nav-link" data-on-click="switchView('agent-orchestration', this)">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.952 11.952 0 01-7.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-              Agent Orchestration Flow
+              Agent Orchestration
+            </div>
+          </li>
+        </ul>
+
+        <div class="nav-section-title">Settings</div>
+        <ul class="nav-list">
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('social-integrations', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+              Integrations
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('auth-team', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              Auth & Team
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-on-click="switchView('db-console', this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
+              Database Console
             </div>
           </li>
         </ul>
@@ -311,7 +319,7 @@
           <div class="pulse-dot"></div>
           <span>Copilot Connected</span>
         </div>
-        <div>Active: <span id="sidebar-app-name">FitPulse AI</span></div>
+        <div>Active: <span id="sidebar-app-name">Select Business</span></div>
         <button class="sidebar-logout-btn" data-on-click="logout()">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
           Sign Out
@@ -362,64 +370,65 @@
       
       <!-- VIEW 1: FOUNDER DASHBOARD -->
       <section id="view-founder-dash" class="view-panel active">
-        <!-- Daily Briefing Ribbon -->
+        <!-- Daily Briefing Ribbon (AI Recommendations) -->
         <div class="briefing-ribbon">
           <h4>
             <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
-            Founder Daily Briefing
+            AI Growth Recommendations
           </h4>
-          <div class="briefing-bullet-grid">
-            <div class="briefing-bullet">⭐ <strong>Users:</strong> <span id="brief-users">54 new fitness subscribers.</span></div>
-            <div class="briefing-bullet">📈 <strong>Engagement:</strong> <span id="brief-engagement">+8.4% Instagram reach.</span></div>
-            <div class="briefing-bullet">🔥 <strong>Competitors:</strong> <span id="brief-competitor">Fitbod launched new routine options.</span></div>
-            <div class="briefing-bullet">🔔 <strong>Today's Priority:</strong> <span id="brief-priority">Schedule launch countdowns.</span></div>
+          <div class="briefing-bullet-grid" id="dashboard-ai-recommendations">
+            <!-- Rendered via JS -->
+            <div class="briefing-bullet">⭐ <strong>Leads:</strong> <span id="brief-users">Loading...</span></div>
+            <div class="briefing-bullet">📈 <strong>Sales:</strong> <span id="brief-engagement">Loading...</span></div>
+            <div class="briefing-bullet">🔥 <strong>Reputation:</strong> <span id="brief-competitor">Loading...</span></div>
+            <div class="briefing-bullet">🔔 <strong>Action:</strong> <span id="brief-priority">Loading...</span></div>
           </div>
         </div>
 
-        <!-- Global Portfolio Metrics -->
-        <h3 id="dashboard-main-title" style="margin-bottom: 16px; color: white;">Global Portfolio Performance</h3>
+        <!-- Global Business Metrics -->
+        <h3 id="dashboard-main-title" style="margin-bottom: 16px; color: white;">Business Performance</h3>
         <div class="kpi-grid">
           <div class="glass-card card-primary kpi-card">
-            <div class="kpi-title" id="kpi-title-1">Total Portfolio MRR</div>
+            <div class="kpi-title" id="kpi-title-1">Total Revenue</div>
             <div class="kpi-value-row">
-              <div class="kpi-value" id="kpi-value-1">$184,500</div>
-              <div class="kpi-change up">▲ 22%</div>
+              <div class="kpi-value" id="kpi-value-1">$0</div>
+              <div class="kpi-change up">▲ 0%</div>
             </div>
           </div>
           <div class="glass-card card-secondary kpi-card">
-            <div class="kpi-title" id="kpi-title-2">Total Downloads</div>
+            <div class="kpi-title" id="kpi-title-2">Total Leads</div>
             <div class="kpi-value-row">
-              <div class="kpi-value" id="kpi-value-2">254,700</div>
-              <div class="kpi-change up">▲ 18%</div>
+              <div class="kpi-value" id="kpi-value-2">0</div>
+              <div class="kpi-change up">▲ 0%</div>
             </div>
           </div>
           <div class="glass-card card-green kpi-card">
-            <div class="kpi-title" id="kpi-title-3">Total Active Users</div>
+            <div class="kpi-title" id="kpi-title-3">Conversion Rate</div>
             <div class="kpi-value-row">
-              <div class="kpi-value" id="kpi-value-3">90,900</div>
-              <div class="kpi-change up">▲ 15%</div>
+              <div class="kpi-value" id="kpi-value-3">0%</div>
+              <div class="kpi-change up">▲ 0%</div>
             </div>
           </div>
           <div class="glass-card card-purple kpi-card">
-            <div class="kpi-title" id="kpi-title-4">Total Subscribers</div>
+            <div class="kpi-title" id="kpi-title-4">Active Customers</div>
             <div class="kpi-value-row">
-              <div class="kpi-value" id="kpi-value-4">14,640</div>
-              <div class="kpi-change up">▲ 25%</div>
+              <div class="kpi-value" id="kpi-value-4">0</div>
+              <div class="kpi-change up">▲ 0%</div>
             </div>
           </div>
         </div>
 
         <div class="comparison-grid">
-          <!-- Multi-App Revenue Growth Chart -->
+          <!-- Multi-Business Revenue Growth Chart -->
           <div class="glass-card">
             <div class="card-header-flex">
               <div>
-                <h3 class="card-title">Cross-App Growth Comparison</h3>
-                <div class="card-subtitle">Comparing Monthly Recurring Revenue (MRR) across apps</div>
+                <h3 class="card-title">Revenue & Growth Pipeline</h3>
+                <div class="card-subtitle">Comparing Monthly Recurring Revenue (MRR) and Lead Flow</div>
               </div>
               <div class="tabs-navigation" style="margin-bottom: 0; border: none;">
                 <button class="sub-tab-btn active" id="chart-mrr-btn" data-on-click="toggleDashboardChart('mrr')">MRR ($)</button>
-                <button class="sub-tab-btn" id="chart-downloads-btn" data-on-click="toggleDashboardChart('downloads')">Downloads</button>
+                <button class="sub-tab-btn" id="chart-downloads-btn" data-on-click="toggleDashboardChart('downloads')">Leads</button>
               </div>
             </div>
             <div class="analytics-chart-container" id="dashboard-bar-chart">
@@ -427,11 +436,11 @@
             </div>
           </div>
           
-          <!-- App List Rankings Card -->
+          <!-- Business List Rankings Card -->
           <div class="glass-card">
             <div class="card-header-flex">
               <div>
-                <h3 class="card-title">Portfolio Performance</h3>
+                <h3 class="card-title">Business Portfolio</h3>
                 <div class="card-subtitle">Growth speed ranking</div>
               </div>
             </div>
@@ -441,32 +450,45 @@
           </div>
         </div>
 
-        <!-- Selected App Detail Overview Card -->
+        <!-- Selected Business Health Detail -->
         <div class="glass-card" style="margin-top: 24px;">
           <div class="card-header-flex">
             <div>
-              <h3 class="card-title" id="selected-detail-title">FitPulse AI Overview</h3>
-              <div class="card-subtitle">Active app summary metrics</div>
+              <h3 class="card-title" id="selected-detail-title">Business Health Overview</h3>
+              <div class="card-subtitle">Active business health metrics</div>
             </div>
-            <button class="btn btn-secondary" data-on-click="switchView('launch-center')">Plan Launch</button>
+            <button class="btn btn-secondary" data-on-click="switchView('health-score')">View Full Health Report</button>
           </div>
           <div class="kpi-grid">
-            <div class="glass-card kpi-card" style="background: rgba(255,255,255,0.02); min-height: 100px;">
-              <div class="kpi-title">Active App Rating</div>
-              <div class="kpi-value-row">
-                <div class="kpi-value" id="app-detail-rating">4.8 ★</div>
-                <div class="kpi-change" style="color: var(--text-muted);">App Store / Google Play</div>
+            <div class="glass-card kpi-card" style="background: rgba(255,255,255,0.02); min-height: 100px; display: flex; align-items: center; gap: 16px;">
+              <div class="health-gauge-mini">
+                <svg viewBox="0 0 36 36" class="circular-chart green">
+                  <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path class="circle" id="health-gauge-path" stroke-dasharray="92, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <text x="18" y="20.35" class="percentage" id="health-gauge-text">92</text>
+                </svg>
+              </div>
+              <div>
+                <div class="kpi-title" style="margin-bottom:4px;">Overall Health Score</div>
+                <div class="kpi-change up">▲ Excellent</div>
               </div>
             </div>
             <div class="glass-card kpi-card" style="background: rgba(255,255,255,0.02); min-height: 100px;">
-              <div class="kpi-title">Conversion Rate</div>
+              <div class="kpi-title">Reputation Score</div>
+              <div class="kpi-value-row">
+                <div class="kpi-value" id="app-detail-rating">4.8 ★</div>
+                <div class="kpi-change" style="color: var(--text-muted);">Google / Facebook</div>
+              </div>
+            </div>
+            <div class="glass-card kpi-card" style="background: rgba(255,255,255,0.02); min-height: 100px;">
+              <div class="kpi-title">Sales Conversion</div>
               <div class="kpi-value-row">
                 <div class="kpi-value" id="app-detail-conversion">4.2%</div>
                 <div class="kpi-change up">▲ Healthy</div>
               </div>
             </div>
             <div class="glass-card kpi-card" style="background: rgba(255,255,255,0.02); min-height: 100px;">
-              <div class="kpi-title">MoM Growth</div>
+              <div class="kpi-title">Revenue Growth</div>
               <div class="kpi-value-row">
                 <div class="kpi-value" id="app-detail-growth">+24%</div>
                 <div class="kpi-change up">Steady</div>
@@ -1493,16 +1515,16 @@
       <section id="view-competitor-ecosystem" class="view-panel">
         <div style="display: grid; grid-template-columns: 1.4fr 1.6fr; gap: 24px;">
           <div class="glass-card">
-            <h3 class="card-title">Competitor App Intelligence</h3>
-            <div class="card-subtitle">Live store ratings, downloads, and search optimization gaps.</div>
+            <h3 class="card-title">Competitor Business Intelligence</h3>
+            <div class="card-subtitle">Live market share, audience tracking, and strategic gaps.</div>
             
             <table class="competitor-table">
               <thead>
                 <tr>
                   <th>Competitor Name</th>
-                  <th>Est. Downloads</th>
-                  <th>Store Rating</th>
-                  <th>Focus Keyword</th>
+                  <th>Est. Market Share</th>
+                  <th>Target Audience</th>
+                  <th>Focus Strategy</th>
                 </tr>
               </thead>
               <tbody id="competitor-list-tbody"></tbody>
@@ -1713,40 +1735,60 @@
           <div class="card-subtitle" style="margin-bottom: 20px;">Watch automated agents analyze metrics, deploy content updates, and trigger keyword tracking synchronously.</div>
           
           <!-- Orchestration line diagram nodes -->
-          <div class="agent-flow-chart-container">
-            <div class="agent-flow-node active" id="node-analytics">
-              <div class="agent-avatar analytics">📊</div>
-              <div class="agent-flow-label">Analytics</div>
+          <div class="agent-flow-chart-container" style="flex-wrap: wrap; justify-content: center; gap: 30px;">
+            <div class="agent-flow-node active" id="node-strategy">
+              <div class="agent-avatar">🧠</div>
+              <div class="agent-flow-label">Strategy</div>
             </div>
-            <div class="agent-flow-line" id="line-an-gr"></div>
             
             <div class="agent-flow-node" id="node-growth">
               <div class="agent-avatar growth">⚡</div>
               <div class="agent-flow-label">Growth</div>
             </div>
-            <div class="agent-flow-line" id="line-gr-aso"></div>
             
-            <div class="agent-flow-node" id="node-aso">
-              <div class="agent-avatar aso">🔍</div>
-              <div class="agent-flow-label">ASO</div>
+            <div class="agent-flow-node" id="node-analytics">
+              <div class="agent-avatar analytics">📊</div>
+              <div class="agent-flow-label">Analytics</div>
             </div>
-            <div class="agent-flow-line" id="line-aso-mkt"></div>
-            
-            <div class="agent-flow-node" id="node-marketing">
-              <div class="agent-avatar marketing">🎯</div>
-              <div class="agent-flow-label">Marketing</div>
-            </div>
-            <div class="agent-flow-line" id="line-mkt-cnt"></div>
             
             <div class="agent-flow-node" id="node-content">
               <div class="agent-avatar content">✍️</div>
               <div class="agent-flow-label">Content</div>
             </div>
-            <div class="agent-flow-line" id="line-cnt-sch"></div>
             
-            <div class="agent-flow-node" id="node-scheduler">
-              <div class="agent-avatar scheduler">🗓️</div>
-              <div class="agent-flow-label">Scheduler</div>
+            <div class="agent-flow-node" id="node-marketing">
+              <div class="agent-avatar marketing">🎯</div>
+              <div class="agent-flow-label">Marketing</div>
+            </div>
+            
+            <div class="agent-flow-node" id="node-crm">
+              <div class="agent-avatar">🤝</div>
+              <div class="agent-flow-label">CRM/Sales</div>
+            </div>
+            
+            <div class="agent-flow-node" id="node-reputation">
+              <div class="agent-avatar">⭐</div>
+              <div class="agent-flow-label">Reputation</div>
+            </div>
+            
+            <div class="agent-flow-node" id="node-seo">
+              <div class="agent-avatar">🔍</div>
+              <div class="agent-flow-label">SEO/ASO</div>
+            </div>
+            
+            <div class="agent-flow-node" id="node-social">
+              <div class="agent-avatar">📱</div>
+              <div class="agent-flow-label">Social</div>
+            </div>
+            
+            <div class="agent-flow-node" id="node-video">
+              <div class="agent-avatar">🎥</div>
+              <div class="agent-flow-label">Video</div>
+            </div>
+            
+            <div class="agent-flow-node" id="node-retention">
+              <div class="agent-avatar">💌</div>
+              <div class="agent-flow-label">Retention</div>
             </div>
           </div>
           
@@ -1895,6 +1937,95 @@
       <!-- VIEW 11: UNIVERSAL CRM -->
       <section id="view-universal-crm" class="view-panel">
         <!-- Rendered by crmModule.js -->
+      </section>
+
+      <!-- VIEW: REVENUE INTELLIGENCE -->
+      <section id="view-revenue-intelligence" class="view-panel">
+        <div class="glass-card">
+          <h3 class="card-title">Revenue Intelligence Engine</h3>
+          <div class="card-subtitle">Track MRR, LTV, CAC, ROAS, and connect marketing to revenue outcomes.</div>
+          <div id="revenue-intelligence-container" style="margin-top: 24px;">
+            <div class="kpi-grid" id="revenue-kpi-grid">
+              <!-- Rendered by revenueIntelligenceModule.js -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: SALES INTELLIGENCE -->
+      <section id="view-sales-intelligence" class="view-panel">
+        <div class="glass-card">
+          <h3 class="card-title">Sales Intelligence Engine</h3>
+          <div class="card-subtitle">Analyze leads, deals, conversion rates, and generate revenue forecasts.</div>
+          <div id="sales-intelligence-container" style="margin-top: 24px;">
+            <div id="sales-pipeline-board">
+              <!-- Rendered by salesIntelligenceModule.js -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: ATTRIBUTION ENGINE -->
+      <section id="view-attribution-engine" class="view-panel">
+        <div class="glass-card">
+          <h3 class="card-title">Attribution Engine</h3>
+          <div class="card-subtitle">Track the full journey: Content → Clicks → Leads → Customers → Revenue.</div>
+          <div id="attribution-container" style="margin-top: 24px;">
+            <div id="attribution-funnel">
+              <!-- Rendered by attributionModule.js -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: CUSTOMER INTELLIGENCE -->
+      <section id="view-customer-intelligence" class="view-panel">
+        <div class="glass-card">
+          <h3 class="card-title">Customer Intelligence Engine</h3>
+          <div class="card-subtitle">Analyze reviews, messages, feedback. Identify pain points, churn risks, and upsell opportunities.</div>
+          <div id="customer-intelligence-container" style="margin-top: 24px;">
+            <!-- Rendered by customerIntelligenceModule.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: REPUTATION MANAGEMENT -->
+      <section id="view-reputation-center" class="view-panel">
+        <div class="glass-card">
+          <h3 class="card-title">Reputation Management Center</h3>
+          <div class="card-subtitle">Monitor Google, Facebook, and industry reviews. Track sentiment and reputation score.</div>
+          <div id="reputation-container" style="margin-top: 24px;">
+            <div id="reputation-dashboard">
+              <!-- Rendered by reputationModule.js -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: INDUSTRY BENCHMARKS -->
+      <section id="view-industry-benchmarks" class="view-panel">
+        <div class="glass-card">
+          <h3 class="card-title">Industry Benchmarks</h3>
+          <div class="card-subtitle">Compare your performance against industry averages for SaaS, Dental, Restaurant, E-commerce, and more.</div>
+          <div id="benchmarks-container" style="margin-top: 24px;">
+            <div id="benchmarks-grid">
+              <!-- Rendered by industryBenchmarkModule.js -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: BUSINESS HEALTH SCORE -->
+      <section id="view-health-score" class="view-panel">
+        <div class="glass-card">
+          <h3 class="card-title">Business Health Score</h3>
+          <div class="card-subtitle">Universal score measuring Marketing, Sales, Revenue, Satisfaction, Growth, Retention, Reputation, and Advertising.</div>
+          <div id="health-score-container" style="margin-top: 24px;">
+            <div id="health-score-gauge">
+              <!-- Rendered by healthScoreModule.js -->
+            </div>
+          </div>
+        </div>
       </section>
 
     </main>

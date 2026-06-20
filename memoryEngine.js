@@ -22,9 +22,9 @@ async function handleUniversalWebhook(payload, authHeader) {
       messages: [
         { 
           role: "system", 
-          content: `You are the Growth Analyst Agent. Your job is to parse incoming webhook JSON payloads (e.g., from Stripe, RevenueCat, or custom sources) and identify the growth event.
-          Categorize the event as 'revenue', 'install', 'churn', 'video_metric' or 'other'.
-          Extract the exact value, currency, and the likely associated app or campaign. For video_metric, look for completion rates or CTRs.
+          content: `You are the Growth Analyst Agent. Your job is to parse incoming webhook JSON payloads (e.g., from Stripe, HubSpot, Google My Business) and identify the business growth event.
+          Categorize the event as 'revenue', 'lead', 'deal_won', 'churn', 'reputation_review', or 'other'.
+          Extract the exact value, currency, and the likely associated business or campaign. For reputation_review, look for star ratings and sentiment.
           Return a strict JSON format: {"category": "...", "value": 0, "appId": "...", "inferred_campaign": "..."}` 
         },
         { role: "user", content: `Payload: ${JSON.stringify(payload)}` }
@@ -35,7 +35,7 @@ async function handleUniversalWebhook(payload, authHeader) {
     const eventData = JSON.parse(analysisResponse.choices[0].message.content);
     
     // 2. Embed the event into the vector memory layer
-    const memoryText = `Growth Event: ${eventData.category} of ${eventData.value} recorded for app ${eventData.appId}. Associated Campaign: ${eventData.inferred_campaign || 'Organic'}.`;
+    const memoryText = `Business Growth Event: ${eventData.category} of ${eventData.value} recorded for business ${eventData.appId}. Associated Campaign: ${eventData.inferred_campaign || 'Organic'}.`;
     
     await embedAndStoreMemory(memoryText, {
       type: 'webhook_event',
@@ -83,8 +83,8 @@ async function embedAndStoreMemory(text, metadata, supabaseClient) {
 }
 
 /**
- * Cross-Project Pollination Search
- * Searches for relevant memories across the workspace. Weights exact app matches higher.
+ * Cross-Business Pollination Search
+ * Searches for relevant memories across the workspace. Weights exact business matches higher.
  */
 async function searchGrowthMemory(query, appId, supabaseClient, matchCount = 5) {
   try {
@@ -107,8 +107,8 @@ async function searchGrowthMemory(query, appId, supabaseClient, matchCount = 5) 
     if (!data) return [];
 
     // Filter to memory type and apply "Weighted Memory Matrix"
-    // Memories belonging to the exact app get priority. 
-    // Memories from other apps get secondary priority (Cross-Pollination).
+    // Memories belonging to the exact business get priority. 
+    // Memories from other businesses get secondary priority (Cross-Pollination).
     const memories = data.filter(d => d.metadata?.type === 'webhook_event' || d.metadata?.type === 'campaign_lesson');
     
     const exactMatches = memories.filter(m => m.metadata?.appId === appId);

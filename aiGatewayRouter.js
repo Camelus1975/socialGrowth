@@ -4,6 +4,7 @@ const { OpenAI } = require('openai');
 const Replicate = require('replicate');
 const { createClient } = require('@supabase/supabase-js');
 const config = require('./config');
+const { searchGrowthMemory } = require('./memoryEngine'); // Import new memory engine
 
 const openai = new OpenAI({
   apiKey: config.OPENAI_API_KEY,
@@ -57,19 +58,28 @@ function determineModelTier(taskType) {
 }
 
 // Helper: Execute OpenAI call based on the Tier
-async function callLLM(tier, prompt, contextData, tone) {
+async function callLLM(tier, prompt, contextData, memoryData, tone) {
   let modelToUse = 'gpt-4o-mini'; // Default to cheap model for Tier 1 & 2
-  let systemMessage = `You are an expert social media manager. Tone: ${tone || 'professional'}. Generate highly engaging content based on the user's prompt. Keep it concise, natively formatted for social platforms, and include relevant emojis and a CTA.`;
+  let systemMessage = `You are an expert business growth manager. Tone: ${tone || 'professional'}. Generate highly engaging content and strategies based on the user's prompt. Focus on lead generation, conversion rates, and scaling ROI.`;
 
   if (tier === 'TIER_3' || tier === 'TIER_4') {
     modelToUse = 'gpt-4o'; // Use premium model for advanced reasoning
-    systemMessage = `You are a strategic Founder Growth Copilot. Analyze the summarized context provided and deliver actionable insights. Never hallucinate data. Respond directly and clearly.`;
+    systemMessage = `You are a strategic Business Growth Copilot. Analyze the summarized context provided and deliver actionable insights. Never hallucinate data. Respond directly and clearly.`;
   }
 
   // Construct context string if data is provided (e.g., from pgvector or materialized views)
   let userMessage = prompt;
   if (contextData && (Array.isArray(contextData) ? contextData.length > 0 : Object.keys(contextData).length > 0)) {
      userMessage += `\n\nContext Data:\n${JSON.stringify(contextData)}`;
+  }
+  
+  // Inject the dynamically retrieved memory data to augment the prompt (RAG)
+  if (memoryData && memoryData.length > 0) {
+    userMessage += `\n\n[Memory Engine Consultation - Historical Growth Events]:\n`;
+    memoryData.forEach(m => {
+      userMessage += `- ${m.metadata.appId} (${m.metadata.category}): Value ${m.metadata.value}. Context: ${m.content_text}\n`;
+    });
+    userMessage += `\nPlease consider these past memories and cross-pollinated insights when answering.`;
   }
 
   const response = await openai.chat.completions.create({
@@ -79,7 +89,7 @@ async function callLLM(tier, prompt, contextData, tone) {
       { role: "user", content: userMessage }
     ],
     temperature: 0.7,
-    max_tokens: 400, // Keep costs strictly capped
+    max_tokens: 500, // Keep costs strictly capped
   });
 
   return {
@@ -90,14 +100,14 @@ async function callLLM(tier, prompt, contextData, tone) {
 
 // Main Gateway Endpoint
 router.post('/generate', async (req, res) => {
-  const { prompt, taskType, contextData, tone, enable_ab } = req.body;
+  const { prompt, taskType, contextData, tone, enable_ab, appId } = req.body;
   
   if (!prompt || !taskType) {
     return res.status(400).json({ error: 'Missing prompt or taskType parameters.' });
   }
 
   // 1. Cache Check: Prevent duplicate exact requests
-  const cacheKey = `${taskType}_${prompt}_${tone}_${enable_ab}`;
+  const cacheKey = `${taskType}_${prompt}_${tone}_${enable_ab}_${appId || 'global'}`;
   const cachedResult = getCachedResponse(cacheKey);
   if (cachedResult) {
     console.log(`[AI Gateway] CACHE HIT for ${taskType}`);
@@ -112,8 +122,20 @@ router.post('/generate', async (req, res) => {
   console.log(`[AI Gateway] Routing task '${taskType}' to ${tier}`);
 
   try {
-    // 3. Execution
-    const response = await callLLM(tier, prompt, contextData, tone);
+    // 3. Autonomous Memory Consultation (RAG)
+    // Only query memory for complex tasks to save vector DB load
+    let memoryData = [];
+    if (['copilot', 'strategy', 'growth_report', 'analysis'].includes(taskType) && req.headers.authorization) {
+      console.log(`[AI Gateway] Consulting Growth Memory Engine...`);
+      const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
+        global: { headers: { Authorization: req.headers.authorization } }
+      });
+      // Retrieve top 3 relevant historical lessons for cross-pollination
+      memoryData = await searchGrowthMemory(prompt, appId || 'global', supabase, 3);
+    }
+
+    // 4. Execution
+    const response = await callLLM(tier, prompt, contextData, memoryData, tone);
     
     // Format response specifically for A/B variants if requested by our studio
     let formattedResult = {
@@ -122,18 +144,17 @@ router.post('/generate', async (req, res) => {
     };
 
     if (enable_ab) {
-       // In a full implementation, we could ask the LLM for 2 variants in JSON. For now, we do a second fast pass.
-       const responseB = await callLLM(tier, prompt + " (Provide an entirely different creative angle)", contextData, tone);
+       const responseB = await callLLM(tier, prompt + " (Provide an entirely different creative angle)", contextData, memoryData, tone);
        formattedResult.variant_b = responseB.content;
     }
 
-    // 4. Cache the successful result
+    // 5. Cache the successful result
     setCachedResponse(cacheKey, formattedResult);
     
-    // 5. Return payload
+    // 6. Return payload
     res.json({
       copy: formattedResult,
-      meta: { cached: false, tier: tier, model: response.modelUsed }
+      meta: { cached: false, tier: tier, model: response.modelUsed, memoryRetrieved: memoryData.length }
     });
     
   } catch (err) {

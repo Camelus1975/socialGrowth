@@ -441,41 +441,41 @@ export async function downloadWeeklyReport() {
 // ------------------------------------------
 function getLocalFallbackIntelligence() {
   return {
-    averageScore: 74.5,
+    averageScore: 84.5,
     totalRevenue: 28450.00,
-    totalDownloads: 12450,
+    totalDownloads: 1245,
     totalLeads: 3100,
     topPosts: [
-      { id: "hist_1", platform: "twitter", type: "Founder Story", caption: "Why we bootstrapped FitPulse to $10k MRR in 6 months as indie creators. 🧵", success_score: 92.00, reach: 45000, likes: 1200, ctr: 4.80, downloads: 350, revenue: 1200.00 },
-      { id: "hist_2", platform: "linkedin", type: "Review/Testimonial", caption: "Elena Rostova saved 6 hours/week tracking workout routines using our WearOS widgets. Read her story:", success_score: 88.00, reach: 28000, likes: 980, ctr: 5.20, downloads: 210, revenue: 840.00 },
-      { id: "hist_3", platform: "twitter", type: "Product Launch", caption: "The wait is over. FitPulse smartwatch workout trackers are officially live! 🚀", success_score: 78.00, reach: 35000, likes: 850, ctr: 3.90, downloads: 410, revenue: 1640.00 }
+      { id: "hist_1", platform: "email", type: "Cold Outreach", caption: "Subject: Quick question about [Company] scaling... \nHey [Name], loved your recent post on LinkedIn...", success_score: 92.00, reach: 4500, likes: 120, ctr: 8.80, downloads: 35, revenue: 12000.00 },
+      { id: "hist_2", platform: "seo", type: "Lead Magnet", caption: "The Ultimate 2026 Checklist for Local SEO Optimization (PDF Guide + Templates)", success_score: 88.00, reach: 2800, likes: 98, ctr: 12.20, downloads: 410, revenue: 8400.00 },
+      { id: "hist_3", platform: "linkedin", type: "Case Study", caption: "How we helped a local dental clinic scale from 15 to 45 new patient bookings a month using simple automations. 🚀", success_score: 78.00, reach: 35000, likes: 850, ctr: 3.90, downloads: 41, revenue: 1640.00 }
     ],
     postingTimes: {
       best: [
-        { platform: "twitter", time: "Tuesday 10:00 AM", score: 88 },
+        { platform: "email", time: "Tuesday 10:00 AM", score: 88 },
         { platform: "linkedin", time: "Wednesday 09:00 AM", score: 92 },
-        { platform: "instagram", time: "Friday 08:00 PM", score: 85 }
+        { platform: "webinar", time: "Thursday 02:00 PM", score: 85 }
       ],
       worst: [
-        { platform: "twitter", time: "Sunday 11:00 PM", score: 18 },
-        { platform: "linkedin", time: "Saturday 04:00 PM", score: 12 }
+        { platform: "email", time: "Friday 04:00 PM", score: 18 },
+        { platform: "linkedin", time: "Saturday 11:00 AM", score: 12 }
       ]
     },
     hashtags: {
       best: [
-        { hashtag: "#IndieHacker", impact: "+24% Reach" },
-        { hashtag: "#SaaSGrowth", impact: "+18% Clicks" },
-        { hashtag: "#FitnessTech", impact: "+32% Downloads" }
+        { hashtag: "Free Audit", impact: "+24% Conversion" },
+        { hashtag: "ROI Calculator", impact: "+18% Clicks" },
+        { hashtag: "Case Study Video", impact: "+32% Leads" }
       ],
       worst: [
-        { hashtag: "#FitnessInspiration", impact: "-4% Reach" },
-        { hashtag: "#WorkoutGoals", impact: "-2% Clicks" }
+        { hashtag: "Newsletter Signup", impact: "-14% Clicks" },
+        { hashtag: "Consultation Call", impact: "-12% Leads" }
       ]
     },
     ctas: [
-      { cta: "Try Free", ctr: "5.4%", conversions: "3.2%", downloads: 1450, revenue: 5800.00 },
-      { cta: "Download Now", ctr: "4.8%", conversions: "2.8%", downloads: 1210, revenue: 4840.00 },
-      { cta: "Learn More", ctr: "3.2%", conversions: "1.1%", downloads: 340, revenue: 1360.00 }
+      { cta: "Get Free Audit", ctr: "8.4%", conversions: "3.2%", downloads: 145, revenue: 15800.00 },
+      { cta: "Download Framework", ctr: "12.8%", conversions: "4.8%", downloads: 810, revenue: 4840.00 },
+      { cta: "Book Strategy Call", ctr: "1.2%", conversions: "0.8%", downloads: 34, revenue: 13600.00 }
     ]
   };
 }
@@ -484,20 +484,20 @@ function getLocalFallbackPrediction(caption) {
   let score = 55;
   const suggestions = [];
   
-  if (caption.includes("🚀") || caption.includes("🔥")) score += 6;
-  if (caption.includes("link") || caption.includes("http")) score += 12;
-  if (caption.toLowerCase().includes("testimonial") || caption.toLowerCase().includes("story")) {
+  if (caption.includes("?") || caption.includes("audit")) score += 12;
+  if (caption.includes("case study") || caption.includes("framework")) score += 18;
+  if (caption.toLowerCase().includes("guarantee") || caption.toLowerCase().includes("results")) {
     score += 15;
   } else {
-    suggestions.push("Add a customer testimonial quote to increase trustworthiness (+15 points).");
+    suggestions.push("Add a specific performance guarantee or case study result to increase conversion (+15 points).");
   }
   
   return {
     predictedScore: score,
-    reach: Math.round(score * 355),
-    engagement: Math.round(score * 11.2),
-    ctr: (score * 0.065).toFixed(2) + "%",
-    downloads: Math.round(score * 2.5),
+    reach: Math.round(score * 155),
+    engagement: Math.round(score * 2.2),
+    ctr: (score * 0.12).toFixed(2) + "%",
+    downloads: Math.round(score * 1.5),
     suggestions
   };
 }

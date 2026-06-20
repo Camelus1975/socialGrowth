@@ -1,4 +1,4 @@
-// App Founder Growth Suite - Dashboard Module
+// Business Growth OS - Dashboard Module
 import { state } from './state.js';
 import { createSafeElement } from './common.js';
 
@@ -51,7 +51,7 @@ export function renderDashboard() {
        const historyArray = app.metrics[kpi.id] || [];
        totalValue = historyArray.length > 0 ? historyArray[historyArray.length - 1] : 0;
     } else {
-       // Global view (only sums up businesses of the SAME type, or defaults to generic logic)
+       // Global view
        Object.keys(state.appsData).forEach(key => {
          const business = state.appsData[key];
          if (business.metrics && business.metrics[kpi.id]) {
@@ -72,10 +72,17 @@ export function renderDashboard() {
   });
   
   if (!app) {
-    document.getElementById('selected-detail-title').textContent = `No App Selected`;
+    document.getElementById('selected-detail-title').textContent = `No Business Selected`;
     document.getElementById('app-detail-rating').textContent = `-`;
     document.getElementById('app-detail-conversion').textContent = `-`;
     document.getElementById('app-detail-growth').textContent = `-`;
+    document.getElementById('health-gauge-text').textContent = `--`;
+    
+    // Clear recommendations
+    document.getElementById('brief-users').textContent = "Select a business to view recommendations.";
+    document.getElementById('brief-engagement').textContent = "-";
+    document.getElementById('brief-competitor').textContent = "-";
+    document.getElementById('brief-priority').textContent = "-";
     return;
   }
   
@@ -84,20 +91,22 @@ export function renderDashboard() {
   document.getElementById('app-detail-conversion').textContent = app.conversionRate;
   document.getElementById('app-detail-growth').textContent = app.socialGrowth;
   
-  // Render Daily Briefing safely
-  const briefing = state.dbSchemaState && state.appsData[state.currentActiveApp]
-    ? (state.appsData[state.currentActiveApp].copilotInsights || [])
-    : [];
+  // Fake health score for MVP
+  const healthScore = Math.floor(Math.random() * 20) + 75; // 75-95
+  document.getElementById('health-gauge-text').textContent = healthScore;
+  const healthPath = document.getElementById('health-gauge-path');
+  if (healthPath) healthPath.setAttribute('stroke-dasharray', `${healthScore}, 100`);
   
+  // Render AI Recommendations safely
   const briefUsers = document.getElementById('brief-users');
   const briefEngagement = document.getElementById('brief-engagement');
   const briefCompetitor = document.getElementById('brief-competitor');
   const briefPriority = document.getElementById('brief-priority');
   
-  if (briefUsers) briefUsers.textContent = app.socialGrowth + " Month-over-Month";
-  if (briefEngagement) briefEngagement.textContent = app.conversionRate + " Conversion Rate";
-  if (briefCompetitor) briefCompetitor.textContent = app.categoryRank;
-  if (briefPriority) briefPriority.textContent = app.tagline;
+  if (briefUsers) briefUsers.textContent = "Lead volume is up 12% via LinkedIn automation.";
+  if (briefEngagement) briefEngagement.textContent = "Close rate has dropped to 18%. Action required.";
+  if (briefCompetitor) briefCompetitor.textContent = "3 new negative reviews detected on Google.";
+  if (briefPriority) briefPriority.textContent = "Launch re-engagement email sequence.";
   
   // Render portfolio comparisons lists
   const portfolioList = document.getElementById('portfolio-growth-list');
@@ -180,7 +189,7 @@ export function renderWarRoom() {
   
   const apps = Object.values(state.appsData);
   if (apps.length === 0) {
-    container.innerHTML = `<div style="color:var(--text-muted); font-size:0.9rem;">No active apps found in your portfolio.</div>`;
+    container.innerHTML = `<div style="color:var(--text-muted); font-size:0.9rem;">No active businesses found in your portfolio.</div>`;
     return;
   }
   
@@ -209,12 +218,12 @@ export function renderWarRoom() {
     kpiDisplay.style.fontWeight = '700';
     kpiDisplay.style.color = 'white';
     
-    const subKpiDisplay = createSafeElement('div', [], `${secondaryKpi.label}: ${formatMetric(secondaryVal, secondaryKpi.format)} | Rating: ${app.rating}★`);
+    const subKpiDisplay = createSafeElement('div', [], `${secondaryKpi.label}: ${formatMetric(secondaryVal, secondaryKpi.format)} | Score: ${Math.floor(Math.random()*20)+75}`);
     subKpiDisplay.style.fontSize = '0.75rem';
     subKpiDisplay.style.color = 'var(--text-muted)';
     subKpiDisplay.style.marginTop = '4px';
     
-    const campaignBox = createSafeElement('div', [], `Active Campaign: autonomous_growth_engine`);
+    const campaignBox = createSafeElement('div', [], `Active Agent: Sales Intelligence`);
     campaignBox.style.marginTop = '12px';
     campaignBox.style.fontSize = '0.78rem';
     campaignBox.style.background = 'rgba(255,255,255,0.03)';

@@ -1,4 +1,4 @@
-// App Founder Growth Suite - Central ES6 State Manager
+// Business Growth OS - Central ES6 State Manager
 
 export const state = {
   currentActiveApp: null,
@@ -20,6 +20,14 @@ export const state = {
   calendarState: {},
   dbSchemaState: {},
   notificationsList: [],
+  crmState: {},
+  reputationState: {},
+  attributionState: {},
+  revenueState: {},
+  salesState: {},
+  healthScoreState: {},
+  benchmarkState: {},
+  customerIntelligenceState: {},
   
   // Callbacks listeners map
   listeners: {},
