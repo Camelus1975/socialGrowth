@@ -59,11 +59,14 @@ function injectTranslationEngine() {
   const style = document.createElement('style');
   style.innerHTML = `
     .goog-te-banner-frame.skiptranslate { display: none !important; }
-    body { top: 0px !important; }
+    iframe.skiptranslate { display: none !important; }
+    body { top: 0px !important; position: static !important; }
     .goog-tooltip { display: none !important; }
     .goog-tooltip:hover { display: none !important; }
     .goog-text-highlight { background-color: transparent !important; border: none !important; box-shadow: none !important; }
-    #goog-gt-tt { display: none !important; }
+    #goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
+    .goog-te-spinner-pos { display: none !important; }
+    .VIpgJd-ZVi9od-aZ2wEe-wOHMyf, .VIpgJd-ZVi9od-aZ2wEe { display: none !important; }
   `;
   document.head.appendChild(style);
 }
