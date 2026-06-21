@@ -1770,6 +1770,11 @@ input[type="text"]:focus, select:focus, textarea:focus {
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-glass);
   font-size: 0.8rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+.user-profile-widget:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 /* Custom CSS Modals Styling Overlay */

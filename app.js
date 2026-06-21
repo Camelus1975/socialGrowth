@@ -284,10 +284,12 @@ async function syncUserSession() {
     });
     
     const headerName = document.getElementById('user-header-name');
+    const headerAvatar = document.getElementById('user-header-avatar');
     const authName = document.getElementById('auth-user-name');
     const authRole = document.getElementById('auth-user-role');
     
     if (headerName) headerName.textContent = data.user.name;
+    if (headerAvatar && data.user.avatar) headerAvatar.src = data.user.avatar;
     if (authName) authName.textContent = data.user.name;
     if (authRole) authRole.textContent = `${data.user.role} (${data.organization.name})`;
     console.log("Supabase active user session verified successfully.");
@@ -667,6 +669,87 @@ export function simulateSbAuthSignout() {
   if (authRole) authRole.textContent = "Signed Out";
 }
 
+export function openProfileModal() {
+  const headerName = document.getElementById('user-header-name');
+  const avatar = document.getElementById('user-header-avatar');
+  
+  document.getElementById('profile-modal-name').value = headerName ? headerName.textContent : '';
+  document.getElementById('profile-modal-avatar-preview').src = avatar ? avatar.src : '';
+  
+  // Store the file reference
+  window.selectedAvatarFile = null;
+  
+  document.getElementById('user-profile-modal').style.display = 'flex';
+}
+
+window.previewAvatarUpload = function(event) {
+  const file = event.target.files[0];
+  if (file) {
+    window.selectedAvatarFile = file;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('profile-modal-avatar-preview').src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+export async function saveUserProfile() {
+  const saveBtn = document.getElementById('save-profile-btn');
+  const originalText = saveBtn.textContent;
+  saveBtn.textContent = 'Saving...';
+  saveBtn.disabled = true;
+  
+  const newName = document.getElementById('profile-modal-name').value;
+  let newAvatarUrl = document.getElementById('profile-modal-avatar-preview').src;
+  
+  try {
+    // If we have a selected file and supabase client is available
+    if (window.selectedAvatarFile && window.supabaseClient) {
+      const file = window.selectedAvatarFile;
+      const fileExt = file.name.split('.').pop();
+      // Generate a somewhat unique file name using current time
+      const fileName = `${Date.now()}_avatar.${fileExt}`;
+      const filePath = `${fileName}`;
+      
+      const { data, error } = await window.supabaseClient.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+        
+      if (error) throw error;
+      
+      const { data: { publicUrl } } = window.supabaseClient.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+        
+      newAvatarUrl = publicUrl;
+    }
+    
+    // Update user_metadata via Supabase Auth if available
+    if (window.supabaseClient) {
+      const { error } = await window.supabaseClient.auth.updateUser({
+        data: { full_name: newName, avatar_url: newAvatarUrl }
+      });
+      if (error) throw error;
+    }
+    
+    // Update DOM
+    const headerName = document.getElementById('user-header-name');
+    const avatar = document.getElementById('user-header-avatar');
+    if (headerName) headerName.textContent = newName;
+    if (avatar) avatar.src = newAvatarUrl;
+    
+    showToast('Profile updated successfully!', 'success');
+    closeModal('user-profile-modal');
+  } catch (err) {
+    console.error('Error saving profile:', err);
+    showToast(err.message || 'Error saving profile', 'error');
+  } finally {
+    saveBtn.textContent = originalText;
+    saveBtn.disabled = false;
+  }
+}
+
 export async function inviteNewTeamMember() {
   const email = prompt("Enter team member invite email address:");
   if (!email) return;
@@ -835,13 +918,15 @@ function callFunction(name, args, element, event) {
     toggleMobileSidebar,
     toggleThemeMode,
     
-    // Auth / Team
+    // Auth / Team / Profile
     simulateSbAuthVerify,
     simulateSbAuthSignout,
     inviteNewTeamMember,
     changeMemberRoleSim,
     removeTeamMemberSim,
     connectOAuthPlatform,
+    openProfileModal,
+    saveUserProfile,
     
     // Inbox
     sendInboxMessageReply,

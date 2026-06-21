@@ -361,7 +361,7 @@
           </div>
           
           <!-- User Widget -->
-          <div class="user-profile-widget">
+          <div class="user-profile-widget" data-on-click="openProfileModal()">
             <img id="user-header-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">
             <span id="user-header-name">Shadi</span>
           </div>
@@ -2050,6 +2050,35 @@
 
   <!-- Modular App Architecture -->
   <script type="module" src="/app.js"></script>
+
+  <!-- USER PROFILE MODAL -->
+  <div id="user-profile-modal" class="custom-modal-overlay">
+    <div class="custom-modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 style="color:white; margin:0;">Edit Profile</h3>
+        <button class="btn btn-secondary" style="padding:6px; border-radius:50%;" data-on-click="closeModal('user-profile-modal')">✕</button>
+      </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:20px; align-items:center;">
+        
+        <div style="position: relative; cursor: pointer;" onclick="document.getElementById('profile-avatar-upload').click()">
+          <img id="profile-modal-avatar-preview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-green);">
+          <div style="position: absolute; bottom: 0; right: 0; background: var(--accent-green); border-radius: 50%; padding: 6px;">
+            <svg fill="none" viewBox="0 0 24 24" stroke="black" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          </div>
+          <input type="file" id="profile-avatar-upload" accept="image/*" style="display: none;" onchange="window.previewAvatarUpload(event)">
+        </div>
+
+        <div class="form-group" style="width: 100%;">
+          <label>Display Name</label>
+          <input type="text" id="profile-modal-name" class="input-field" placeholder="Enter your name">
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: flex-end;">
+        <button class="btn btn-secondary" data-on-click="closeModal('user-profile-modal')">Cancel</button>
+        <button class="btn btn-primary" id="save-profile-btn" data-on-click="saveUserProfile()">Save Changes</button>
+      </div>
+    </div>
+  </div>
 
   <!-- CALENDAR DETAILS MODAL -->
   <div id="calendar-details-modal" class="custom-modal-overlay">
