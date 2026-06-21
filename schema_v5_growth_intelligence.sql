@@ -109,16 +109,16 @@ CREATE TABLE IF NOT EXISTS public.video_factory_assets (
 ALTER TABLE public.growth_memory_events ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view memory of their businesses"
 ON public.growth_memory_events FOR SELECT
-USING (app_id IN (SELECT business_id FROM public.businesses WHERE owner_id = auth.uid()));
+USING (app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid()));
 
 -- Competitors RLS
 ALTER TABLE public.competitors ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view competitors of their businesses"
 ON public.competitors FOR SELECT
-USING (app_id IN (SELECT business_id FROM public.businesses WHERE owner_id = auth.uid()));
+USING (app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid()));
 
 -- Agent Operations RLS
 ALTER TABLE public.agent_operations ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view agent ops of their businesses"
 ON public.agent_operations FOR SELECT
-USING (app_id IN (SELECT business_id FROM public.businesses WHERE owner_id = auth.uid()));
+USING (app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid()));
