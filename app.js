@@ -454,6 +454,15 @@ export function switchView(viewId, element) {
 // Refresh data for the current active view
 export function refreshViewData() {
   switch(state.currentActiveView) {
+    case 'unified-intelligence-dash':
+      initIntelligenceDashboard();
+      break;
+    case 'growth-memory':
+      initMemoryEngine();
+      break;
+    case 'competitor-intelligence':
+      initCompetitorIntelligence();
+      break;
     case 'founder-dash':
       renderDashboard();
       break;
