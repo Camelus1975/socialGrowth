@@ -435,7 +435,6 @@ export function switchView(viewId, element) {
   }
   
   // Close mobile sidebar on navigation
-  const sidebar = document.querySelector('aside');
   if (sidebar) sidebar.classList.remove('mobile-active');
   
   refreshViewData();
