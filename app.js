@@ -104,6 +104,7 @@ import {
 } from './contentIntelligenceModule.js';
 
 import { initMemoryEngine, searchGrowthMemoryUI } from './memoryModule.js';
+import { initCompetitorIntelligence } from './competitorIntelligenceModule.js';
 
 import {
   initAuth,
@@ -183,6 +184,7 @@ export async function bootApp() {
   initMedia();
   initDatabaseConsole();
   initMemoryEngine();
+  initCompetitorIntelligence();
   initStudio();
   initVideoFactory();
   initDistributionEngine();

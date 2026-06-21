@@ -517,15 +517,15 @@
         <div class="metrics-grid">
           <div class="metric-card">
             <h3 class="metric-title">Tracked Competitors</h3>
-            <div class="metric-value">12</div>
+            <div class="metric-value" id="comp-metric-tracked">Loading...</div>
           </div>
           <div class="metric-card">
             <h3 class="metric-title">Pricing Changes Detected</h3>
-            <div class="metric-value" style="color: var(--accent-green)">2 Last 30 Days</div>
+            <div class="metric-value" style="color: var(--accent-green)" id="comp-metric-pricing">Loading...</div>
           </div>
           <div class="metric-card">
             <h3 class="metric-title">Feature Gaps Closed</h3>
-            <div class="metric-value">4</div>
+            <div class="metric-value" id="comp-metric-gaps">Loading...</div>
           </div>
         </div>
         
@@ -541,36 +541,9 @@
                 <th style="padding:12px 0;">Threat Level</th>
               </tr>
             </thead>
-            <tbody style="color:white; font-size:0.9rem;">
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                <td style="padding:16px 0; display:flex; align-items:center; gap:8px;">
-                  <div style="width:24px; height:24px; background:var(--primary); border-radius:4px;"></div>
-                  <strong>AcmeCorp</strong>
-                </td>
-                <td style="padding:16px 0;"><span class="alert-tag" style="background:rgba(236,72,153,0.2); color:#ec4899;">Feature Launch</span></td>
-                <td style="padding:16px 0; color:var(--text-sub);">Launched 'AI Content Generator' on ProductHunt.</td>
-                <td style="padding:16px 0; color:var(--text-sub);">2 hours ago</td>
-                <td style="padding:16px 0;"><span style="color:#f87171;">High</span></td>
-              </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                <td style="padding:16px 0; display:flex; align-items:center; gap:8px;">
-                  <div style="width:24px; height:24px; background:var(--accent-green); border-radius:4px;"></div>
-                  <strong>SaaSGenius</strong>
-                </td>
-                <td style="padding:16px 0;"><span class="alert-tag" style="background:rgba(99,102,241,0.2); color:#818cf8;">Pricing Change</span></td>
-                <td style="padding:16px 0; color:var(--text-sub);">Increased Pro tier from $49 to $79/mo.</td>
-                <td style="padding:16px 0; color:var(--text-sub);">Yesterday</td>
-                <td style="padding:16px 0;"><span style="color:var(--accent-green);">Opportunity</span></td>
-              </tr>
+            <tbody id="competitor-activity-feed" style="color:white; font-size:0.9rem;">
               <tr>
-                <td style="padding:16px 0; display:flex; align-items:center; gap:8px;">
-                  <div style="width:24px; height:24px; background:#f59e0b; border-radius:4px;"></div>
-                  <strong>MarketLeader</strong>
-                </td>
-                <td style="padding:16px 0;"><span class="alert-tag" style="background:rgba(245,158,11,0.2); color:#fcd34d;">Ad Strategy</span></td>
-                <td style="padding:16px 0; color:var(--text-sub);">Started bidding on our branded keywords on Google Ads.</td>
-                <td style="padding:16px 0; color:var(--text-sub);">3 days ago</td>
-                <td style="padding:16px 0;"><span style="color:#f59e0b;">Medium</span></td>
+                <td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">Scanning competitor landscape...</td>
               </tr>
             </tbody>
           </table>
