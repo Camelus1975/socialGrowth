@@ -12,6 +12,7 @@ import {
 } from './common.js';
 
 import { initDashboard, renderDashboard } from './dashboardModule.js';
+import { initIntelligenceDashboard } from './intelligenceDashboardModule.js';
 import { initCalendar, fetchCalendarPosts, renderCalendarView, openCalendarPostModal } from './calendarModule.js';
 import { initUniversalCRM } from './crmModule.js';
 import { initRevenueIntelligence } from './revenueIntelligenceModule.js';
@@ -168,6 +169,7 @@ export async function bootApp() {
   initAppManager();
   initBusinessDiscovery();
   initDashboard();
+  initIntelligenceDashboard();
   initCalendar();
   initUniversalCRM();
   initRevenueIntelligence();

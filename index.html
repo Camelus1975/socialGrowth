@@ -419,45 +419,27 @@
           </div>
           <div class="metric-card">
             <h3 class="metric-title">Active Opportunities</h3>
-            <div class="metric-value">4 Detected</div>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">3 Marketing, 1 Product</p>
+            <div class="metric-value" id="dash-metric-opportunities">... Loading</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;" id="dash-metric-opp-desc">Scanning market data</p>
           </div>
           <div class="metric-card" style="border-color: rgba(239, 68, 68, 0.3);">
             <h3 class="metric-title">Competitor Threats</h3>
-            <div class="metric-value" style="color: #f87171;">2 Critical</div>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">Pricing changes detected</p>
+            <div class="metric-value" style="color: #f87171;" id="dash-metric-threats">... Loading</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;" id="dash-metric-threats-desc">Scanning competitors</p>
           </div>
           <div class="metric-card">
             <h3 class="metric-title">Agent Network Status</h3>
-            <div class="metric-value" style="color: var(--primary)">9 Active</div>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">Executing Q3 Growth Strategy</p>
+            <div class="metric-value" style="color: var(--primary)" id="dash-metric-agents">... Loading</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;" id="dash-metric-agents-desc">Checking agent states</p>
           </div>
         </div>
 
         <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr; margin-top: 24px;">
           <div class="card">
             <h3 class="card-title">Priority Actions & Agent Recommendations</h3>
-            <div style="display:flex; flex-direction:column; gap:12px; margin-top:16px;">
-              <div style="padding:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                  <div style="font-weight:600; color:white; margin-bottom:4px;">Approve: Retargeting Ad Budget Increase</div>
-                  <div style="font-size:0.85rem; color:var(--text-sub);">Advertising Agent recommends reallocating $500 to the 'Abandoned Cart' segment. Predicted ROI: +310%.</div>
-                </div>
-                <button class="btn btn-primary">Approve</button>
-              </div>
-              <div style="padding:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                  <div style="font-weight:600; color:white; margin-bottom:4px;">Review: Competitor 'GrowthApp' Launched New Tier</div>
-                  <div style="font-size:0.85rem; color:var(--text-sub);">Competitor Intelligence Agent detected a pricing drop. Generates feature gap report.</div>
-                </div>
-                <button class="btn btn-secondary">View Report</button>
-              </div>
-              <div style="padding:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                  <div style="font-weight:600; color:white; margin-bottom:4px;">Publish: 5 AI-Generated Product Videos</div>
-                  <div style="font-size:0.85rem; color:var(--text-sub);">Video Agent completed batch rendering for TikTok/Reels. Awaiting final approval.</div>
-                </div>
-                <button class="btn btn-primary">Review Videos</button>
+            <div id="agent-priority-actions-list" style="display:flex; flex-direction:column; gap:12px; margin-top:16px;">
+              <div style="text-align: center; color: var(--text-muted); padding: 20px;">
+                Scanning for active agent recommendations...
               </div>
             </div>
           </div>
