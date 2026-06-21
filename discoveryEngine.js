@@ -119,6 +119,7 @@ async function processDiscoveryJob(jobId, appId, urls, appName, providedSupabase
     await updateJobStatus(supabase, jobId, 'scanning', 40, 'Fetching social media profiles...');
     const instagramContent = await scrapeWebContent(urls.instagram);
     const linkedinContent = await scrapeWebContent(urls.linkedin);
+    const googleBusinessContent = await scrapeWebContent(urls.google_business);
     
     const scrapedDataSummary = `
 === REAL WEBSITE CONTENT (scraped from ${urls.website || 'N/A'}) ===
@@ -129,6 +130,9 @@ ${instagramContent || 'No Instagram content available'}
 
 === LINKEDIN PAGE CONTENT (scraped from ${urls.linkedin || 'N/A'}) ===
 ${linkedinContent || 'No LinkedIn content available'}
+
+=== GOOGLE BUSINESS PROFILE CONTENT (scraped from ${urls.google_business || 'N/A'}) ===
+${googleBusinessContent || 'No Google Business Profile content available'}
     `.trim();
     
     const hasRealContent = websiteContent.length > 50 || instagramContent.length > 50 || linkedinContent.length > 50;
@@ -153,6 +157,7 @@ ${linkedinContent || 'No LinkedIn content available'}
     Website URL: ${urls.website || 'Not provided'}
     Instagram URL: ${urls.instagram || 'Not provided'}
     LinkedIn URL: ${urls.linkedin || 'Not provided'}
+    Google Business Profile URL: ${urls.google_business || 'Not provided'}
     
     REAL SCRAPED CONTENT:
     ${scrapedDataSummary}
@@ -226,6 +231,9 @@ ${linkedinContent || 'No LinkedIn content available'}
     const primaryColor = (discoveryData?.brandKit?.colors?.primary || '#8B5CF6').replace('#', '');
     discoveryData.brandKit = discoveryData.brandKit || { colors: { primary: '#8B5CF6' } };
     discoveryData.brandKit.logoUrl = `https://ui-avatars.com/api/?name=${appNameEncoded}&background=${primaryColor}&color=fff&size=512`;
+    
+    // Save URLs into the discovery profile
+    discoveryData.urls = urls;
 
     await updateJobStatus(supabase, jobId, 'analyzing', 85, 'Saving brand intelligence profile to database...');
 

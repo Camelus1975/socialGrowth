@@ -28,6 +28,7 @@ async function startDiscovery() {
   const appNameInput = document.getElementById('discovery-app-name');
   const websiteInput = document.getElementById('discovery-url-website');
   const igInput = document.getElementById('discovery-url-ig');
+  const gmbInput = document.getElementById('discovery-url-gmb');
   const linkedInInput = document.getElementById('discovery-url-linkedin');
   
   const appName = appNameInput ? appNameInput.value.trim() : '';
@@ -48,6 +49,7 @@ async function startDiscovery() {
   const urls = {
     website: websiteInput.value.trim(),
     instagram: igInput.value.trim(),
+    google_business: gmbInput ? gmbInput.value.trim() : '',
     linkedin: linkedInInput.value.trim()
   };
   
