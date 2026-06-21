@@ -2165,7 +2165,7 @@ html[dir="rtl"] aside {
   border-left: 1px solid var(--border-glass);
 }
 
-html[dir="rtl"] .main-content {
+html[dir="rtl"] main {
   margin-left: 0;
   margin-right: var(--sidebar-width);
 }
