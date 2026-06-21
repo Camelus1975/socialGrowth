@@ -95,8 +95,8 @@ function decryptToken(encryptedText) {
 // AUTHENTICATION MIDDLEWARE
 // ------------------------------------------
 const authenticate = async (req, res, next) => {
-  // Allow auth and OAuth routes to proceed without token headers
-  if (req.originalUrl.startsWith('/api/auth/')) {
+  // Allow auth, OAuth, and webhooks to proceed without token headers
+  if (req.originalUrl.startsWith('/api/auth/') || req.originalUrl.startsWith('/api/webhooks/')) {
     return next();
   }
   
@@ -803,11 +803,10 @@ app.post('/api/db/query', async (req, res) => {
   const sanitizedQuery = statement.trim().toLowerCase();
   
   // Protect database console from destructive write commands (SQL injection hardening)
-  /*
+  // Protect database console from destructive write commands (SQL injection hardening)
   if (sanitizedQuery.includes("delete") || sanitizedQuery.includes("drop") || sanitizedQuery.includes("truncate") || sanitizedQuery.includes("update") || sanitizedQuery.includes("insert")) {
     return res.status(403).json({ error: "Forbidden: Console restricted to SELECT query logs checks." });
   }
-  */
   
   try {
     if (isDummyDb) throw new Error("Offline Mode");

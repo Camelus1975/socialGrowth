@@ -456,10 +456,21 @@ CREATE TABLE IF NOT EXISTS public.customers (
     FOREIGN KEY (app_id) REFERENCES public.businesses(business_id) ON DELETE CASCADE
 );
 
+-- RLS for CUSTOMERS
+ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can manage their customers" ON public.customers
+    FOR ALL TO authenticated
+    USING (
+        app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
+    );
+
+-- ==========================================
+-- INDEXES FOR CUSTOMERS
+-- ==========================================
+CREATE INDEX IF NOT EXISTS idx_customers_app_id ON public.customers(app_id);
 
 -- ==========================================
 -- 14. REALTIME CONFIGURATION
 -- Enable Realtime for the unified dashboard to instantly flash.
 -- ==========================================
 ALTER PUBLICATION supabase_realtime ADD TABLE agent_operations;
-
