@@ -1,5 +1,6 @@
 import { getSupabaseClient } from './auth.js';
 import { state } from './state.js';
+import { requestApi } from './common.js';
 
 let updateInterval = null;
 
@@ -126,10 +127,16 @@ async function refreshPriorityActions(supabase) {
                 e.target.innerText = 'Approving...';
                 e.target.disabled = true;
                 
-                await supabase
-                    .from('agent_operations')
-                    .update({ approved: true, status: 'executing' })
-                    .eq('id', id);
+                const appId = state.currentActiveApp || 'default';
+                
+                try {
+                    await requestApi('/api/agents/orchestration/approve', 'POST', {
+                        operationId: id,
+                        appId: appId
+                    });
+                } catch (err) {
+                    console.error("Failed to approve orchestration:", err);
+                }
                     
                 await refreshPriorityActions(supabase);
             });

@@ -748,6 +748,36 @@ app.post('/api/agents/orchestration/trigger', async (req, res) => {
   }
 });
 
+// Approve an orchestration operation and move draft posts to scheduled
+app.post('/api/agents/orchestration/approve', async (req, res) => {
+  const { operationId, appId } = req.body;
+  if (!operationId || !appId) return res.status(400).json({ error: "operationId and appId are required." });
+
+  try {
+    // 1. Mark operation as executing/completed
+    const { error: opError } = await supabase
+      .from('agent_operations')
+      .update({ approved: true, status: 'completed' })
+      .eq('id', operationId);
+
+    if (opError) throw opError;
+
+    // 2. Update all draft posts for this app to scheduled
+    const { error: postError } = await supabase
+      .from('scheduled_posts')
+      .update({ status: 'scheduled' })
+      .eq('app_id', appId)
+      .eq('status', 'draft');
+
+    if (postError) throw postError;
+
+    res.json({ status: 'success', message: 'Operation approved and content scheduled successfully.' });
+  } catch (err) {
+    console.error("Error approving orchestration:", err);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 // Priority 16: Database & SQL Console execute
 const { handleUniversalWebhook } = require('./memoryEngine');
 
