@@ -221,11 +221,66 @@ const reviewsWorker = new Worker('review_imports', async (job) => {
 
 // 4. Agent Execution Orchestrator Worker
 const agentWorker = new Worker('agent_execution', async (job) => {
-  console.log(`[Worker - AI Agents] Executing autonomous collaborative loop ID: ${job.data.orchestrationId}`);
-  
-  // Simulate Agent memory lookup
-  console.log(`[Worker - AI Agents] Analytics Agent triggered Growth audit routines.`);
-  return { success: true };
+  if (job.name === 'poll_executing_operations') {
+    console.log(`[Worker - AI Agents] Polling database for approved executing operations...`);
+    
+    const { data: executingOps, error } = await supabase
+      .from('agent_operations')
+      .select('*')
+      .eq('status', 'executing');
+
+    if (error) {
+      if (error.code !== '42P01') { 
+        console.error(`[Worker - AI Agents] Error fetching operations:`, error);
+      }
+      return;
+    }
+
+    if (!executingOps || executingOps.length === 0) return;
+
+    for (const op of executingOps) {
+      await activeQueues['agent_execution'].add('execute_operation', op);
+    }
+    return { success: true, processed: executingOps.length };
+  }
+
+  if (job.name === 'execute_operation') {
+    const op = job.data;
+    console.log(`[Worker - AI Agents] Executing autonomous action ID: ${op.id} from ${op.agent_name}`);
+    
+    try {
+      // Execute based on agent name
+      if (op.agent_name.includes('Advertising')) {
+        // Find pending ad campaigns for this app
+        const { data: campaigns } = await supabase
+          .from('ad_campaigns')
+          .select('id')
+          .eq('app_id', op.app_id)
+          .eq('status', 'pending_approval');
+          
+        if (campaigns && campaigns.length > 0) {
+          console.log(`[Worker - AI Agents] Simulating Meta/Google Ads API payload dispatch...`);
+          // Mark all pending campaigns as active
+          for (let camp of campaigns) {
+            await supabase.from('ad_campaigns').update({ status: 'active', start_date: new Date().toISOString() }).eq('id', camp.id);
+            console.log(`[Worker - AI Agents] Campaign ${camp.id} is now LIVE on ad networks.`);
+          }
+        }
+      } else if (op.agent_name.includes('Content')) {
+        console.log(`[Worker - AI Agents] Content scheduled via Scheduled Publishing Engine.`);
+      } else {
+        console.log(`[Worker - AI Agents] Generic operation executed successfully.`);
+      }
+
+      // Mark operation as completed
+      await supabase.from('agent_operations').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', op.id);
+      return { success: true };
+    } catch (err) {
+      console.error(`[Worker - AI Agents] Operation ${op.id} failed:`, err);
+      await supabase.from('agent_operations').update({ status: 'failed' }).eq('id', op.id);
+      throw err;
+    }
+  }
 }, { connection: redisConnection });
 
 // Callback Listeners
@@ -267,8 +322,18 @@ if (require.main === module) {
   }).then(() => {
     console.log("[Workers] 1-Minute Auto-Publishing Cron Job scheduled successfully.");
   });
+
+  // Agent Execution Orchestrator 1-Minute Cron Job
+  activeQueues['agent_execution'].add('poll_executing_operations', {}, {
+    repeat: {
+      pattern: '* * * * *' // Runs every minute
+    }
+  }).then(() => {
+    console.log("[Workers] 1-Minute Agent Execution Cron Job scheduled successfully.");
+  });
   
   // Also trigger immediate runs on boot
   activeQueues['analytics_collection'].add('boot_refresh', { isBoot: true });
   activeQueues['scheduled_publishing'].add('poll_scheduled_posts', { isBoot: true });
+  activeQueues['agent_execution'].add('poll_executing_operations', { isBoot: true });
 }

@@ -754,10 +754,10 @@ app.post('/api/agents/orchestration/approve', async (req, res) => {
   if (!operationId || !appId) return res.status(400).json({ error: "operationId and appId are required." });
 
   try {
-    // 1. Mark operation as executing/completed
+    // 1. Mark operation as executing
     const { error: opError } = await supabase
       .from('agent_operations')
-      .update({ approved: true, status: 'completed' })
+      .update({ approved: true, status: 'executing' })
       .eq('id', operationId);
 
     if (opError) throw opError;
