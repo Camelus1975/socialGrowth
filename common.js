@@ -105,8 +105,12 @@ export function toggleNotificationDrawer() {
 // Mobile Responsive Hamburger Menu
 export function toggleMobileSidebar() {
   const sidebar = document.querySelector('aside');
+  const overlay = document.getElementById('mobile-sidebar-overlay');
   if (sidebar) {
     sidebar.classList.toggle('mobile-active');
+  }
+  if (overlay) {
+    overlay.classList.toggle('active');
   }
 }
 

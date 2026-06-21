@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Business Growth OS — Growth Operating System</title>
   <link rel="stylesheet" href="/styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -85,7 +85,8 @@
   <div id="app-container">
     
     <!-- Sidebar Navigation -->
-    <aside>
+    <div id="mobile-sidebar-overlay" class="mobile-sidebar-overlay" data-on-click="toggleMobileSidebar()"></div>
+    <aside id="app-sidebar">
       <div class="sidebar-header">
         <div class="logo-container">
           <div class="logo-icon">▲</div>

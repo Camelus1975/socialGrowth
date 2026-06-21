@@ -1844,10 +1844,35 @@ input[type="text"]:focus, select:focus, textarea:focus {
   gap: 12px;
 }
 
+/* Mobile Sidebar Overlay */
+.mobile-sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(4, 7, 17, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-sidebar-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.hamburger-btn {
+  display: none;
+}
+
 /* Mobile Responsiveness Improvements */
 @media (max-width: 900px) {
   aside {
     left: -var(--sidebar-width);
+    z-index: 1000;
   }
   
   html[dir="rtl"] aside {
@@ -1884,10 +1909,55 @@ input[type="text"]:focus, select:focus, textarea:focus {
     cursor: pointer;
     margin-right: 12px;
   }
+
+  /* Force grids to single column on tablet/mobile */
+  .dashboard-grid,
+  .metrics-grid,
+  .calendar-grid,
+  .crm-board,
+  .inbox-layout,
+  .media-grid,
+  .view-container > div[style*="display: grid"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  .crm-columns {
+    flex-direction: column !important;
+    overflow-x: hidden;
+  }
+  
+  .crm-column {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin-bottom: 20px;
+  }
 }
 
-.hamburger-btn {
-  display: none;
+@media (max-width: 600px) {
+  .header-actions {
+    gap: 8px !important;
+  }
+  
+  .header-actions .btn {
+    padding: 6px 10px !important;
+    font-size: 0.8rem !important;
+  }
+  
+  .user-profile-widget span {
+    display: none; /* Hide name on small mobile, keep avatar */
+  }
+  
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+  
+  .header-controls {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
 }
 
 /* ==========================================================================

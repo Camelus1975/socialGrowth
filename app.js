@@ -384,6 +384,16 @@ export function switchView(viewId, element) {
     activePanel.classList.add('active');
   }
   
+  // Close mobile sidebar automatically after navigation
+  const sidebar = document.querySelector('aside');
+  const overlay = document.getElementById('mobile-sidebar-overlay');
+  if (sidebar && sidebar.classList.contains('mobile-active')) {
+    sidebar.classList.remove('mobile-active');
+  }
+  if (overlay && overlay.classList.contains('active')) {
+    overlay.classList.remove('active');
+  }
+  
   state.setActiveView(viewId);
   
   const viewTitles = {
