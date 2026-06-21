@@ -397,6 +397,10 @@ export function switchView(viewId, element) {
   state.setActiveView(viewId);
   
   const viewTitles = {
+    'unified-intelligence-dash': { title: 'Unified Intelligence Dashboard', desc: 'Centralized executive overview of predicted revenue, agent status, and active opportunities.' },
+    'growth-command-center': { title: 'Growth Command Center', desc: 'Conversational interface to set goals and let the AI Strategy Planner handle execution.' },
+    'growth-memory': { title: 'Growth Memory Engine', desc: 'Permanent business memory tracking success patterns, failure patterns, and competitor events.' },
+    'competitor-intelligence': { title: 'Competitor Intelligence Center', desc: 'Continuous monitoring of competitor websites, features, pricing, and ads.' },
     'founder-dash': { title: 'Founder Dashboard', desc: 'Monitor startup metrics and cross-app growth performance.' },
     'war-room': { title: 'Executive War Room', desc: 'Centralized command center aggregate metrics and active loops.' },
     'insights': { title: 'Executive Insights', desc: 'Downloadable strategy updates and portfolio financial analytics.' },

@@ -3,7 +3,7 @@
 export const state = {
   currentActiveApp: null,
   language: 'en',
-  currentActiveView: 'founder-dash',
+  currentActiveView: 'unified-intelligence-dash',
   activeMockupTheme: 'indigo',
   reviewFilterSentiment: 'all',
   roadmapVisibility: 'public',
