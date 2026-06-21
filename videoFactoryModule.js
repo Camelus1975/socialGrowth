@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { requestApi, showToast, createSafeElement } from './common.js';
+import { getSupabaseClient } from './auth.js';
 
 export function initVideoFactory() {
   state.on('appChanged', () => {
@@ -22,6 +23,120 @@ function refreshVideoFactoryView() {
 
   const titleEl = document.getElementById('video-factory-app-title');
   if (titleEl) titleEl.textContent = `Video Assembly Line: ${app.name}`;
+  
+  loadHistoricalVideos(state.currentActiveApp);
+}
+
+async function loadHistoricalVideos(appId) {
+  const block = document.getElementById('video-factory-outputs-block');
+  if (!block) return;
+  
+  block.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-sub);">Loading assets...</div>';
+
+  const supabase = getSupabaseClient();
+  if (!supabase) return;
+
+  try {
+    const { data, error } = await supabase
+      .from('video_factory_assets')
+      .select('*')
+      .eq('app_id', appId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    
+    block.innerHTML = '';
+    
+    if (!data || data.length === 0) {
+      block.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-sub);">No generated videos yet.</div>';
+      return;
+    }
+
+    data.forEach(video => {
+      renderVideoCard(video, block);
+    });
+  } catch (err) {
+    console.error("Failed to load historical videos", err);
+    block.innerHTML = '<div style="text-align:center; padding: 20px; color: #f87171;">Failed to load assets.</div>';
+  }
+}
+
+function renderVideoCard(video, container, prepend = false) {
+  const card = createSafeElement('div');
+  card.style.background = 'rgba(255,255,255,0.02)';
+  card.style.border = '1px solid var(--border-glass)';
+  card.style.padding = '14px';
+  card.style.borderRadius = '6px';
+  card.style.marginBottom = '12px';
+
+  const head = createSafeElement('h5', [], video.title || `Generated Video Asset`);
+  head.style.color = 'white';
+  head.style.fontSize = '0.8rem';
+  head.style.marginBottom = '10px';
+  head.style.display = 'flex';
+  head.style.justifyContent = 'space-between';
+
+  const platformBadge = createSafeElement('span', [], video.platform || 'Unknown');
+  platformBadge.style.background = 'rgba(99, 102, 241, 0.2)';
+  platformBadge.style.color = '#c7d2fe';
+  platformBadge.style.padding = '2px 6px';
+  platformBadge.style.borderRadius = '4px';
+  platformBadge.style.fontSize = '0.7rem';
+  head.appendChild(platformBadge);
+
+  let contentArea;
+  
+  if (video.video_url === 'template_mode' || video.video_url === 'assembly_mode') {
+    // Mode 1/2/3 Placeholder Render
+    contentArea = createSafeElement('div');
+    contentArea.style.position = 'relative';
+    contentArea.style.width = '100%';
+    contentArea.style.aspectRatio = '16/9';
+    contentArea.style.background = `linear-gradient(135deg, var(--bg-card), #0f172a)`;
+    contentArea.style.borderRadius = '8px';
+    contentArea.style.overflow = 'hidden';
+    contentArea.style.display = 'flex';
+    contentArea.style.alignItems = 'center';
+    contentArea.style.justifyContent = 'center';
+    contentArea.style.boxShadow = 'inset 0 0 40px rgba(0,0,0,0.5)';
+    
+    const animContainer = createSafeElement('div');
+    animContainer.style.background = 'radial-gradient(circle at center, rgba(99, 102, 241, 0.2) 0%, transparent 70%)';
+    animContainer.style.width = '100%'; 
+    animContainer.style.height = '100%'; 
+    animContainer.style.display = 'flex'; 
+    animContainer.style.flexDirection = 'column'; 
+    animContainer.style.alignItems = 'center'; 
+    animContainer.style.justifyContent = 'center';
+    
+    const tmplText = createSafeElement('div', [], video.title?.substring(0, 60));
+    tmplText.style.color = 'white'; 
+    tmplText.style.fontSize = '1.5rem'; 
+    tmplText.style.fontWeight = '800'; 
+    tmplText.style.textAlign = 'center';
+    
+    animContainer.appendChild(tmplText);
+    contentArea.appendChild(animContainer);
+  } else {
+    // Real Video Render
+    contentArea = createSafeElement('video');
+    contentArea.src = video.video_url;
+    contentArea.style.width = '100%';
+    contentArea.style.borderRadius = '8px';
+    contentArea.autoplay = true;
+    contentArea.loop = true;
+    contentArea.muted = true;
+    contentArea.controls = true;
+  }
+
+  card.appendChild(head);
+  card.appendChild(contentArea);
+  
+  if (prepend && container.firstChild) {
+    container.insertBefore(card, container.firstChild);
+  } else {
+    container.appendChild(card);
+  }
 }
 
 export async function generateStudioVideo() {
@@ -48,109 +163,20 @@ export async function generateStudioVideo() {
 
     loadingDiv.remove();
 
-    const card = createSafeElement('div');
-    card.style.background = 'rgba(255,255,255,0.02)';
-    card.style.border = '1px solid var(--border-glass)';
-    card.style.padding = '14px';
-    card.style.borderRadius = '6px';
-    card.style.marginBottom = '12px';
-
-    const head = createSafeElement('h5', [], `Generated Video Asset (Mode: ${data.mode})`);
-    head.style.color = 'white';
-    head.style.fontSize = '0.8rem';
-    head.style.marginBottom = '10px';
-
-    let contentArea;
-
-    if (data.mode === 'template' || data.mode === 'motion_graphics' || data.mode === 'assembly_mode') {
-      // Modes 1, 2, 3: Template Rendering or HTML/CSS Assembly
-      contentArea = createSafeElement('div');
-      contentArea.style.position = 'relative';
-      contentArea.style.width = '100%';
-      contentArea.style.aspectRatio = '16/9';
-      contentArea.style.background = `linear-gradient(135deg, var(--bg-card), #0f172a)`;
-      contentArea.style.borderRadius = '8px';
-      contentArea.style.overflow = 'hidden';
-      contentArea.style.display = 'flex';
-      contentArea.style.alignItems = 'center';
-      contentArea.style.justifyContent = 'center';
-      contentArea.style.boxShadow = 'inset 0 0 40px rgba(0,0,0,0.5)';
-      
-      // We inject CSS keyframes dynamically for this specific video
-      const styleId = 'video-anim-style-' + Date.now();
-      const styleEl = document.createElement('style');
-      styleEl.id = styleId;
-      styleEl.textContent = `
-        @keyframes slideUpFade {
-          0% { transform: translateY(30px); opacity: 0; }
-          15% { transform: translateY(0); opacity: 1; }
-          85% { transform: translateY(0); opacity: 1; }
-          100% { transform: translateY(-30px); opacity: 0; }
-        }
-        @keyframes zoomBg {
-          0% { background-size: 100% 100%; }
-          50% { background-size: 120% 120%; }
-          100% { background-size: 100% 100%; }
-        }
-        .anim-container {
-          animation: zoomBg 10s infinite alternate ease-in-out;
-          background: radial-gradient(circle at center, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
-          width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .anim-text {
-          animation: slideUpFade 4s infinite linear;
-          color: white; font-family: 'Inter', sans-serif; font-size: 1.5rem; font-weight: 800; text-align: center;
-          padding: 0 40px; text-shadow: 0 4px 10px rgba(0,0,0,0.8);
-        }
-        .anim-logo {
-          animation: slideUpFade 4s infinite linear; animation-delay: 2s;
-          color: var(--primary); font-size: 1rem; margin-top: 20px; font-weight: bold; letter-spacing: 2px;
-        }
-      `;
-      document.head.appendChild(styleEl);
-
-      const animContainer = createSafeElement('div');
-      animContainer.className = 'anim-container';
-      
-      const tmplText = createSafeElement('div', [], promptText.substring(0, 60) + (promptText.length > 60 ? "..." : ""));
-      tmplText.className = 'anim-text';
-      
-      const appName = state.appsData[state.currentActiveApp]?.name || "Brand";
-      const tmplLogo = createSafeElement('div', [], appName.toUpperCase());
-      tmplLogo.className = 'anim-logo';
-      
-      animContainer.appendChild(tmplText);
-      animContainer.appendChild(tmplLogo);
-      contentArea.appendChild(animContainer);
-      
-      // Clean up styles when removed
-      const observer = new MutationObserver((mutations) => {
-        if (!document.body.contains(contentArea)) {
-          styleEl.remove();
-          observer.disconnect();
-        }
-      });
-      observer.observe(document.body, { childList: true, subtree: true });
-
-      showToast(`${data.mode} motion graphics rendering initialized ($${data.cost} cost).`, "success");
-
-    } else {
-      // Mode 4: Premium AI Video (e.g. Minimax / Luma)
-      contentArea = createSafeElement('video');
-      contentArea.src = data.url;
-      contentArea.style.width = '100%';
-      contentArea.style.borderRadius = '8px';
-      contentArea.autoplay = true;
-      contentArea.loop = true;
-      contentArea.muted = true;
-      contentArea.controls = true;
-      
-      showToast(`Premium AI Video created! Cost: $${data.cost}`, "success");
+    // Instead of rendering manually in this function, we'll re-fetch or construct the object
+    const newVideo = {
+      title: promptText,
+      platform: 'shorts',
+      video_url: data.url,
+      mode: data.mode
+    };
+    
+    // Clear "No generated videos yet" if it exists
+    if (block.innerHTML.includes("No generated videos")) {
+      block.innerHTML = '';
     }
 
-    card.appendChild(head);
-    card.appendChild(contentArea);
-    block.insertBefore(card, block.firstChild);
+    renderVideoCard(newVideo, block, true);
 
   } catch (err) {
     loadingDiv.remove();

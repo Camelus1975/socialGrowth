@@ -14,6 +14,8 @@ const replicate = new Replicate({
   auth: config.REPLICATE_API_TOKEN,
 });
 
+const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_KEY || config.SUPABASE_ANON_KEY);
+
 /**
  * AI Gateway Router
  * This router intercepts all AI requests from the frontend, classifies the task,
@@ -273,11 +275,24 @@ router.post('/generate-video', async (req, res) => {
       videoUrl = 'assembly_mode';
       costEstimated = 0.005;
     } else {
-      console.log(`[Video Router] Routed to Mode 4 (Premium AI - Minimax)`);
-      // Simulate API call to Minimax via Replicate
-      // In production: await replicate.run("minimax/video-01", { input: { prompt: prompt } })
-      videoUrl = 'https://example.com/premium-ai-video-output.mp4';
+      console.log(`[Video Router] Routed to Mode 4 (Premium AI - Hotshot-XL via Replicate)`);
+      // Use Hotshot-XL for fast GIF/Video generation (under 10s)
+      const output = await replicate.run("lucataco/hotshot-xl:78b3a6257e16e4b241245d65c8b2b80ea2fac59353d5167683935de984e7ec9e", { 
+        input: { prompt: prompt, mp4: true, steps: 30 } 
+      });
+      videoUrl = output;
       costEstimated = 0.080;
+    }
+    
+    // Save to video_factory_assets
+    if (appId) {
+      await supabase.from('video_factory_assets').insert({
+        app_id: appId,
+        title: prompt.substring(0, 50),
+        platform: 'shorts',
+        video_url: videoUrl,
+        status: 'published'
+      });
     }
 
     res.json({
