@@ -103,7 +103,7 @@ import {
   downloadWeeklyReport
 } from './contentIntelligenceModule.js';
 
-import { searchGrowthMemoryUI } from './memoryModule.js';
+import { initMemoryEngine, searchGrowthMemoryUI } from './memoryModule.js';
 
 import {
   initAuth,
@@ -182,6 +182,7 @@ export async function bootApp() {
   initInbox();
   initMedia();
   initDatabaseConsole();
+  initMemoryEngine();
   initStudio();
   initVideoFactory();
   initDistributionEngine();

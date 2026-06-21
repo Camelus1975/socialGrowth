@@ -1,3 +1,84 @@
+import { getSupabaseClient } from './auth.js';
+import { state } from './state.js';
+
+export async function initMemoryEngine() {
+  const timelineEl = document.getElementById('memory-timeline-feed');
+  if (!timelineEl) return;
+  
+  const supabase = getSupabaseClient();
+  if (!supabase) return;
+  
+  const appId = state.currentActiveApp || 'default';
+  
+  try {
+    const { data, error } = await supabase
+      .from('growth_memory_events')
+      .select('*')
+      .eq('app_id', appId)
+      .order('created_at', { ascending: false })
+      .limit(20);
+      
+    if (error) throw error;
+    
+    if (!data || data.length === 0) {
+      timelineEl.innerHTML = `
+        <div style="color:var(--text-muted); text-align:center; padding: 20px;">
+          No growth memories found for this business yet.
+        </div>
+      `;
+      return;
+    }
+    
+    let html = '';
+    
+    data.forEach(event => {
+      // Determine styles based on event_type
+      let color = 'var(--primary)'; // Default blue
+      let typeLabel = 'EVENT';
+      
+      if (event.event_type === 'success' || event.event_type === 'revenue') {
+        color = 'var(--accent-green)';
+        typeLabel = event.event_type === 'success' ? 'SUCCESS PATTERN' : 'REVENUE EVENT';
+      } else if (event.event_type === 'failure') {
+        color = '#f87171'; // red
+        typeLabel = 'FAILURE PATTERN';
+      } else if (event.event_type === 'competitor') {
+        color = 'var(--primary)';
+        typeLabel = 'COMPETITOR EVENT';
+      }
+      
+      const dateStr = new Date(event.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      
+      let tagsHtml = '';
+      if (event.tags && Array.isArray(event.tags)) {
+        tagsHtml = event.tags.map(tag => `<span class="alert-tag" style="background:rgba(255,255,255,0.05); color:var(--text-sub);">${tag}</span>`).join('');
+      }
+
+      html += `
+        <div style="position:relative;">
+          <div style="position:absolute; left:-39px; top:0; width:16px; height:16px; border-radius:50%; background:${color}; border:4px solid var(--bg-card);"></div>
+          <div style="font-size:0.8rem; color:${color}; font-weight:600; margin-bottom:4px;">${typeLabel} • ${dateStr}</div>
+          <h4 style="color:white; font-size:1.1rem; margin-bottom:8px;">${event.title || 'Untitled Memory'}</h4>
+          <p style="color:var(--text-sub); font-size:0.9rem; margin-bottom:12px;">${event.content_text || ''}</p>
+          <div style="display:flex; gap:8px;">
+            ${tagsHtml}
+          </div>
+        </div>
+      `;
+    });
+    
+    timelineEl.innerHTML = html;
+    
+  } catch (err) {
+    console.error('[Memory Engine] Failed to fetch timeline:', err);
+    timelineEl.innerHTML = `
+      <div style="color:#f87171; text-align:center; padding: 20px;">
+        Error loading timeline events.
+      </div>
+    `;
+  }
+}
+
 export async function searchGrowthMemoryUI() {
   const input = document.getElementById('memory-search-input');
   const resultsContainer = document.getElementById('memory-search-results');
