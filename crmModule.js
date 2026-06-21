@@ -2,28 +2,79 @@
 import { state } from './state.js';
 import { createSafeElement, showToast } from './common.js';
 import { getTemplateForBusiness } from './industryTemplates.js';
+import { getSupabaseClient } from './auth.js';
 
 let currentMockLeads = [];
 
 export function initUniversalCRM() {
   state.on('viewChanged', (viewId) => {
     if (viewId === 'universal-crm') {
-      renderCRMView();
+      loadLeadsFromSupabase(state.currentActiveApp);
     }
   });
 
   state.on('appChanged', () => {
     if (state.currentActiveView === 'universal-crm') {
-      // Re-seed mock leads when app changes to prevent persisting across different apps
-      currentMockLeads = getMockLeads(state.appsData[state.currentActiveApp]?.businessType);
-      renderCRMView();
+      loadLeadsFromSupabase(state.currentActiveApp);
     }
   });
   
-  // Initial seed
-  const app = state.appsData[state.currentActiveApp];
-  if (app) {
-    currentMockLeads = getMockLeads(app.businessType);
+  // Initial load if already on the tab
+  if (state.currentActiveView === 'universal-crm') {
+    loadLeadsFromSupabase(state.currentActiveApp);
+  }
+}
+
+async function loadLeadsFromSupabase(appId) {
+  if (!appId) return;
+  const supabase = getSupabaseClient();
+  if (!supabase) return;
+
+  try {
+    const { data, error } = await supabase
+      .from('customers')
+      .select('*')
+      .eq('app_id', appId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      // Auto-seed mock leads for a better UX when it's empty
+      const app = state.appsData[appId];
+      if (app) {
+        const mockData = getMockLeads(app.businessType).map(m => ({
+          app_id: appId,
+          name: m.name,
+          detail: m.detail,
+          stage: m.stage,
+          value: m.value
+        }));
+        
+        const { data: inserted, error: insertError } = await supabase
+          .from('customers')
+          .insert(mockData)
+          .select();
+          
+        if (!insertError && inserted) {
+          currentMockLeads = inserted;
+        } else {
+           currentMockLeads = [];
+        }
+      }
+    } else {
+      currentMockLeads = data;
+    }
+    
+    renderCRMView();
+  } catch (err) {
+    console.error('Failed to load leads from Supabase, falling back to local mocks', err);
+    // Graceful fallback for the prototype if the SQL migration hasn't been run
+    const app = state.appsData[appId];
+    if (app) {
+      currentMockLeads = getMockLeads(app.businessType);
+    }
+    renderCRMView();
   }
 }
 
@@ -86,7 +137,7 @@ function handleDragLeave(e) {
   }
 }
 
-function handleDrop(e, targetStage) {
+async function handleDrop(e, targetStage) {
   e.preventDefault();
   const col = e.target.closest('.crm-stage-col');
   if (col) {
@@ -94,12 +145,18 @@ function handleDrop(e, targetStage) {
   }
   
   const leadId = e.dataTransfer.getData('text/plain');
-  const leadIndex = currentMockLeads.findIndex(l => l.id === leadId);
+  const leadIndex = currentMockLeads.findIndex(l => String(l.id) === String(leadId));
   
   if (leadIndex > -1 && currentMockLeads[leadIndex].stage !== targetStage) {
     currentMockLeads[leadIndex].stage = targetStage;
     showToast(`Moved ${currentMockLeads[leadIndex].name} to ${targetStage}`, "success");
-    renderCRMView(); // Re-render to reflect new state
+    renderCRMView(); // Optimistic UI update
+    
+    // Save to DB
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      await supabase.from('customers').update({ stage: targetStage }).eq('id', leadId);
+    }
   }
 }
 
@@ -129,7 +186,33 @@ export function renderCRMView() {
   title.style.color = 'white';
   
   const addBtn = createSafeElement('button', ['btn', 'btn-primary'], '+ Add Contact');
-  addBtn.onclick = () => showToast("Add contact modal simulated.", "info");
+  addBtn.onclick = async () => {
+    const name = prompt("Enter customer name:");
+    if (!name) return;
+    const detail = prompt("Enter customer details (optional):") || "";
+    
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    
+    const newLead = {
+      app_id: app.business_id,
+      name,
+      detail,
+      stage: stages[0],
+      value: 0
+    };
+    
+    showToast("Adding contact...", "info");
+    
+    const { data, error } = await supabase.from('customers').insert([newLead]).select();
+    if (!error && data) {
+      currentMockLeads.push(data[0]);
+      renderCRMView();
+      showToast("Contact added successfully!", "success");
+    } else {
+      showToast("Failed to add contact", "error");
+    }
+  };
   
   header.appendChild(title);
   header.appendChild(addBtn);

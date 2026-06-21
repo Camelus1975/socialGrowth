@@ -436,3 +436,23 @@ CREATE INDEX IF NOT EXISTS idx_audit_logs_app_id ON public.audit_logs(app_id);
 -- ==========================================
 -- DONE! Your production database is ready.
 -- ==========================================
+
+-- ==========================================
+-- 13. CUSTOMERS (CRM Module)
+-- Used for storing leads, customers, and pipeline stages.
+-- ==========================================
+CREATE TABLE IF NOT EXISTS public.customers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    app_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    detail TEXT,
+    stage TEXT NOT NULL DEFAULT 'Lead',
+    value NUMERIC DEFAULT 0,
+    email TEXT,
+    phone TEXT,
+    last_contact TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    FOREIGN KEY (app_id) REFERENCES public.businesses(business_id) ON DELETE CASCADE
+);
+
