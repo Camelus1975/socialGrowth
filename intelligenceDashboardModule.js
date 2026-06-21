@@ -2,7 +2,7 @@ import { getSupabaseClient } from './auth.js';
 import { state } from './state.js';
 import { requestApi } from './common.js';
 
-let updateInterval = null;
+let realtimeChannel = null;
 
 export async function initIntelligenceDashboard() {
     console.log('[Intelligence Dash] Initializing unified dashboard...');
@@ -18,15 +18,38 @@ export async function initIntelligenceDashboard() {
     await refreshDashboardMetrics(supabase);
     await refreshPriorityActions(supabase);
 
-    // Setup polling for live updates (every 30 seconds)
-    if (updateInterval) clearInterval(updateInterval);
-    updateInterval = setInterval(async () => {
-        // Only refresh if we are currently looking at the dash
-        if (state.currentActiveView === 'unified-intelligence-dash') {
-            await refreshDashboardMetrics(supabase);
-            await refreshPriorityActions(supabase);
-        }
-    }, 30000);
+    // Setup Real-Time Subscriptions
+    if (realtimeChannel) supabase.removeChannel(realtimeChannel);
+    
+    realtimeChannel = supabase
+        .channel('dashboard-updates')
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'agent_operations' },
+            (payload) => {
+                console.log('[Intelligence Dash] Realtime agent_operations update:', payload);
+                if (state.currentActiveView === 'unified-intelligence-dash') {
+                    refreshDashboardMetrics(supabase);
+                    refreshPriorityActions(supabase);
+                    
+                    // Instant Visual Flashing Effect
+                    const dashHeader = document.querySelector('#view-unified-intelligence-dash h2');
+                    if (dashHeader) {
+                        const origColor = dashHeader.style.color;
+                        dashHeader.style.transition = 'color 0.3s ease';
+                        dashHeader.style.color = '#818cf8';
+                        dashHeader.style.textShadow = '0 0 10px rgba(129, 140, 248, 0.8)';
+                        setTimeout(() => {
+                            dashHeader.style.color = origColor;
+                            dashHeader.style.textShadow = 'none';
+                        }, 800);
+                    }
+                }
+            }
+        )
+        .subscribe((status) => {
+            console.log('[Intelligence Dash] Realtime subscription status:', status);
+        });
 }
 
 async function refreshDashboardMetrics(supabase) {

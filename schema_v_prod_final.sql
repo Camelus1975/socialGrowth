@@ -456,3 +456,10 @@ CREATE TABLE IF NOT EXISTS public.customers (
     FOREIGN KEY (app_id) REFERENCES public.businesses(business_id) ON DELETE CASCADE
 );
 
+
+-- ==========================================
+-- 14. REALTIME CONFIGURATION
+-- Enable Realtime for the unified dashboard to instantly flash.
+-- ==========================================
+ALTER PUBLICATION supabase_realtime ADD TABLE agent_operations;
+
