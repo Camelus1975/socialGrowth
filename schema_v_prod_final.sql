@@ -302,6 +302,7 @@ ALTER TABLE public.audit_logs          ENABLE ROW LEVEL SECURITY;
 -- ==============================
 -- Businesses: Users can only see/modify their own businesses
 -- ==============================
+DROP POLICY IF EXISTS "Users can manage their own businesses" ON public.businesses;
 CREATE POLICY "Users can manage their own businesses" ON public.businesses
     FOR ALL TO authenticated
     USING (user_id = auth.uid())
@@ -310,6 +311,7 @@ CREATE POLICY "Users can manage their own businesses" ON public.businesses
 -- ==============================
 -- Scheduled Posts: Users can manage posts for their businesses
 -- ==============================
+DROP POLICY IF EXISTS "Users can manage their scheduled posts" ON public.scheduled_posts;
 CREATE POLICY "Users can manage their scheduled posts" ON public.scheduled_posts
     FOR ALL TO authenticated
     USING (
@@ -322,6 +324,7 @@ CREATE POLICY "Users can manage their scheduled posts" ON public.scheduled_posts
 -- ==============================
 -- Media: Users can manage media for their businesses
 -- ==============================
+DROP POLICY IF EXISTS "Users can manage their media" ON public.media;
 CREATE POLICY "Users can manage their media" ON public.media
     FOR ALL TO authenticated
     USING (
@@ -334,6 +337,7 @@ CREATE POLICY "Users can manage their media" ON public.media
 -- ==============================
 -- Discovery Jobs: Users can manage discovery jobs for their businesses
 -- ==============================
+DROP POLICY IF EXISTS "Users can manage their discovery jobs" ON public.discovery_jobs;
 CREATE POLICY "Users can manage their discovery jobs" ON public.discovery_jobs
     FOR ALL TO authenticated
     USING (
@@ -346,6 +350,7 @@ CREATE POLICY "Users can manage their discovery jobs" ON public.discovery_jobs
 -- ==============================
 -- Social Accounts: Users can manage social accounts for their businesses
 -- ==============================
+DROP POLICY IF EXISTS "Users can manage their social accounts" ON public.social_accounts;
 CREATE POLICY "Users can manage their social accounts" ON public.social_accounts
     FOR ALL TO authenticated
     USING (
@@ -358,11 +363,13 @@ CREATE POLICY "Users can manage their social accounts" ON public.social_accounts
 -- ==============================
 -- Inbox: Users can manage inbox for their businesses
 -- ==============================
+DROP POLICY IF EXISTS "Users can manage their inbox threads" ON public.inbox_threads;
 CREATE POLICY "Users can manage their inbox threads" ON public.inbox_threads
     FOR ALL TO authenticated
     USING (true)
     WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Users can manage their inbox messages" ON public.inbox_messages;
 CREATE POLICY "Users can manage their inbox messages" ON public.inbox_messages
     FOR ALL TO authenticated
     USING (true)
@@ -371,6 +378,7 @@ CREATE POLICY "Users can manage their inbox messages" ON public.inbox_messages
 -- ==============================
 -- Ad Campaigns: Users can manage ads for their businesses
 -- ==============================
+DROP POLICY IF EXISTS "Users can manage their ad campaigns" ON public.ad_campaigns;
 CREATE POLICY "Users can manage their ad campaigns" ON public.ad_campaigns
     FOR ALL TO authenticated
     USING (
@@ -380,6 +388,7 @@ CREATE POLICY "Users can manage their ad campaigns" ON public.ad_campaigns
         app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
     );
 
+DROP POLICY IF EXISTS "Users can read their ad performance" ON public.ad_performance_daily;
 CREATE POLICY "Users can read their ad performance" ON public.ad_performance_daily
     FOR ALL TO authenticated
     USING (
@@ -392,6 +401,7 @@ CREATE POLICY "Users can read their ad performance" ON public.ad_performance_dai
 -- ==============================
 -- AI Embeddings: Users can manage their own embeddings
 -- ==============================
+DROP POLICY IF EXISTS "Users can manage their embeddings" ON public.ai_content_embeddings;
 CREATE POLICY "Users can manage their embeddings" ON public.ai_content_embeddings
     FOR ALL TO authenticated
     USING (user_id = auth.uid() OR user_id IS NULL)
@@ -400,12 +410,14 @@ CREATE POLICY "Users can manage their embeddings" ON public.ai_content_embedding
 -- ==============================
 -- Business Posts & Audit Logs: Read access for business owners
 -- ==============================
+DROP POLICY IF EXISTS "Users can read their business posts" ON public.businesses_posts;
 CREATE POLICY "Users can read their business posts" ON public.businesses_posts
     FOR ALL TO authenticated
     USING (
         business_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
     );
 
+DROP POLICY IF EXISTS "Users can manage audit logs" ON public.audit_logs;
 CREATE POLICY "Users can manage audit logs" ON public.audit_logs
     FOR ALL TO authenticated
     USING (
@@ -458,6 +470,7 @@ CREATE TABLE IF NOT EXISTS public.customers (
 
 -- RLS for CUSTOMERS
 ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can manage their customers" ON public.customers;
 CREATE POLICY "Users can manage their customers" ON public.customers
     FOR ALL TO authenticated
     USING (
