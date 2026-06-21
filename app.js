@@ -679,7 +679,10 @@ export function openProfileModal() {
   // Store the file reference
   window.selectedAvatarFile = null;
   
-  document.getElementById('user-profile-modal').style.display = 'flex';
+  const modal = document.getElementById('user-profile-modal');
+  if (modal) {
+    modal.classList.add('active');
+  }
 }
 
 window.previewAvatarUpload = function(event) {
