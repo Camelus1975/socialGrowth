@@ -513,7 +513,13 @@ CREATE INDEX IF NOT EXISTS idx_customers_app_id ON public.customers(app_id);
 -- 14. GROWTH INTELLIGENCE EXPANSION (Phase 5 Tables)
 -- ==========================================
 
-CREATE TYPE public.memory_category AS ENUM ('success_pattern', 'failure_pattern', 'experiment', 'revenue_event', 'churn_event');
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'memory_category') THEN
+        CREATE TYPE public.memory_category AS ENUM ('success_pattern', 'failure_pattern', 'experiment', 'revenue_event', 'churn_event');
+    END IF;
+END$$;
+
 CREATE TABLE IF NOT EXISTS public.growth_memory_events (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     app_id TEXT NOT NULL,
@@ -541,8 +547,16 @@ CREATE TABLE IF NOT EXISTS public.competitors (
     FOREIGN KEY (app_id) REFERENCES public.businesses(business_id) ON DELETE CASCADE
 );
 
-CREATE TYPE public.competitor_event_type AS ENUM ('feature_launch', 'pricing_change', 'ad_strategy', 'content_strategy', 'general_news');
-CREATE TYPE public.threat_level AS ENUM ('low', 'medium', 'high', 'opportunity');
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'competitor_event_type') THEN
+        CREATE TYPE public.competitor_event_type AS ENUM ('feature_launch', 'pricing_change', 'ad_strategy', 'content_strategy', 'general_news');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'threat_level') THEN
+        CREATE TYPE public.threat_level AS ENUM ('low', 'medium', 'high', 'opportunity');
+    END IF;
+END$$;
+
 CREATE TABLE IF NOT EXISTS public.competitor_events (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     competitor_id UUID NOT NULL,
