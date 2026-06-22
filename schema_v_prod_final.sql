@@ -513,4 +513,14 @@ CREATE INDEX IF NOT EXISTS idx_customers_app_id ON public.customers(app_id);
 -- 14. REALTIME CONFIGURATION
 -- Enable Realtime for the unified dashboard to instantly flash.
 -- ==========================================
-ALTER PUBLICATION supabase_realtime ADD TABLE agent_operations;
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_publication_tables
+        WHERE pubname = 'supabase_realtime'
+        AND tablename = 'agent_operations'
+    ) THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE agent_operations;
+    END IF;
+END $$;
