@@ -510,7 +510,113 @@ CREATE POLICY "Users can manage their customers" ON public.customers
 CREATE INDEX IF NOT EXISTS idx_customers_app_id ON public.customers(app_id);
 
 -- ==========================================
--- 14. REALTIME CONFIGURATION
+-- 14. GROWTH INTELLIGENCE EXPANSION (Phase 5 Tables)
+-- ==========================================
+
+CREATE TYPE public.memory_category AS ENUM ('success_pattern', 'failure_pattern', 'experiment', 'revenue_event', 'churn_event');
+CREATE TABLE IF NOT EXISTS public.growth_memory_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    app_id TEXT NOT NULL,
+    category public.memory_category NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    revenue_impact DECIMAL(12,2) DEFAULT 0.00,
+    metrics JSONB DEFAULT '{}'::jsonb,
+    tags TEXT[] DEFAULT '{}',
+    detected_by_agent TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (app_id) REFERENCES public.businesses(business_id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_growth_memory_app ON public.growth_memory_events(app_id);
+
+CREATE TABLE IF NOT EXISTS public.competitors (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    app_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    website_url TEXT,
+    current_pricing JSONB DEFAULT '{}'::jsonb,
+    market_position TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    last_scanned_at TIMESTAMPTZ,
+    FOREIGN KEY (app_id) REFERENCES public.businesses(business_id) ON DELETE CASCADE
+);
+
+CREATE TYPE public.competitor_event_type AS ENUM ('feature_launch', 'pricing_change', 'ad_strategy', 'content_strategy', 'general_news');
+CREATE TYPE public.threat_level AS ENUM ('low', 'medium', 'high', 'opportunity');
+CREATE TABLE IF NOT EXISTS public.competitor_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    competitor_id UUID NOT NULL,
+    event_type public.competitor_event_type NOT NULL,
+    details TEXT NOT NULL,
+    threat public.threat_level DEFAULT 'low',
+    detected_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (competitor_id) REFERENCES public.competitors(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS public.agent_operations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    app_id TEXT NOT NULL,
+    agent_name TEXT NOT NULL,
+    task_goal TEXT NOT NULL,
+    status TEXT DEFAULT 'pending',
+    recommendation TEXT,
+    predicted_outcome JSONB DEFAULT '{}'::jsonb,
+    actual_outcome JSONB DEFAULT '{}'::jsonb,
+    accuracy_score INTEGER,
+    requires_approval BOOLEAN DEFAULT false,
+    approved BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    completed_at TIMESTAMPTZ,
+    FOREIGN KEY (app_id) REFERENCES public.businesses(business_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS public.video_factory_assets (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    app_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    platform TEXT NOT NULL,
+    hook_type TEXT,
+    video_url TEXT NOT NULL,
+    status TEXT DEFAULT 'draft',
+    views INTEGER DEFAULT 0,
+    watch_time_seconds INTEGER DEFAULT 0,
+    engagement_rate DECIMAL(5,2) DEFAULT 0.00,
+    conversions INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (app_id) REFERENCES public.businesses(business_id) ON DELETE CASCADE
+);
+
+-- RLS FOR PHASE 5 TABLES
+ALTER TABLE public.growth_memory_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.competitors ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.competitor_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.agent_operations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.video_factory_assets ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can manage growth_memory_events" ON public.growth_memory_events;
+CREATE POLICY "Users can manage growth_memory_events" ON public.growth_memory_events
+    FOR ALL TO authenticated USING (app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid()));
+
+DROP POLICY IF EXISTS "Users can manage competitors" ON public.competitors;
+CREATE POLICY "Users can manage competitors" ON public.competitors
+    FOR ALL TO authenticated USING (app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid()));
+
+DROP POLICY IF EXISTS "Users can manage competitor_events" ON public.competitor_events;
+CREATE POLICY "Users can manage competitor_events" ON public.competitor_events
+    FOR ALL TO authenticated USING (
+        competitor_id IN (SELECT id FROM public.competitors WHERE app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid()))
+    );
+
+DROP POLICY IF EXISTS "Users can manage agent_operations" ON public.agent_operations;
+CREATE POLICY "Users can manage agent_operations" ON public.agent_operations
+    FOR ALL TO authenticated USING (app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid()));
+
+DROP POLICY IF EXISTS "Users can manage video_factory_assets" ON public.video_factory_assets;
+CREATE POLICY "Users can manage video_factory_assets" ON public.video_factory_assets
+    FOR ALL TO authenticated USING (app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid()));
+
+-- ==========================================
+-- 15. REALTIME CONFIGURATION
 -- Enable Realtime for the unified dashboard to instantly flash.
 -- ==========================================
 DO $$
