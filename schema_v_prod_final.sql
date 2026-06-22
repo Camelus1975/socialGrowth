@@ -110,9 +110,22 @@ CREATE OR REPLACE FUNCTION public.insert_social_account(
     p_platform TEXT,
     p_account_name TEXT,
     p_handle TEXT,
-    p_access_token_encrypted TEXT
+    p_access_token_encrypted TEXT,
+    p_user_id UUID DEFAULT NULL
 ) RETURNS void AS $$
 BEGIN
+    -- Verify the caller owns the business ID they are trying to attach an account to
+    IF p_user_id IS NOT NULL THEN
+        IF NOT EXISTS (SELECT 1 FROM public.businesses WHERE business_id = p_app_id AND user_id = p_user_id) THEN
+            RAISE EXCEPTION 'Unauthorized: You do not own this business app_id.';
+        END IF;
+    ELSE
+        -- Fallback to auth.uid() if no explicit user_id is provided
+        IF NOT EXISTS (SELECT 1 FROM public.businesses WHERE business_id = p_app_id AND user_id = auth.uid()) THEN
+            RAISE EXCEPTION 'Unauthorized: You do not own this business app_id.';
+        END IF;
+    END IF;
+
     INSERT INTO public.social_accounts (app_id, platform, account_name, handle, access_token_encrypted)
     VALUES (p_app_id, p_platform, p_account_name, p_handle, p_access_token_encrypted);
 END;
@@ -366,14 +379,28 @@ CREATE POLICY "Users can manage their social accounts" ON public.social_accounts
 DROP POLICY IF EXISTS "Users can manage their inbox threads" ON public.inbox_threads;
 CREATE POLICY "Users can manage their inbox threads" ON public.inbox_threads
     FOR ALL TO authenticated
-    USING (true)
-    WITH CHECK (true);
+    USING (
+        app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
+    )
+    WITH CHECK (
+        app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
+    );
 
 DROP POLICY IF EXISTS "Users can manage their inbox messages" ON public.inbox_messages;
 CREATE POLICY "Users can manage their inbox messages" ON public.inbox_messages
     FOR ALL TO authenticated
-    USING (true)
-    WITH CHECK (true);
+    USING (
+        thread_id IN (
+            SELECT id FROM public.inbox_threads 
+            WHERE app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
+        )
+    )
+    WITH CHECK (
+        thread_id IN (
+            SELECT id FROM public.inbox_threads 
+            WHERE app_id IN (SELECT business_id FROM public.businesses WHERE user_id = auth.uid())
+        )
+    );
 
 -- ==============================
 -- Ad Campaigns: Users can manage ads for their businesses
@@ -405,7 +432,7 @@ DROP POLICY IF EXISTS "Users can manage their embeddings" ON public.ai_content_e
 CREATE POLICY "Users can manage their embeddings" ON public.ai_content_embeddings
     FOR ALL TO authenticated
     USING (user_id = auth.uid() OR user_id IS NULL)
-    WITH CHECK (true);
+    WITH CHECK (user_id = auth.uid() OR user_id IS NULL);
 
 -- ==============================
 -- Business Posts & Audit Logs: Read access for business owners

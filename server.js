@@ -303,20 +303,42 @@ app.get('/api/discovery/status/:jobId', async (req, res) => {
 
 const META_REDIRECT_URI = process.env.META_REDIRECT_URI || 'https://socialgrowth-production.up.railway.app/api/auth/meta/callback';
 
-app.get('/api/auth/meta', (req, res) => {
-  const { projectId } = req.query;
+app.get('/api/auth/meta', async (req, res) => {
+  const { projectId, token } = req.query;
   if (!projectId) return res.status(400).send("Missing projectId");
+  if (!token) return res.status(401).send("Missing authentication token");
+
+  let userId;
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+    userId = decoded.id;
+  } catch (err) {
+    return res.status(401).send("Invalid token");
+  }
+
+  // Sign the state parameter securely to prevent hijacking
+  const statePayload = { projectId, userId };
+  const stateToken = jwt.sign(statePayload, process.env.JWT_SECRET || 'secret', { expiresIn: '10m' });
   
   // Scopes required for Facebook Pages and Instagram Professional
   const scopes = 'pages_show_list,pages_manage_posts,pages_read_engagement,instagram_basic,instagram_content_publish';
-  const url = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${process.env.FACEBOOK_CLIENT_ID || process.env.META_APP_ID}&redirect_uri=${encodeURIComponent(META_REDIRECT_URI)}&state=${projectId}&scope=${scopes}`;
+  const url = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${process.env.FACEBOOK_CLIENT_ID || process.env.META_APP_ID}&redirect_uri=${encodeURIComponent(META_REDIRECT_URI)}&state=${stateToken}&scope=${scopes}`;
   
   res.redirect(url);
 });
 
 app.get('/api/auth/meta/callback', async (req, res) => {
-  const { code, state: projectId } = req.query;
-  if (!code || !projectId) return res.redirect('/?error=oauth_failed');
+  const { code, state: stateToken } = req.query;
+  if (!code || !stateToken) return res.redirect('/?error=oauth_failed');
+
+  let projectId, userId;
+  try {
+    const decoded = jwt.verify(stateToken, process.env.JWT_SECRET || 'secret');
+    projectId = decoded.projectId;
+    userId = decoded.userId;
+  } catch (err) {
+    return res.redirect('/?error=invalid_state_token');
+  }
 
   try {
     // 1. Exchange code for short-lived access token
@@ -341,12 +363,15 @@ app.get('/api/auth/meta/callback', async (req, res) => {
         // Encrypt and store each page as a social connection using the RPC to bypass RLS
         for (const page of pagesData.data) {
           const encryptedToken = encryptToken(page.access_token);
+          // Use the global supabase client. The RPC is SECURITY DEFINER so it bypasses RLS,
+          // but we pass the secure decoded p_user_id to the RPC for ownership verification.
           await supabase.rpc('insert_social_account', {
             p_app_id: projectId,
             p_platform: 'facebook',
             p_account_name: page.name,
             p_handle: page.id,
-            p_access_token_encrypted: encryptedToken
+            p_access_token_encrypted: encryptedToken,
+            p_user_id: userId
           });
           
           // Optionally fetch Instagram accounts attached to the page if needed

@@ -934,8 +934,13 @@ export function connectOAuthPlatform(platform) {
     showToast("Please select or create an app first", "error");
     return;
   }
-  window.location.href = `/api/auth/${platform}?projectId=${appId}`;
+  window.authMeta(platform, appId);
 }
+
+window.authMeta = (platform, appId) => {
+  const token = localStorage.getItem('supabase.auth.token');
+  window.location.href = `/api/auth/${platform}?projectId=${appId}&token=${token}`;
+};
 
 // ------------------------------------------
 // GLOBAL EVENT DELEGATOR (for UI onclick handlers)
