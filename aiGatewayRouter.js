@@ -6,6 +6,7 @@ const { createClient } = require('@supabase/supabase-js');
 const config = require('./config');
 const { searchGrowthMemory } = require('./memoryEngine'); // Import new memory engine
 const { requireCredits } = require('./creditGate'); // Import Credit Gate
+const { activeQueues } = require('./workers'); // Import BullMQ queues
 
 const openai = new OpenAI({
   apiKey: config.OPENAI_API_KEY,
@@ -264,9 +265,15 @@ router.post('/generate-video', requireCredits(50), async (req, res) => {
   const { prompt, type, appId } = req.body;
   if (!prompt) return res.status(400).json({ error: 'Missing prompt' });
 
-  // Intelligent Routing Logic for Video Factory
+  const token = req.headers.authorization?.split(' ')[1];
+  let userSupabase = supabase;
+  if (token && token !== 'mock-supabase-jwt-token') {
+    userSupabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: `Bearer ${token}` } }
+    });
+  }
+
   let generationMode = 'template';
-  let videoUrl = '';
   let costEstimated = 0;
 
   try {
@@ -284,37 +291,57 @@ router.post('/generate-video', requireCredits(50), async (req, res) => {
 
     if (generationMode === 'template' || generationMode === 'motion_graphics') {
       console.log(`[Video Router] Routed to Mode 1/2 (${generationMode})`);
-      videoUrl = 'template_mode';
       costEstimated = 0;
     } else if (generationMode === 'assembly') {
       console.log(`[Video Router] Routed to Mode 3 (Assembly)`);
-      videoUrl = 'assembly_mode';
       costEstimated = 0.005;
     } else {
       console.log(`[Video Router] Routed to Mode 4 (Premium AI - Hotshot-XL via Replicate)`);
-      // Use Hotshot-XL for fast GIF/Video generation (under 10s)
-      const output = await replicate.run("lucataco/hotshot-xl:78b3a6257e16e4b241245d65c8b2b80ea2fac59353d5167683935de984e7ec9e", { 
-        input: { prompt: prompt, mp4: true, steps: 30 } 
-      });
-      videoUrl = output;
       costEstimated = 0.080;
     }
     
-    // Save to video_factory_assets
+    // Save to video_factory_assets as 'processing'
+    let assetId = null;
+    let fallbackUrl = (generationMode === 'template' || generationMode === 'motion_graphics') ? 'template_mode' : 'assembly_mode';
+    if (generationMode === 'premium_ai') fallbackUrl = ''; // It will be generated
+
     if (appId) {
-      await supabase.from('video_factory_assets').insert({
+      const { data, error } = await userSupabase.from('video_factory_assets').insert({
         app_id: appId,
         title: prompt.substring(0, 50),
         platform: 'shorts',
-        video_url: videoUrl,
-        status: 'published'
+        video_url: fallbackUrl,
+        status: generationMode === 'premium_ai' ? 'processing' : 'published'
+      }).select().single();
+
+      if (error) throw error;
+      assetId = data.id;
+    }
+
+    // If it's a real AI generation, queue it up in BullMQ
+    if (generationMode === 'premium_ai' && assetId) {
+      await activeQueues['video_rendering'].add('render_video', {
+        assetId,
+        prompt,
+        appId
+      });
+
+      return res.status(202).json({
+        id: assetId,
+        url: '', // Frontend should poll
+        mode: generationMode,
+        cost: costEstimated,
+        status: 'queued'
       });
     }
 
+    // For mock modes, return immediately
     res.json({
-      url: videoUrl,
+      id: assetId,
+      url: fallbackUrl,
       mode: generationMode,
-      cost: costEstimated
+      cost: costEstimated,
+      status: 'completed'
     });
 
   } catch (err) {

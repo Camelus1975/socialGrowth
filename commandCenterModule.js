@@ -1,31 +1,45 @@
 import { requestApi } from './common.js';
 import { state } from './state.js';
 
+let isInitialized = false;
+
 export function initCommandCenter() {
     console.log('[Command Center] Initializing...');
+    
+    if (!isInitialized) {
+        state.on('appChanged', () => {
+            const feedEl = document.getElementById('command-center-feed');
+            if (feedEl) feedEl.innerHTML = ''; // Clear feed when switching apps
+        });
+        isInitialized = true;
+    }
     
     const inputEl = document.getElementById('command-center-input');
     const submitBtn = document.getElementById('command-center-submit');
     
     if (!inputEl || !submitBtn) return;
     
-    submitBtn.addEventListener('click', () => submitGoal(inputEl.value));
-    inputEl.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            submitGoal(inputEl.value);
-        }
-    });
-
-    // Add click listeners to the suggestion pills
-    const pills = document.querySelectorAll('#view-growth-command-center span[style*="cursor:pointer"]');
-    pills.forEach(pill => {
-        pill.addEventListener('click', () => {
-            // Extract text from quotes
-            const text = pill.innerText.replace(/"/g, '');
-            inputEl.value = text;
-            submitGoal(text);
+    // Check if listener is already added
+    if (!submitBtn.dataset.listenerAdded) {
+        submitBtn.addEventListener('click', () => submitGoal(inputEl.value));
+        inputEl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                submitGoal(inputEl.value);
+            }
         });
-    });
+        submitBtn.dataset.listenerAdded = 'true';
+
+        // Add click listeners to the suggestion pills
+        const pills = document.querySelectorAll('#view-growth-command-center span[style*="cursor:pointer"]');
+        pills.forEach(pill => {
+            pill.addEventListener('click', () => {
+                // Extract text from quotes
+                const text = pill.innerText.replace(/"/g, '');
+                inputEl.value = text;
+                submitGoal(text);
+            });
+        });
+    }
 }
 
 async function submitGoal(goalText) {
@@ -34,7 +48,12 @@ async function submitGoal(goalText) {
     const feedEl = document.getElementById('command-center-feed');
     const inputEl = document.getElementById('command-center-input');
     const submitBtn = document.getElementById('command-center-submit');
-    const appId = state.currentActiveApp || 'default';
+    const appId = state.currentActiveApp;
+    
+    if (!appId) {
+        alert("Please select a business first.");
+        return;
+    }
     
     // Clear input
     inputEl.value = '';

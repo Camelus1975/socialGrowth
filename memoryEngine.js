@@ -11,8 +11,9 @@ const openai = new OpenAI({
  * calculates ROI/Lessons Learned, and embeds it into the Growth Memory Engine.
  */
 async function handleUniversalWebhook(payload, authHeader) {
-  const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
-    global: { headers: { Authorization: authHeader } }
+  // Use service key for background webhook processing to bypass RLS securely
+  const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_KEY || config.SUPABASE_ANON_KEY, {
+    global: authHeader ? { headers: { Authorization: authHeader } } : {}
   });
 
   try {
@@ -43,6 +44,20 @@ async function handleUniversalWebhook(payload, authHeader) {
       category: eventData.category,
       value: eventData.value
     }, supabase);
+
+    // 3. Insert into the visual timeline table
+    let eventType = 'success';
+    if (eventData.category === 'revenue') eventType = 'revenue';
+    else if (eventData.category === 'churn') eventType = 'failure';
+    else if (eventData.category === 'reputation_review') eventType = 'competitor';
+
+    await supabase.from('growth_memory_events').insert({
+      app_id: eventData.appId,
+      event_type: eventType,
+      title: `New ${eventData.category} Event`,
+      content_text: memoryText,
+      tags: [eventData.category, eventData.inferred_campaign || 'Organic']
+    });
 
     return { success: true, event: eventData };
   } catch (error) {

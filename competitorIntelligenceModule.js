@@ -1,8 +1,32 @@
 import { getSupabaseClient } from './auth.js';
 import { state } from './state.js';
 
-export async function initCompetitorIntelligence() {
-  console.log('[Competitor Intelligence] Initializing...');
+let isInitialized = false;
+
+export function initCompetitorIntelligence() {
+  if (!isInitialized) {
+    state.on('appChanged', () => {
+      if (state.currentActiveView === 'competitor-intelligence') {
+        loadCompetitorIntelligence();
+      }
+    });
+    
+    state.on('viewChanged', (viewId) => {
+      if (viewId === 'competitor-intelligence') {
+        loadCompetitorIntelligence();
+      }
+    });
+    
+    isInitialized = true;
+  }
+  
+  if (state.currentActiveView === 'competitor-intelligence') {
+    loadCompetitorIntelligence();
+  }
+}
+
+async function loadCompetitorIntelligence() {
+  console.log('[Competitor Intelligence] Loading...');
   
   const metricTracked = document.getElementById('comp-metric-tracked');
   const metricPricing = document.getElementById('comp-metric-pricing');
@@ -11,10 +35,22 @@ export async function initCompetitorIntelligence() {
   
   if (!metricTracked || !feedEl) return;
   
+  const appId = state.currentActiveApp;
+  
+  if (!appId) {
+    metricTracked.innerText = '-';
+    metricPricing.innerText = '-';
+    metricGaps.innerText = '-';
+    feedEl.innerHTML = `
+      <tr>
+        <td colspan="5" class="mod-style-dGV4dC1h">Please select a business to view competitor intelligence.</td>
+      </tr>
+    `;
+    return;
+  }
+
   const supabase = getSupabaseClient();
   if (!supabase) return;
-  
-  const appId = state.currentActiveApp || 'default';
   
   try {
     // 1. Fetch competitors

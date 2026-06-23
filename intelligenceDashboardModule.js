@@ -3,11 +3,25 @@ import { state } from './state.js';
 import { requestApi } from './common.js';
 
 let realtimeChannel = null;
+let isInitialized = false;
 
 export async function initIntelligenceDashboard() {
     console.log('[Intelligence Dash] Initializing unified dashboard...');
-    const supabase = getSupabaseClient();
     
+    if (!isInitialized) {
+        state.on('appChanged', () => {
+            if (state.currentActiveView === 'unified-intelligence-dash') {
+                const supabase = getSupabaseClient();
+                if (supabase) {
+                    refreshDashboardMetrics(supabase);
+                    refreshPriorityActions(supabase);
+                }
+            }
+        });
+        isInitialized = true;
+    }
+
+    const supabase = getSupabaseClient();
     if (!supabase) {
         console.warn('[Intelligence Dash] Supabase client not initialized. Retrying in 2s...');
         setTimeout(initIntelligenceDashboard, 2000);
@@ -53,7 +67,18 @@ export async function initIntelligenceDashboard() {
 }
 
 async function refreshDashboardMetrics(supabase) {
-    const appId = state.currentActiveApp || 'default';
+    const appId = state.currentActiveApp;
+    
+    if (!appId) {
+        const opsEl = document.getElementById('dash-metric-opportunities');
+        if (opsEl) opsEl.innerHTML = `-`;
+        const threatEl = document.getElementById('dash-metric-threats');
+        if (threatEl) threatEl.innerHTML = `-`;
+        const el = document.getElementById('dash-metric-agents');
+        if (el) el.innerHTML = `-`;
+        return;
+    }
+
     
     try {
         // 1. Fetch Agent Status
@@ -102,18 +127,26 @@ async function refreshDashboardMetrics(supabase) {
 }
 
 async function refreshPriorityActions(supabase) {
-    const appId = state.currentActiveApp || 'default';
+    const appId = state.currentActiveApp;
     const listContainer = document.getElementById('agent-priority-actions-list');
     if (!listContainer) return;
+
+    if (!appId) {
+        listContainer.innerHTML = `
+            <div class="mod-style-dGV4dC1h">
+                <p>Please select a business to view pending actions.</p>
+            </div>
+        `;
+        return;
+    }
 
     try {
         const { data, error } = await supabase
             .from('agent_operations')
             .select('*')
             .eq('app_id', appId)
-            .eq('requires_approval', true)
-            .eq('approved', false)
-            .order('created_at', { ascending: false });
+            .order('created_at', { ascending: false })
+            .limit(10);
 
         if (error) throw error;
 
@@ -131,15 +164,49 @@ async function refreshPriorityActions(supabase) {
         listContainer.innerHTML = '';
         data.forEach(action => {
             const el = document.createElement('div');
-            el.style = "padding:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; display:flex; justify-content:space-between; align-items:center;";
+            el.style = "padding:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;";
             
-            el.innerHTML = `
+            let actionHtml = '';
+            if (!action.approved) {
+              actionHtml = `
                 <div>
-                  <div class="mod-style-Zm9udC13">Approve: ${action.task_goal}</div>
-                  <div class="mod-style-Zm9udC1z">${action.agent_name} recommendation: ${action.recommendation || 'Please review.'}</div>
+                  <div class="mod-style-Zm9udC13">Pending: ${action.task_goal}</div>
+                  <div class="mod-style-Zm9udC1z" style="color: #9ca3af; font-size: 0.9em; margin-top: 4px;">${action.agent_name}: ${action.recommendation || 'Please review.'}</div>
                 </div>
                 <button class="btn btn-primary approve-btn" data-id="${action.id}">Approve</button>
-            `;
+              `;
+            } else if (action.status === 'live') {
+              let badgeText = 'Live';
+              let badgeColor = '#10b981'; // Green
+              if (action.agent_name.includes('Advertising')) badgeText = 'Live on Google';
+              else if (action.agent_name.includes('Content')) badgeText = 'Live on Meta';
+
+              actionHtml = `
+                <div>
+                  <div class="mod-style-Zm9udC13" style="color: #10b981;">✓ Executed: ${action.task_goal}</div>
+                  <div class="mod-style-Zm9udC1z" style="color: #9ca3af; font-size: 0.9em; margin-top: 4px;">${action.agent_name}: ${action.recommendation || 'Action complete.'}</div>
+                </div>
+                <span style="background: rgba(16, 185, 129, 0.2); color: ${badgeColor}; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold;">${badgeText}</span>
+              `;
+            } else if (action.status === 'executing' || action.status === 'pending') {
+              actionHtml = `
+                <div>
+                  <div class="mod-style-Zm9udC13" style="color: #fbbf24;">⚙ Processing: ${action.task_goal}</div>
+                  <div class="mod-style-Zm9udC1z" style="color: #9ca3af; font-size: 0.9em; margin-top: 4px;">${action.agent_name} is currently executing this action...</div>
+                </div>
+                <span style="color: #fbbf24; font-size: 0.8em;">In Progress</span>
+              `;
+            } else {
+               // completed or generic or failed
+              actionHtml = `
+                <div>
+                  <div class="mod-style-Zm9udC13" style="color: #9ca3af;">✓ ${action.status}: ${action.task_goal}</div>
+                </div>
+                <span style="color: #9ca3af; font-size: 0.8em; text-transform: capitalize;">${action.status}</span>
+              `;
+            }
+
+            el.innerHTML = actionHtml;
             listContainer.appendChild(el);
         });
 
@@ -150,7 +217,8 @@ async function refreshPriorityActions(supabase) {
                 e.target.innerText = 'Approving...';
                 e.target.disabled = true;
                 
-                const appId = state.currentActiveApp || 'default';
+                const appId = state.currentActiveApp;
+                if (!appId) return;
                 
                 try {
                     await requestApi('/api/agents/orchestration/approve', 'POST', {

@@ -2,6 +2,8 @@ import { state } from './state.js';
 import { requestApi, showToast, createSafeElement } from './common.js';
 import { getSupabaseClient } from './auth.js';
 
+let pollingTimer = null;
+
 export function initVideoFactory() {
   state.on('appChanged', () => {
     refreshVideoFactoryView();
@@ -10,11 +12,14 @@ export function initVideoFactory() {
   state.on('viewChanged', () => {
     if (state.currentActiveView === 'video-factory') {
       refreshVideoFactoryView();
+    } else {
+      if (pollingTimer) clearTimeout(pollingTimer);
     }
   });
 }
 
 function refreshVideoFactoryView() {
+  if (pollingTimer) clearTimeout(pollingTimer);
   const viewId = state.currentActiveView;
   if (viewId !== 'video-factory') return;
 
@@ -31,7 +36,10 @@ async function loadHistoricalVideos(appId) {
   const block = document.getElementById('video-factory-outputs-block');
   if (!block) return;
   
-  block.innerHTML = '<div class="mod-style-dGV4dC1h">Loading assets...</div>';
+  // Only show loading indicator if there's no content to avoid flickering during polling
+  if (block.innerHTML.trim() === '') {
+    block.innerHTML = '<div class="mod-style-dGV4dC1h">Loading assets...</div>';
+  }
 
   const supabase = getSupabaseClient();
   if (!supabase) return;
@@ -52,9 +60,21 @@ async function loadHistoricalVideos(appId) {
       return;
     }
 
+    let hasProcessing = false;
+
     data.forEach(video => {
+      if (video.status === 'processing' || video.status === 'queued') hasProcessing = true;
       renderVideoCard(video, block);
     });
+
+    if (hasProcessing) {
+      pollingTimer = setTimeout(() => {
+        if (state.currentActiveView === 'video-factory' && state.currentActiveApp === appId) {
+          loadHistoricalVideos(appId);
+        }
+      }, 5000);
+    }
+
   } catch (err) {
     console.error("Failed to load historical videos", err);
     block.innerHTML = '<div class="mod-style-dGV4dC1h">Failed to load assets.</div>';
@@ -86,7 +106,22 @@ function renderVideoCard(video, container, prepend = false) {
 
   let contentArea;
   
-  if (video.video_url === 'template_mode' || video.video_url === 'assembly_mode') {
+  if (video.status === 'processing' || video.status === 'queued') {
+    contentArea = createSafeElement('div');
+    contentArea.style.position = 'relative';
+    contentArea.style.width = '100%';
+    contentArea.style.aspectRatio = '16/9';
+    contentArea.style.background = `linear-gradient(135deg, var(--bg-card), #0f172a)`;
+    contentArea.style.borderRadius = '8px';
+    contentArea.style.display = 'flex';
+    contentArea.style.alignItems = 'center';
+    contentArea.style.justifyContent = 'center';
+    
+    const spinner = createSafeElement('div', [], "Processing AI Engine... (Usually takes 10-30s)");
+    spinner.style.color = "var(--primary)";
+    spinner.className = 'pulse-animation'; // Assuming there's a pulse-animation class in styles.css
+    contentArea.appendChild(spinner);
+  } else if (video.video_url === 'template_mode' || video.video_url === 'assembly_mode') {
     // Mode 1/2/3 Placeholder Render
     contentArea = createSafeElement('div');
     contentArea.style.position = 'relative';
@@ -149,7 +184,7 @@ export async function generateStudioVideo() {
   showToast("Routing video request to Video Marketing Agent...", "success");
   
   const block = document.getElementById('video-factory-outputs-block');
-  const loadingDiv = createSafeElement('div', [], "Assembling video... Processing AI Agent Storyboard (~30-90s)");
+  const loadingDiv = createSafeElement('div', [], "Queueing job...");
   loadingDiv.style.color = "var(--primary)";
   loadingDiv.style.textAlign = "center";
   loadingDiv.style.padding = "20px";
@@ -163,20 +198,12 @@ export async function generateStudioVideo() {
 
     loadingDiv.remove();
 
-    // Instead of rendering manually in this function, we'll re-fetch or construct the object
-    const newVideo = {
-      title: promptText,
-      platform: 'shorts',
-      video_url: data.url,
-      mode: data.mode
-    };
-    
-    // Clear "No generated videos yet" if it exists
-    if (block.innerHTML.includes("No generated videos")) {
-      block.innerHTML = '';
+    if (data.status === 'queued') {
+       showToast("Job successfully queued!", "success");
     }
 
-    renderVideoCard(newVideo, block, true);
+    // Refresh the view which will grab the new 'processing' row and start polling
+    loadHistoricalVideos(state.currentActiveApp);
 
   } catch (err) {
     loadingDiv.remove();

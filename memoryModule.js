@@ -1,14 +1,46 @@
 import { getSupabaseClient } from './auth.js';
 import { state } from './state.js';
 
-export async function initMemoryEngine() {
+let isInitialized = false;
+
+export function initMemoryEngine() {
+  if (!isInitialized) {
+    state.on('appChanged', () => {
+      if (state.currentActiveView === 'growth-memory') {
+        loadMemoryEngine();
+      }
+    });
+    
+    state.on('viewChanged', (viewId) => {
+      if (viewId === 'growth-memory') {
+        loadMemoryEngine();
+      }
+    });
+    
+    isInitialized = true;
+  }
+  
+  if (state.currentActiveView === 'growth-memory') {
+    loadMemoryEngine();
+  }
+}
+
+async function loadMemoryEngine() {
   const timelineEl = document.getElementById('memory-timeline-feed');
   if (!timelineEl) return;
   
+  const appId = state.currentActiveApp;
+  if (!appId) {
+    timelineEl.innerHTML = `
+      <div class="mod-style-Y29sb3I6">
+        Please select a business from the top dropdown to view its memories.
+      </div>
+    `;
+    return;
+  }
+  
   const supabase = getSupabaseClient();
   if (!supabase) return;
-  
-  const appId = state.currentActiveApp || 'default';
   
   try {
     const { data, error } = await supabase

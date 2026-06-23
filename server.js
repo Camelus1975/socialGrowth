@@ -490,17 +490,25 @@ app.post('/api/calendar/schedule', async (req, res) => {
     return res.status(400).json({ error: "Text, date and platform variables required." });
   }
   
+  const token = req.headers.authorization?.split(' ')[1];
+  let userSupabase = supabase;
+  if (token && token !== 'mock-supabase-jwt-token') {
+    userSupabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: `Bearer ${token}` } }
+    });
+  }
+  
   try {
     if (isDummyDb) throw new Error("Offline Mode");
 
     const localDateObj = new Date(`${date}T${time || '12:00'}:00`);
     const publish_at_iso = localDateObj.toISOString();
 
-    const { data, error } = await supabase
+    const { data, error } = await userSupabase
       .from('scheduled_posts')
       .insert([{
         user_id: req.user?.id,
-        app_id: projectId || 'default',
+        app_id: projectId,
         platform: platform,
         content: text,
         publish_at: publish_at_iso,
@@ -645,14 +653,15 @@ app.get('/api/media/assets', async (req, res) => {
   const appId = req.query.appId;
   try {
     if (isDummyDb) throw new Error("Offline Mode");
+    if (!appId) throw new Error("appId is required");
     const { data, error } = await supabase
       .from('media')
       .select('*')
-      .eq('app_id', appId || '');
+      .eq('app_id', appId);
     if (error) throw error;
     res.json({ assets: data || [] });
   } catch (err) {
-    res.json({ assets: [] });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -664,9 +673,10 @@ app.post('/api/media/upload', async (req, res) => {
   }
   
   try {
-    if (isDummyDb) throw new Error("Offline Mode");
-    const { data, error } = await supabase.from('media').insert([{
-      app_id: appId || 'default',
+      if (isDummyDb) throw new Error("Offline Mode");
+      if (!appId) throw new Error("appId is required");
+      const { data, error } = await supabase.from('media').insert([{
+        app_id: appId,
       name: name,
       file_type: file_type || 'image/png',
       file_size: file_size || 0,
@@ -812,9 +822,17 @@ app.post('/api/agents/orchestration/approve', async (req, res) => {
   const { operationId, appId } = req.body;
   if (!operationId || !appId) return res.status(400).json({ error: "operationId and appId are required." });
 
+  const token = req.headers.authorization?.split(' ')[1];
+  let userSupabase = supabase;
+  if (token && token !== 'mock-supabase-jwt-token') {
+    userSupabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: `Bearer ${token}` } }
+    });
+  }
+
   try {
     // 1. Mark operation as executing
-    const { error: opError } = await supabase
+    const { error: opError } = await userSupabase
       .from('agent_operations')
       .update({ approved: true, status: 'executing' })
       .eq('id', operationId);
@@ -822,7 +840,7 @@ app.post('/api/agents/orchestration/approve', async (req, res) => {
     if (opError) throw opError;
 
     // 2. Update all draft posts for this app to scheduled
-    const { error: postError } = await supabase
+    const { error: postError } = await userSupabase
       .from('scheduled_posts')
       .update({ status: 'scheduled' })
       .eq('app_id', appId)
