@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Business Growth OS — Growth Operating System</title>
   <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="/modernized_styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <meta name="description" content="Business Growth Operating System — Generate leads, acquire customers, increase revenue, and scale efficiently with AI-powered automation.">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -14,69 +13,69 @@
 <body>
 
   <!-- AUTH LOGIN SCREEN -->
-  <div id="auth-login-screen" class="mod-style-ZGlzcGxh">
+  <div id="auth-login-screen" style="display:flex; position:fixed; inset:0; z-index:9999; background:linear-gradient(135deg, #040711 0%, #0a1628 40%, #0f172a 100%); align-items:center; justify-content:center; font-family:'Inter',system-ui,sans-serif;">
     <!-- Animated background orbs -->
-    <div class="mod-style-cG9zaXRp"></div>
-    <div class="mod-style-cG9zaXRp"></div>
+    <div style="position:absolute; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle, rgba(99,102,241,0.15), transparent 70%); top:10%; left:10%; animation: pulse 4s ease-in-out infinite;"></div>
+    <div style="position:absolute; width:300px; height:300px; border-radius:50%; background:radial-gradient(circle, rgba(236,72,153,0.1), transparent 70%); bottom:15%; right:15%; animation: pulse 5s ease-in-out infinite reverse;"></div>
 
-    <div class="mod-style-YmFja2dy">
+    <div style="background:rgba(15,23,42,0.8); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:48px; width:420px; max-width:90vw; box-shadow:0 25px 60px rgba(0,0,0,0.5);">
       <!-- Logo -->
-      <div class="mod-style-dGV4dC1h">
-        <div class="mod-style-d2lkdGg6">▲</div>
-        <h1 class="mod-style-Y29sb3I6">Business Growth OS</h1>
-        <p class="mod-style-Y29sb3I6">Growth Operating System</p>
+      <div style="text-align:center; margin-bottom:32px;">
+        <div style="width:56px; height:56px; background:linear-gradient(135deg, #6366f1, #8b5cf6); border-radius:14px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px; color:white; font-weight:800;">▲</div>
+        <h1 style="color:white; font-size:1.5rem; font-weight:700; margin:0;">Business Growth OS</h1>
+        <p style="color:rgba(148,163,184,0.8); font-size:0.85rem; margin-top:4px;">Growth Operating System</p>
       </div>
 
       <!-- Error message -->
-      <div id="auth-error-message" class="mod-style-Y29sb3I6"></div>
+      <div id="auth-error-message" style="color:#f87171; font-size:0.8rem; text-align:center; min-height:20px; margin-bottom:8px;"></div>
 
       <!-- Login Form -->
       <div id="auth-login-form">
-        <div class="mod-style-bWFyZ2lu">
-          <label class="mod-style-ZGlzcGxh">Email</label>
-          <input type="email" id="auth-email" placeholder="founder@company.com" class="mod-style-d2lkdGg6" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+        <div style="margin-bottom:16px;">
+          <label style="display:block; color:rgba(148,163,184,0.9); font-size:0.78rem; font-weight:600; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Email</label>
+          <input type="email" id="auth-email" placeholder="founder@company.com" style="width:100%; padding:12px 16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white; font-size:0.9rem; outline:none; transition:border-color 0.2s; box-sizing:border-box;" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
         </div>
-        <div class="mod-style-bWFyZ2lu">
-          <label class="mod-style-ZGlzcGxh">Password</label>
-          <input type="password" id="auth-password" placeholder="••••••••" class="mod-style-d2lkdGg6" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+        <div style="margin-bottom:24px;">
+          <label style="display:block; color:rgba(148,163,184,0.9); font-size:0.78rem; font-weight:600; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Password</label>
+          <input type="password" id="auth-password" placeholder="••••••••" style="width:100%; padding:12px 16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white; font-size:0.9rem; outline:none; transition:border-color 0.2s; box-sizing:border-box;" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
         </div>
-        <button id="auth-login-btn" class="mod-style-d2lkdGg6" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">Sign In</button>
+        <button id="auth-login-btn" style="width:100%; padding:12px; background:linear-gradient(135deg, #6366f1, #8b5cf6); color:white; border:none; border-radius:8px; font-size:0.9rem; font-weight:600; cursor:pointer; transition:opacity 0.2s, transform 0.1s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">Sign In</button>
         
-        <p class="mod-style-dGV4dC1h">
-          Don't have an account? <a href="#" id="auth-show-signup" class="mod-style-Y29sb3I6">Create one</a>
+        <p style="text-align:center; color:rgba(148,163,184,0.6); font-size:0.8rem; margin-top:20px;">
+          Don't have an account? <a href="#" id="auth-show-signup" style="color:#818cf8; text-decoration:none; font-weight:600;">Create one</a>
         </p>
       </div>
 
       <!-- Signup Form (hidden by default) -->
-      <div id="auth-signup-form" class="mod-style-ZGlzcGxh">
-        <div class="mod-style-bWFyZ2lu">
-          <label class="mod-style-ZGlzcGxh">Email</label>
-          <input type="email" id="auth-signup-email" placeholder="founder@company.com" class="mod-style-d2lkdGg6" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+      <div id="auth-signup-form" style="display:none;">
+        <div style="margin-bottom:16px;">
+          <label style="display:block; color:rgba(148,163,184,0.9); font-size:0.78rem; font-weight:600; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Email</label>
+          <input type="email" id="auth-signup-email" placeholder="founder@company.com" style="width:100%; padding:12px 16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white; font-size:0.9rem; outline:none; transition:border-color 0.2s; box-sizing:border-box;" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
         </div>
-        <div class="mod-style-bWFyZ2lu">
-          <label class="mod-style-ZGlzcGxh">Password</label>
-          <input type="password" id="auth-signup-password" placeholder="Min 6 characters" class="mod-style-d2lkdGg6" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+        <div style="margin-bottom:24px;">
+          <label style="display:block; color:rgba(148,163,184,0.9); font-size:0.78rem; font-weight:600; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Password</label>
+          <input type="password" id="auth-signup-password" placeholder="Min 6 characters" style="width:100%; padding:12px 16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white; font-size:0.9rem; outline:none; transition:border-color 0.2s; box-sizing:border-box;" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
         </div>
-        <button id="auth-signup-btn" class="mod-style-d2lkdGg6" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Create Account</button>
+        <button id="auth-signup-btn" style="width:100%; padding:12px; background:linear-gradient(135deg, #6366f1, #8b5cf6); color:white; border:none; border-radius:8px; font-size:0.9rem; font-weight:600; cursor:pointer; transition:opacity 0.2s, transform 0.1s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Create Account</button>
         
-        <p class="mod-style-dGV4dC1h">
-          Already have an account? <a href="#" id="auth-show-login" class="mod-style-Y29sb3I6">Sign in</a>
+        <p style="text-align:center; color:rgba(148,163,184,0.6); font-size:0.8rem; margin-top:20px;">
+          Already have an account? <a href="#" id="auth-show-login" style="color:#818cf8; text-decoration:none; font-weight:600;">Sign in</a>
         </p>
       </div>
 
       <!-- Divider -->
-      <div class="mod-style-ZGlzcGxh">
-        <div class="mod-style-ZmxleDox"></div>
-        <span class="mod-style-Y29sb3I6">OR</span>
-        <div class="mod-style-ZmxleDox"></div>
+      <div style="display:flex; align-items:center; gap:12px; margin:20px 0;">
+        <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
+        <span style="color:rgba(148,163,184,0.5); font-size:0.75rem;">OR</span>
+        <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
       </div>
 
       <!-- OAuth Buttons -->
-      <button id="auth-google-btn" class="mod-style-d2lkdGg6" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
+      <button id="auth-google-btn" style="width:100%; padding:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:rgba(255,255,255,0.8); font-size:0.85rem; cursor:pointer; transition:background 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
         <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
         Continue with Google
       </button>
-      <button id="auth-github-btn" class="mod-style-d2lkdGg6" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
+      <button id="auth-github-btn" style="width:100%; padding:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:rgba(255,255,255,0.8); font-size:0.85rem; cursor:pointer; transition:background 0.2s; display:flex; align-items:center; justify-content:center; gap:8px;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
         Continue with GitHub
       </button>
@@ -100,7 +99,7 @@
         <!-- App Selector -->
         <div class="app-selector-container">
           <button class="app-select-btn" id="active-app-selector" data-action="toggleAppSelectorDropdown">
-            <span><span class="app-dot" id="active-app-dot" class="mod-style-YmFja2dy"></span><span id="active-app-name">Select Business</span></span>
+            <span><span class="app-dot" id="active-app-dot" style="background: linear-gradient(135deg, #FF6B6B, #FF8E53);"></span><span id="active-app-name">Select Business</span></span>
             <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
           </button>
           <div class="app-select-options" id="app-selector-dropdown">
@@ -108,10 +107,10 @@
               <!-- Rendered by appManager.js -->
             </div>
             
-            <div class="mod-style-aGVpZ2h0"></div>
+            <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 8px 0;"></div>
             
-            <div class="app-option" data-action="openModal" data-args="discovery-wizard-modal" class="mod-style-anVzdGlm">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mod-style-bWFyZ2lu"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <div class="app-option" data-action="openModal" data-args="discovery-wizard-modal" style="justify-content: center; color: var(--accent-green);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
               Add New Business
             </div>
           </div>
@@ -368,7 +367,7 @@
       
       <!-- Sticky Header -->
       <header>
-        <div class="header-title-area mod-style-ZGlzcGxh">
+        <div class="header-title-area" style="display:flex; align-items:center;">
           <button class="hamburger-btn" data-action="toggleMobileSidebar">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
@@ -378,33 +377,27 @@
           </div>
         </div>
         <div class="header-actions">
-          <!-- Credits Pill -->
-          <div id="billing-credits-pill" onclick="window.billingModule && window.billingModule.showUpgradeModal()" class="btn btn-secondary mod-style-cGFkZGlu">
-            <svg fill="none" viewBox="0 0 24 24" stroke="var(--accent-gold, #FFD700)" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-            <span id="header-credits-text" class="mod-style-Y29sb3I6">Credits: ...</span>
-          </div>
-
           <!-- Language Toggle Button -->
-          <button class="btn btn-secondary notranslate" onclick="window.toggleLanguage()" class="mod-style-cGFkZGlu">العربية</button>
+          <button class="btn btn-secondary notranslate" onclick="window.toggleLanguage()" style="padding: 10px 15px; border-radius: 8px; margin-right: 10px;">العربية</button>
           <!-- Theme Toggle Button -->
-          <button class="btn btn-secondary" data-action="toggleThemeMode" id="theme-toggle-btn" class="mod-style-cGFkZGlu" title="Toggle Light/Dark Theme">
+          <button class="btn btn-secondary" data-action="toggleThemeMode" id="theme-toggle-btn" style="padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center;" title="Toggle Light/Dark Theme">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" class="theme-icon-sun"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 7a5 5 0 100 10 5 5 0 000-10z" /></svg>
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" class="theme-icon-moon"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
           </button>
 
           <!-- Notification Bell -->
-          <button class="btn btn-secondary" data-action="toggleNotificationDrawer" class="mod-style-cGFkZGlu">
+          <button class="btn btn-secondary" data-action="toggleNotificationDrawer" style="padding: 10px; border-radius: 50%;">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
           </button>
           
           <div class="header-app-badge">
-            <span class="app-dot" id="header-app-dot" class="mod-style-YmFja2dy"></span>
+            <span class="app-dot" id="header-app-dot" style="background: linear-gradient(135deg, #FF6B6B, #FF8E53); width: 8px; height: 8px; border-radius: 50%;"></span>
             <span id="header-app-name">FitPulse AI</span>
           </div>
           
           <!-- User Widget -->
           <div class="user-profile-widget" data-action="openProfileModal">
-            <img id="user-header-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" class="mod-style-d2lkdGg6">
+            <img id="user-header-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">
             <span id="user-header-name" class="notranslate">Shadi</span>
           </div>
         </div>
@@ -421,31 +414,31 @@
         <div class="metrics-grid">
           <div class="metric-card">
             <h3 class="metric-title">Predicted Revenue (90 Days)</h3>
-            <div class="metric-value mod-style-Y29sb3I6">$124,500 <span class="metric-trend positive">↑ 18%</span></div>
-            <p class="mod-style-Zm9udC1z">Confidence Score: 92%</p>
+            <div class="metric-value" style="color: var(--accent-green)">$124,500 <span class="metric-trend positive">↑ 18%</span></div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">Confidence Score: 92%</p>
           </div>
           <div class="metric-card">
             <h3 class="metric-title">Active Opportunities</h3>
             <div class="metric-value" id="dash-metric-opportunities">... Loading</div>
-            <p class="mod-style-Zm9udC1z" id="dash-metric-opp-desc">Scanning market data</p>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;" id="dash-metric-opp-desc">Scanning market data</p>
           </div>
-          <div class="metric-card mod-style-Ym9yZGVy">
+          <div class="metric-card" style="border-color: rgba(239, 68, 68, 0.3);">
             <h3 class="metric-title">Competitor Threats</h3>
-            <div class="metric-value mod-style-Y29sb3I6" id="dash-metric-threats">... Loading</div>
-            <p class="mod-style-Zm9udC1z" id="dash-metric-threats-desc">Scanning competitors</p>
+            <div class="metric-value" style="color: #f87171;" id="dash-metric-threats">... Loading</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;" id="dash-metric-threats-desc">Scanning competitors</p>
           </div>
           <div class="metric-card">
             <h3 class="metric-title">Agent Network Status</h3>
-            <div class="metric-value mod-style-Y29sb3I6" id="dash-metric-agents">... Loading</div>
-            <p class="mod-style-Zm9udC1z" id="dash-metric-agents-desc">Checking agent states</p>
+            <div class="metric-value" style="color: var(--primary)" id="dash-metric-agents">... Loading</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;" id="dash-metric-agents-desc">Checking agent states</p>
           </div>
         </div>
 
-        <div class="dashboard-grid mod-style-Z3JpZC10">
+        <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr; margin-top: 24px;">
           <div class="card">
             <h3 class="card-title">Priority Actions & Agent Recommendations</h3>
-            <div id="agent-priority-actions-list" class="mod-style-ZGlzcGxh">
-              <div class="mod-style-dGV4dC1h">
+            <div id="agent-priority-actions-list" style="display:flex; flex-direction:column; gap:12px; margin-top:16px;">
+              <div style="text-align: center; color: var(--text-muted); padding: 20px;">
                 Scanning for active agent recommendations...
               </div>
             </div>
@@ -453,12 +446,12 @@
           
           <div class="card">
             <h3 class="card-title">Business Health Graph</h3>
-            <div class="mod-style-aGVpZ2h0">
+            <div style="height:300px; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.2); border-radius:8px; margin-top:16px;">
               <!-- Placeholder for Knowledge Graph Visualization -->
-              <div class="mod-style-dGV4dC1h">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mod-style-bWFyZ2lu"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              <div style="text-align:center; color:var(--text-muted);">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:12px; opacity:0.5;"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                 <p>Knowledge Graph Active</p>
-                <p class="mod-style-Zm9udC1z">Connecting 1,245 Data Points</p>
+                <p style="font-size:0.75rem;">Connecting 1,245 Data Points</p>
               </div>
             </div>
           </div>
@@ -467,30 +460,30 @@
 
       <!-- 2. Growth Command Center -->
       <section id="view-growth-command-center" class="view-panel">
-        <div class="card mod-style-aGVpZ2h0">
-          <div class="mod-style-dGV4dC1h">
-            <h2 class="mod-style-Y29sb3I6">How can we grow today?</h2>
-            <p class="mod-style-Y29sb3I6">Focus on goals. The AI Strategy Planner will handle execution.</p>
+        <div class="card" style="height:calc(100vh - 180px); display:flex; flex-direction:column;">
+          <div style="text-align:center; padding: 40px 0 20px;">
+            <h2 style="color:white; font-size:2rem; font-weight:700; margin-bottom:8px;">How can we grow today?</h2>
+            <p style="color:var(--text-muted);">Focus on goals. The AI Strategy Planner will handle execution.</p>
           </div>
           
-          <div id="command-center-feed" class="mod-style-ZmxleDox">
-            <div class="mod-style-YWxpZ24t">
-              <div class="mod-style-ZGlzcGxh">
-                <div class="mod-style-d2lkdGg6">▲</div>
-                <strong class="mod-style-Y29sb3I6">AI Strategy Planner</strong>
+          <div id="command-center-feed" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:20px;">
+            <div style="align-self:flex-start; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:20px; border-radius:16px; border-bottom-left-radius:4px; max-width:80%;">
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+                <div style="width:32px; height:32px; background:linear-gradient(135deg, #6366f1, #8b5cf6); border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">▲</div>
+                <strong style="color:white;">AI Strategy Planner</strong>
               </div>
-              <p class="mod-style-Y29sb3I6">Hello! I am ready to orchestrate your AI agents. Tell me what your goal is.</p>
+              <p style="color:var(--text-sub); margin-bottom:16px; line-height:1.6;">Hello! I am ready to orchestrate your AI agents. Tell me what your goal is.</p>
             </div>
           </div>
           
-          <div class="mod-style-cGFkZGlu">
-            <div class="mod-style-ZGlzcGxh">
-              <input id="command-center-input" type="text" placeholder="e.g. Generate more leads, Launch a new product..." class="mod-style-ZmxleDox">
-              <button id="command-center-submit" class="btn btn-primary mod-style-Ym9yZGVy"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg></button>
+          <div style="padding:20px; border-top:1px solid rgba(255,255,255,0.05);">
+            <div style="display:flex; gap:12px; background:rgba(0,0,0,0.2); padding:8px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
+              <input id="command-center-input" type="text" placeholder="e.g. Generate more leads, Launch a new product..." style="flex:1; background:transparent; border:none; outline:none; color:white; padding:10px 16px; font-size:1rem;">
+              <button id="command-center-submit" class="btn btn-primary" style="border-radius:8px;"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg></button>
             </div>
-            <div class="mod-style-ZGlzcGxh">
-              <span class="mod-style-Zm9udC1z">"Improve customer retention"</span>
-              <span class="mod-style-Zm9udC1z">"Get more appointments"</span>
+            <div style="display:flex; gap:10px; margin-top:12px; justify-content:center;">
+              <span style="font-size:0.75rem; color:var(--text-muted); background:rgba(255,255,255,0.05); padding:4px 12px; border-radius:20px; cursor:pointer;">"Improve customer retention"</span>
+              <span style="font-size:0.75rem; color:var(--text-muted); background:rgba(255,255,255,0.05); padding:4px 12px; border-radius:20px; cursor:pointer;">"Get more appointments"</span>
             </div>
           </div>
         </div>
@@ -498,13 +491,13 @@
 
       <!-- 3. Growth Memory Engine -->
       <section id="view-growth-memory" class="view-panel">
-        <div class="card mod-style-bWFyZ2lu">
-          <h2 class="card-title mod-style-bWFyZ2lu">Growth Memory Engine</h2>
-          <p class="mod-style-Y29sb3I6">The institutional memory of your business. The AI uses this historical data to make accurate future predictions.</p>
+        <div class="card" style="margin-bottom: 24px;">
+          <h2 class="card-title" style="margin-bottom: 16px;">Growth Memory Engine</h2>
+          <p style="color:var(--text-sub); margin-bottom: 20px;">The institutional memory of your business. The AI uses this historical data to make accurate future predictions.</p>
           
-          <div class="mod-style-ZGlzcGxh">
-            <input type="text" class="input-field" placeholder="Search past campaigns, failures, or revenue events..." class="mod-style-ZmxleDox">
-            <select class="input-field mod-style-d2lkdGg6">
+          <div style="display:flex; gap:12px; margin-bottom:24px;">
+            <input type="text" class="input-field" placeholder="Search past campaigns, failures, or revenue events..." style="flex:1;">
+            <select class="input-field" style="width:180px;">
               <option>All Memories</option>
               <option>Success Patterns</option>
               <option>Failure Patterns</option>
@@ -513,8 +506,8 @@
             <button class="btn btn-primary">Search Memory</button>
           </div>
           
-          <div id="memory-timeline-feed" class="mod-style-cG9zaXRp">
-            <div class="mod-style-Y29sb3I6">Scanning Growth Memory database...</div>
+          <div id="memory-timeline-feed" style="position:relative; margin-left:20px; border-left:2px solid rgba(255,255,255,0.1); padding-left:30px; display:flex; flex-direction:column; gap:30px;">
+            <div style="color:var(--text-muted);">Scanning Growth Memory database...</div>
           </div>
         </div>
       </section>
@@ -528,7 +521,7 @@
           </div>
           <div class="metric-card">
             <h3 class="metric-title">Pricing Changes Detected</h3>
-            <div class="metric-value mod-style-Y29sb3I6" id="comp-metric-pricing">Loading...</div>
+            <div class="metric-value" style="color: var(--accent-green)" id="comp-metric-pricing">Loading...</div>
           </div>
           <div class="metric-card">
             <h3 class="metric-title">Feature Gaps Closed</h3>
@@ -536,21 +529,21 @@
           </div>
         </div>
         
-        <div class="card mod-style-bWFyZ2lu">
+        <div class="card" style="margin-top:24px;">
           <h3 class="card-title">Competitor Memory & Activity Feed</h3>
-          <table class="mod-style-d2lkdGg6">
+          <table style="width:100%; text-align:left; border-collapse:collapse; margin-top:16px;">
             <thead>
-              <tr class="mod-style-Ym9yZGVy">
-                <th class="mod-style-cGFkZGlu">Competitor</th>
-                <th class="mod-style-cGFkZGlu">Event Type</th>
-                <th class="mod-style-cGFkZGlu">Details</th>
-                <th class="mod-style-cGFkZGlu">Detected</th>
-                <th class="mod-style-cGFkZGlu">Threat Level</th>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:var(--text-muted); font-size:0.85rem;">
+                <th style="padding:12px 0;">Competitor</th>
+                <th style="padding:12px 0;">Event Type</th>
+                <th style="padding:12px 0;">Details</th>
+                <th style="padding:12px 0;">Detected</th>
+                <th style="padding:12px 0;">Threat Level</th>
               </tr>
             </thead>
-            <tbody id="competitor-activity-feed" class="mod-style-Y29sb3I6">
+            <tbody id="competitor-activity-feed" style="color:white; font-size:0.9rem;">
               <tr>
-                <td colspan="5" class="mod-style-dGV4dC1h">Scanning competitor landscape...</td>
+                <td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">Scanning competitor landscape...</td>
               </tr>
             </tbody>
           </table>
@@ -575,7 +568,7 @@
         </div>
 
         <!-- Global Business Metrics -->
-        <h3 id="dashboard-main-title" class="mod-style-bWFyZ2lu">Business Performance</h3>
+        <h3 id="dashboard-main-title" style="margin-bottom: 16px; color: white;">Business Performance</h3>
         <div class="kpi-grid">
           <div class="glass-card card-primary kpi-card">
             <div class="kpi-title" id="kpi-title-1">Total Revenue</div>
@@ -615,7 +608,7 @@
                 <h3 class="card-title">Revenue & Growth Pipeline</h3>
                 <div class="card-subtitle">Comparing Monthly Recurring Revenue (MRR) and Lead Flow</div>
               </div>
-              <div class="tabs-navigation mod-style-bWFyZ2lu">
+              <div class="tabs-navigation" style="margin-bottom: 0; border: none;">
                 <button class="sub-tab-btn active" id="chart-mrr-btn" data-action="toggleDashboardChart" data-args="mrr">MRR ($)</button>
                 <button class="sub-tab-btn" id="chart-downloads-btn" data-action="toggleDashboardChart" data-args="downloads">Leads</button>
               </div>
@@ -633,14 +626,14 @@
                 <div class="card-subtitle">Growth speed ranking</div>
               </div>
             </div>
-            <div class="mod-style-ZGlzcGxh" id="portfolio-growth-list">
+            <div style="display: flex; flex-direction: column; gap: 16px;" id="portfolio-growth-list">
               <!-- Rendered via JS -->
             </div>
           </div>
         </div>
 
         <!-- Selected Business Health Detail -->
-        <div class="glass-card mod-style-bWFyZ2lu">
+        <div class="glass-card" style="margin-top: 24px;">
           <div class="card-header-flex">
             <div>
               <h3 class="card-title" id="selected-detail-title">Business Health Overview</h3>
@@ -649,7 +642,7 @@
             <button class="btn btn-secondary" data-action="switchView" data-args="health-score">View Full Health Report</button>
           </div>
           <div class="kpi-grid">
-            <div class="glass-card kpi-card mod-style-YmFja2dy">
+            <div class="glass-card kpi-card" style="background: rgba(255,255,255,0.02); min-height: 100px; display: flex; align-items: center; gap: 16px;">
               <div class="health-gauge-mini">
                 <svg viewBox="0 0 36 36" class="circular-chart green">
                   <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -658,25 +651,25 @@
                 </svg>
               </div>
               <div>
-                <div class="kpi-title mod-style-bWFyZ2lu">Overall Health Score</div>
+                <div class="kpi-title" style="margin-bottom:4px;">Overall Health Score</div>
                 <div class="kpi-change up">▲ Excellent</div>
               </div>
             </div>
-            <div class="glass-card kpi-card mod-style-YmFja2dy">
+            <div class="glass-card kpi-card" style="background: rgba(255,255,255,0.02); min-height: 100px;">
               <div class="kpi-title">Reputation Score</div>
               <div class="kpi-value-row">
                 <div class="kpi-value" id="app-detail-rating">4.8 ★</div>
-                <div class="kpi-change mod-style-Y29sb3I6">Google / Facebook</div>
+                <div class="kpi-change" style="color: var(--text-muted);">Google / Facebook</div>
               </div>
             </div>
-            <div class="glass-card kpi-card mod-style-YmFja2dy">
+            <div class="glass-card kpi-card" style="background: rgba(255,255,255,0.02); min-height: 100px;">
               <div class="kpi-title">Sales Conversion</div>
               <div class="kpi-value-row">
                 <div class="kpi-value" id="app-detail-conversion">4.2%</div>
                 <div class="kpi-change up">▲ Healthy</div>
               </div>
             </div>
-            <div class="glass-card kpi-card mod-style-YmFja2dy">
+            <div class="glass-card kpi-card" style="background: rgba(255,255,255,0.02); min-height: 100px;">
               <div class="kpi-title">Revenue Growth</div>
               <div class="kpi-value-row">
                 <div class="kpi-value" id="app-detail-growth">+24%</div>
@@ -694,14 +687,14 @@
             <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" /></svg>
             War Room Strategic Alerts
           </h4>
-          <p class="mod-style-Zm9udC1z">
+          <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;">
             Active marketing loops are running. BullMQ background publishing queues verified. 
             Google Play & Apple Store sync intervals are operating cleanly. 
             ASO Agent has registered 2 keyword ranking shifts.
           </p>
         </div>
 
-        <div id="war-room-cards-container" class="mod-style-ZGlzcGxh">
+        <div id="war-room-cards-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px;">
           <!-- War Cards rendered dynamically via JS -->
         </div>
 
@@ -709,9 +702,9 @@
           <!-- Active Agent Task Board -->
           <div class="glass-card">
             <h3 class="card-title">Live Agent Orchestration Activity</h3>
-            <div class="card-subtitle mod-style-bWFyZ2lu">Real-time task allocations and audit pipelines</div>
+            <div class="card-subtitle" style="margin-bottom: 16px;">Real-time task allocations and audit pipelines</div>
             
-            <div class="mod-style-ZGlzcGxh" id="war-room-agent-activity">
+            <div style="display:flex; flex-direction:column; gap:12px;" id="war-room-agent-activity">
               <!-- Rendered via JS -->
             </div>
           </div>
@@ -719,7 +712,7 @@
           <!-- Quick Actions Panel -->
           <div class="glass-card">
             <h3 class="card-title">Founder Controls</h3>
-            <div class="mod-style-ZGlzcGxh">
+            <div style="display:flex; flex-direction:column; gap:12px; margin-top:16px;">
               <button class="btn btn-primary" data-action="switchView" data-args="social-calendar">Open Content Calendar</button>
               <button class="btn btn-secondary" data-action="switchView" data-args="social-inbox">Open Unified Inbox</button>
               <button class="btn btn-secondary" data-action="switchView" data-args="db-console">Inspect Database Console</button>
@@ -738,7 +731,7 @@
             </div>
           </div>
           
-          <div class="mod-style-ZGlzcGxh">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
             <div>
               <div class="form-group">
                 <label for="launch-type">Launch Program Type</label>
@@ -754,36 +747,36 @@
               <div class="form-group">
                 <label for="launch-prompt">Launch Goal / Description</label>
                 <textarea id="launch-prompt" rows="4" placeholder="Enter target description, e.g., 'Launch my app FitPulse'"></textarea>
-                <div class="mod-style-bWFyZ2lu">
-                  <button class="btn btn-secondary mod-style-cGFkZGlu" data-action="prefillLaunchPrompt" data-args="Launch my app">Suggest: Launch my app</button>
-                  <button class="btn btn-secondary mod-style-cGFkZGlu" data-action="prefillLaunchPrompt" data-args="Launch a new feature">Suggest: Launch new feature</button>
+                <div style="margin-top: 8px; display: flex; gap: 8px;">
+                  <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem;" data-action="prefillLaunchPrompt" data-args="Launch my app">Suggest: Launch my app</button>
+                  <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem;" data-action="prefillLaunchPrompt" data-args="Launch a new feature">Suggest: Launch new feature</button>
                 </div>
               </div>
 
               <button class="btn btn-primary" data-action="generateLaunchCampaign">Generate Launch Assets</button>
             </div>
             
-            <div class="glass-card mod-style-YmFja2dy">
-              <h4 class="mod-style-bWFyZ2lu">Strategic Blueprint</h4>
-              <div id="launch-strategy-summary" class="mod-style-Zm9udC1z">
+            <div class="glass-card" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.04);">
+              <h4 style="margin-bottom: 10px; color: white;">Strategic Blueprint</h4>
+              <div id="launch-strategy-summary" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
                 Enter details on the left and click generate to build the AI-powered launch strategy.
               </div>
             </div>
           </div>
         </div>
 
-        <div class="mod-style-ZGlzcGxh">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px;">
           <div class="glass-card">
-            <h3 class="card-title mod-style-bWFyZ2lu">Launch Sequence Timeline</h3>
+            <h3 class="card-title" style="margin-bottom: 12px;">Launch Sequence Timeline</h3>
             <div class="timeline-wrapper" id="launch-timeline-container">
-              <div class="mod-style-Y29sb3I6">No active timeline generated.</div>
+              <div style="color: var(--text-sub); text-align: center; padding: 40px 0;">No active timeline generated.</div>
             </div>
           </div>
           
           <div class="glass-card">
-            <h3 class="card-title mod-style-bWFyZ2lu">Generated Content Calendar</h3>
-            <div id="content-calendar-container" class="mod-style-bWF4LWhl">
-              <div class="mod-style-Y29sb3I6">No posts in content calendar yet.</div>
+            <h3 class="card-title" style="margin-bottom: 12px;">Generated Content Calendar</h3>
+            <div id="content-calendar-container" style="max-height: 400px; overflow-y: auto;">
+              <div style="color: var(--text-sub); text-align: center; padding: 40px 0;">No posts in content calendar yet.</div>
             </div>
           </div>
         </div>
@@ -797,10 +790,10 @@
               <h3 class="card-title" id="video-factory-app-title">Video Assembly Line</h3>
               <div class="card-subtitle">Generate high-volume marketing videos using Templates, Motion Graphics, and Premium AI.</div>
             </div>
-            <div class="mod-style-Zm9udC1z">Cost Target: 80% Templates / 20% Premium AI</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Cost Target: 80% Templates / 20% Premium AI</div>
           </div>
           
-          <div class="mod-style-ZGlzcGxh">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px;">
             <div>
               <div class="form-group">
                 <label for="video-factory-type">Video Objective</label>
@@ -818,13 +811,13 @@
                 <textarea id="video-factory-prompt" rows="4" placeholder="e.g. Announce our new AI scheduling dashboard with an energetic hook..."></textarea>
               </div>
 
-              <button class="btn btn-primary mod-style-d2lkdGg6" data-action="generateStudioVideo">Initialize Video Assembly (50 Credits)</button>
+              <button class="btn btn-primary" style="width: 100%;" data-action="generateStudioVideo">Initialize Video Assembly</button>
             </div>
 
-            <div class="glass-card mod-style-YmFja2dy">
-              <h4 class="mod-style-Y29sb3I6">Asset Output Library</h4>
-              <div class="mod-style-ZGlzcGxh" id="video-factory-outputs-block">
-                <div class="mod-style-Y29sb3I6">
+            <div class="glass-card" style="background: rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.04);">
+              <h4 style="color: white; margin-bottom: 12px;">Asset Output Library</h4>
+              <div style="display:flex; flex-direction:column; gap:16px; max-height: 400px; overflow-y: auto;" id="video-factory-outputs-block">
+                <div style="color: var(--text-sub); text-align: center; padding: 40px 0;">
                   Enter details and click 'Initialize' to render a video asset.
                 </div>
               </div>
@@ -838,14 +831,14 @@
         <div class="view-header">
           <div>
             <h2 id="autonomous-growth-title" data-i18n="autonomous.title">Autonomous Growth Mode</h2>
-            <p class="mod-style-Y29sb3I6" data-i18n="autonomous.desc">Set a high-level objective and let the multi-agent system execute the entire funnel end-to-end.</p>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;" data-i18n="autonomous.desc">Set a high-level objective and let the multi-agent system execute the entire funnel end-to-end.</p>
           </div>
         </div>
         
-        <div class="card mod-style-bWF4LXdp">
-          <div class="mod-style-dGV4dC1h">
-            <i class="fas fa-bolt mod-style-Zm9udC1z"></i>
-            <h3 class="mod-style-bWFyZ2lu">Growth Command</h3>
+        <div class="card" style="max-width: 600px; margin: 0 auto; background: linear-gradient(145deg, #1f2937, #111827); border: 1px solid var(--primary);">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <i class="fas fa-bolt" style="font-size: 2rem; color: var(--primary);"></i>
+            <h3 style="margin-top: 10px;">Growth Command</h3>
           </div>
           
           <div class="form-group">
@@ -853,26 +846,26 @@
             <textarea id="autonomous-growth-objective" class="form-control" rows="3" placeholder="e.g. Launch the new AI Invoice feature and increase MRR by 10%..." data-i18n="dashboard.cmo_placeholder"></textarea>
           </div>
 
-          <div class="form-group mod-style-bWFyZ2lu">
+          <div class="form-group" style="margin-top: 15px;">
             <label>Campaign Type</label>
-            <select id="autonomous-campaign-type" class="form-control mod-style-YmFja2dy">
+            <select id="autonomous-campaign-type" class="form-control" style="background-color: rgba(255, 255, 255, 0.05); color: white; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 10px; width: 100%;">
               <option value="both">Full Funnel (Organic Posts + Paid Ads)</option>
               <option value="organic">Organic Posts Only (No Ad Spend)</option>
               <option value="paid">Paid Ads Only</option>
             </select>
           </div>
           
-          <div class="mod-style-ZGlzcGxh">
-            <button class="btn btn-primary mod-style-ZmxleDog" data-on-click="executeAutonomousGrowth" data-i18n="autonomous.execute">
+          <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn btn-primary" style="flex: 1;" data-action="executeAutonomousGrowth" data-i18n="autonomous.execute">
               <i class="fas fa-rocket"></i> Execute Autonomous Pipeline
             </button>
           </div>
         </div>
 
-        <div class="card mod-style-bWF4LXdp">
-          <h4 class="mod-style-bWFyZ2lu">Pipeline Status</h4>
-          <div id="autonomous-pipeline-block" class="mod-style-Zm9udC1m">
-            <div class="mod-style-Y29sb3I6">Waiting for command...</div>
+        <div class="card" style="max-width: 600px; margin: 20px auto;">
+          <h4 style="margin-bottom: 15px;">Pipeline Status</h4>
+          <div id="autonomous-pipeline-block" style="font-family: monospace; color: white;">
+            <div style="color: var(--text-muted); text-align: center; padding: 20px;">Waiting for command...</div>
           </div>
         </div>
       </section>
@@ -887,7 +880,7 @@
             </div>
           </div>
           
-          <div class="mod-style-ZGlzcGxh">
+          <div style="display: grid; grid-template-columns: 1.2fr 1.8fr; gap: 24px;">
             <div>
               <div class="form-group">
                 <label for="aso-meta-text">Listing Metadata Content</label>
@@ -896,10 +889,10 @@
               <button class="btn btn-primary" data-action="runASOAnalysis">Analyze Optimization Level</button>
             </div>
             
-            <div class="glass-card mod-style-YmFja2dy">
-              <h4 class="mod-style-bWFyZ2lu">AI Store Listing Optimization</h4>
-              <div class="mod-style-ZGlzcGxh" id="aso-output-block">
-                <div class="mod-style-Y29sb3I6">
+            <div class="glass-card" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.04);">
+              <h4 style="margin-bottom: 12px; color: white;">AI Store Listing Optimization</h4>
+              <div style="display: flex; flex-direction: column; gap: 12px;" id="aso-output-block">
+                <div style="color: var(--text-sub); text-align: center; padding: 40px 0;">
                   Click 'Analyze Optimization Level' to pull keywords and recommendations.
                 </div>
               </div>
@@ -907,7 +900,7 @@
           </div>
         </div>
 
-        <div class="mod-style-ZGlzcGxh">
+        <div style="display: grid; grid-template-columns: 1.5fr 1.5fr; gap: 24px; margin-top: 24px;">
           <div class="glass-card">
             <h3 class="card-title">Keyword Search Rankings</h3>
             <table class="keywords-table">
@@ -925,7 +918,7 @@
           
           <div class="glass-card">
             <h3 class="card-title">Competitor Gap Analysis</h3>
-            <div class="mod-style-ZGlzcGxh" id="aso-competitor-gaps"></div>
+            <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 16px;" id="aso-competitor-gaps"></div>
           </div>
         </div>
       </section>
@@ -934,11 +927,11 @@
       <section id="view-store-integrations" class="view-panel">
         <div class="glass-card">
           <h3 class="card-title">App Store Connect API Connection</h3>
-          <div class="card-subtitle mod-style-bWFyZ2lu">Connect Google Play and Apple App Store to import real-time ratings, reviews, keyword indexing, and install history.</div>
+          <div class="card-subtitle" style="margin-bottom: 20px;">Connect Google Play and Apple App Store to import real-time ratings, reviews, keyword indexing, and install history.</div>
           
-          <div class="mod-style-ZGlzcGxh">
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px;">
             <div>
-              <h4 class="mod-style-Y29sb3I6">OAuth & Credentials Config</h4>
+              <h4 style="color: white; margin-bottom: 12px;">OAuth & Credentials Config</h4>
               
               <div class="form-group">
                 <label for="store-select">Target Application Store</label>
@@ -961,22 +954,22 @@
               <button class="btn btn-primary" data-action="verifyStoreIntegration">Establish Secure Connection</button>
             </div>
 
-            <div class="glass-card mod-style-YmFja2dy">
-              <h4 class="mod-style-Y29sb3I6">Active Store Integrations</h4>
-              <div class="mod-style-ZGlzcGxh">
-                <div class="mod-style-YmFja2dy">
+            <div class="glass-card" style="background: rgba(0,0,0,0.15);">
+              <h4 style="color: white; margin-bottom: 16px;">Active Store Integrations</h4>
+              <div style="display:flex; flex-direction:column; gap:16px;">
+                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:var(--radius-sm); padding:16px; display:flex; justify-content:space-between; align-items:center;">
                   <div>
-                    <h5 class="mod-style-Y29sb3I6">Apple App Store Connect</h5>
-                    <span class="mod-style-Zm9udC1z">Connected (Verified)</span>
+                    <h5 style="color:white; font-size:0.9rem;">Apple App Store Connect</h5>
+                    <span style="font-size:0.75rem; color:var(--accent-green); font-weight:600;">Connected (Verified)</span>
                   </div>
-                  <button class="btn btn-secondary mod-style-cGFkZGlu" data-action="syncAppStoreNow" data-args="apple">Sync Now</button>
+                  <button class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;" data-action="syncAppStoreNow" data-args="apple">Sync Now</button>
                 </div>
-                <div class="mod-style-YmFja2dy">
+                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:var(--radius-sm); padding:16px; display:flex; justify-content:space-between; align-items:center;">
                   <div>
-                    <h5 class="mod-style-Y29sb3I6">Google Play Developer Console</h5>
-                    <span class="mod-style-Zm9udC1z">Connected (Verified)</span>
+                    <h5 style="color:white; font-size:0.9rem;">Google Play Developer Console</h5>
+                    <span style="font-size:0.75rem; color:var(--accent-green); font-weight:600;">Connected (Verified)</span>
                   </div>
-                  <button class="btn btn-secondary mod-style-cGFkZGlu" data-action="syncAppStoreNow" data-args="google">Sync Now</button>
+                  <button class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;" data-action="syncAppStoreNow" data-args="google">Sync Now</button>
                 </div>
               </div>
             </div>
@@ -1000,28 +993,28 @@
             <span class="filter-chip" id="review-filter-pos" data-action="filterReviews" data-args="positive">Positive (4-5★)</span>
             <span class="filter-chip" id="review-filter-neutral" data-action="filterReviews" data-args="neutral">Neutral (3★)</span>
             <span class="filter-chip" id="review-filter-neg" data-action="filterReviews" data-args="negative">Negative (1-2★)</span>
-            <span class="mod-style-Ym9yZGVy"></span>
+            <span style="border-left: 1px solid var(--border-glass); margin: 0 8px;"></span>
             <span class="filter-chip" id="review-filter-ios" data-action="filterReviews" data-args="ios">App Store (iOS)</span>
             <span class="filter-chip" id="review-filter-android" data-action="filterReviews" data-args="android">Google Play</span>
           </div>
 
-          <div class="mod-style-ZGlzcGxh">
+          <div style="display: grid; grid-template-columns: 1.6fr 1.4fr; gap: 24px;">
             <div>
               <div class="review-list" id="reviews-feed-container"></div>
             </div>
             
             <div class="glass-card">
-              <h4 class="mod-style-bWFyZ2lu">Marketing Testimonial Builder</h4>
-              <p class="mod-style-Zm9udC1z">
+              <h4 style="margin-bottom: 12px; color: white;">Marketing Testimonial Builder</h4>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 16px;">
                 Select a review and click "Generate Mockup" to format it into a high-converting square graphic.
               </p>
               
-              <div class="mod-style-ZGlzcGxh">
-                <span class="mod-style-Zm9udC1z">Theme Palette:</span>
-                <span class="filter-chip" data-action="changeMockupTheme" data-args="indigo" class="mod-style-cGFkZGlu">Indigo</span>
-                <span class="filter-chip" data-action="changeMockupTheme" data-args="pink" class="mod-style-cGFkZGlu">Rose</span>
-                <span class="filter-chip" data-action="changeMockupTheme" data-args="emerald" class="mod-style-cGFkZGlu">Emerald</span>
-                <span class="filter-chip" data-action="changeMockupTheme" data-args="dark" class="mod-style-cGFkZGlu">Cyberpunk</span>
+              <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: center;">
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Theme Palette:</span>
+                <span class="filter-chip" data-action="changeMockupTheme" data-args="indigo" style="padding: 4px 10px; font-size: 0.7rem;">Indigo</span>
+                <span class="filter-chip" data-action="changeMockupTheme" data-args="pink" style="padding: 4px 10px; font-size: 0.7rem;">Rose</span>
+                <span class="filter-chip" data-action="changeMockupTheme" data-args="emerald" style="padding: 4px 10px; font-size: 0.7rem;">Emerald</span>
+                <span class="filter-chip" data-action="changeMockupTheme" data-args="dark" style="padding: 4px 10px; font-size: 0.7rem;">Cyberpunk</span>
               </div>
 
               <div class="marketing-mockup-container">
@@ -1037,8 +1030,8 @@
                 </div>
               </div>
               
-              <div class="mod-style-ZGlzcGxh">
-                <button class="btn btn-primary mod-style-ZmxleDog" data-action="exportMockupSuccess">Export Graphic Asset</button>
+              <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <button class="btn btn-primary" style="flex: 1;" data-action="exportMockupSuccess">Export Graphic Asset</button>
                 <button class="btn btn-secondary" data-action="shareMockupAsTweet">Draft Social Post</button>
               </div>
             </div>
@@ -1051,51 +1044,51 @@
         <div class="inbox-layout">
           <!-- Threads list -->
           <div class="inbox-list-panel">
-            <div class="mod-style-cGFkZGlu">
-              <h4 class="mod-style-Y29sb3I6">Inbox Activity</h4>
+            <div style="padding:16px; border-bottom:1px solid var(--border-glass);">
+              <h4 style="color:white; font-size:0.95rem;">Inbox Activity</h4>
             </div>
-            <div class="mod-style-ZmxleDox" id="inbox-threads-list-container">
+            <div style="flex:1; overflow-y:auto;" id="inbox-threads-list-container">
               <!-- Rendered via JS -->
             </div>
           </div>
           
           <!-- Conversations panel -->
-          <div class="glass-card mod-style-ZGlzcGxh">
-            <div class="mod-style-cGFkZGlu">
+          <div class="glass-card" style="display:flex; flex-direction:column; padding:0;">
+            <div style="padding:16px; border-bottom:1px solid var(--border-glass); display:flex; justify-content:space-between; align-items:center;">
               <div>
-                <h4 class="mod-style-Y29sb3I6" id="inbox-active-sender">Select Conversation</h4>
-                <span class="mod-style-Zm9udC1z" id="inbox-active-platform">Choose a thread from the left</span>
+                <h4 style="color:white;" id="inbox-active-sender">Select Conversation</h4>
+                <span style="font-size:0.75rem; color:var(--text-muted);" id="inbox-active-platform">Choose a thread from the left</span>
               </div>
-              <button class="btn btn-secondary mod-style-cGFkZGlu" data-action="markActiveInboxResolved">Mark Resolved</button>
+              <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.72rem;" data-action="markActiveInboxResolved">Mark Resolved</button>
             </div>
             
             <!-- Chat bubble scroll -->
-            <div class="mod-style-ZmxleDox" id="inbox-chat-bubbles">
+            <div style="flex:1; padding:20px; overflow-y:auto; min-height: 300px;" id="inbox-chat-bubbles">
               <!-- Rendered via JS -->
             </div>
             
             <!-- Response text area -->
-            <div class="mod-style-cGFkZGlu">
+            <div style="padding:16px; border-top:1px solid var(--border-glass); background:rgba(0,0,0,0.15);">
               <textarea id="inbox-reply-text" rows="3" placeholder="Write reply message..."></textarea>
-              <div class="mod-style-ZGlzcGxh">
-                <span class="mod-style-Zm9udC1z">Timezone: Default (UTC+3)</span>
+              <div style="display:flex; justify-content:space-between; margin-top:10px;">
+                <span style="font-size:0.75rem; color:var(--text-muted); align-self:center;">Timezone: Default (UTC+3)</span>
                 <button class="btn btn-primary" data-action="sendInboxMessageReply">Send Message</button>
               </div>
             </div>
           </div>
           
           <!-- AI Copilot Panel -->
-          <div class="inbox-list-panel mod-style-cGFkZGlu">
-            <h4 class="mod-style-Y29sb3I6">AI Inbox Copilot</h4>
+          <div class="inbox-list-panel" style="padding:16px;">
+            <h4 style="color:white; font-size:0.9rem; margin-bottom:12px;">AI Inbox Copilot</h4>
             
-            <div class="mod-style-YmFja2dy">
-              <span class="mod-style-Zm9udC1z">INCOMING SENTIMENT</span>
-              <div class="mod-style-Zm9udC13" id="inbox-ai-sentiment">-</div>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); padding:12px; border-radius:6px; margin-bottom:16px;">
+              <span style="font-size:0.7rem; color:var(--text-muted);">INCOMING SENTIMENT</span>
+              <div style="font-weight:700; font-size:1rem; margin-top:4px;" id="inbox-ai-sentiment">-</div>
             </div>
 
-            <span class="mod-style-Zm9udC1z">SUGGESTED RESPONSES</span>
-            <div class="mod-style-ZGlzcGxh" id="inbox-ai-replies-box">
-              <div class="mod-style-Zm9udC1z">Select chat thread to generate options</div>
+            <span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; display:block; margin-bottom:8px;">SUGGESTED RESPONSES</span>
+            <div style="display:flex; flex-direction:column; gap:8px;" id="inbox-ai-replies-box">
+              <div style="font-size:0.75rem; color:var(--text-sub); text-align:center; padding:20px 0;">Select chat thread to generate options</div>
             </div>
           </div>
         </div>
@@ -1105,57 +1098,57 @@
       <section id="view-social-integrations" class="view-panel">
         <div class="glass-card">
           <h3 class="card-title">Social Media Integrations</h3>
-          <div class="card-subtitle mod-style-bWFyZ2lu">Connect your social media accounts to enable automated publishing and AI analytics.</div>
+          <div class="card-subtitle" style="margin-bottom:24px;">Connect your social media accounts to enable automated publishing and AI analytics.</div>
           
-          <div class="mod-style-ZGlzcGxh">
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
             <!-- Instagram -->
-            <div class="mod-style-YmFja2dy">
-              <div class="mod-style-d2lkdGg6">
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+              <div style="width:64px; height:64px; border-radius:16px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
                 <svg fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2" width="32" height="32"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
               </div>
-              <h4 class="mod-style-Y29sb3I6">Instagram</h4>
-              <p class="mod-style-Y29sb3I6">Automate posts, reels, and stories directly to your Instagram Professional Account.</p>
-              <button class="btn btn-primary mod-style-d2lkdGg6" data-action="connectOAuthPlatform" data-args="meta">Connect Account</button>
+              <h4 style="color:white; margin:0 0 8px 0; font-size:1.1rem;">Instagram</h4>
+              <p style="color:var(--text-muted); font-size:0.85rem; margin:0 0 20px 0; line-height:1.4;">Automate posts, reels, and stories directly to your Instagram Professional Account.</p>
+              <button class="btn btn-primary" style="width: 100%;" data-action="connectOAuthPlatform" data-args="meta">Connect Account</button>
             </div>
 
             <!-- TikTok -->
-            <div class="mod-style-YmFja2dy">
-              <div class="mod-style-d2lkdGg6">
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+              <div style="width:64px; height:64px; border-radius:16px; background: #000000; border: 1px solid #333; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
                 <svg fill="currentColor" viewBox="0 0 24 24" stroke="none" width="32" height="32" color="white"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 15.68a6.34 6.34 0 006.32 6.32 6.32 6.32 0 006.32-6.28V9.32a8.27 8.27 0 004.35 1.25V7.12a4.67 4.67 0 01-2.4-.68z"></path></svg>
               </div>
-              <h4 class="mod-style-Y29sb3I6">TikTok</h4>
-              <p class="mod-style-Y29sb3I6">Schedule videos and analyze your viral growth trends.</p>
-              <button class="btn btn-primary mod-style-d2lkdGg6" data-action="showToast" data-args="OAuth Integration Mode: Waiting for Developer API Keys.|info">Connect Account</button>
+              <h4 style="color:white; margin:0 0 8px 0; font-size:1.1rem;">TikTok</h4>
+              <p style="color:var(--text-muted); font-size:0.85rem; margin:0 0 20px 0; line-height:1.4;">Schedule videos and analyze your viral growth trends.</p>
+              <button class="btn btn-primary" style="width: 100%;" data-action="showToast" data-args="OAuth Integration Mode: Waiting for Developer API Keys.|info">Connect Account</button>
             </div>
 
             <!-- Facebook -->
-            <div class="mod-style-YmFja2dy">
-              <div class="mod-style-d2lkdGg6">
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+              <div style="width:64px; height:64px; border-radius:16px; background: #1877F2; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
                 <svg fill="white" viewBox="0 0 24 24" width="32" height="32"><path d="M12 2.04c-5.5 0-10 4.48-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.19 2.23.19v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.9h-2.34v7a10 10 0 008.44-9.9c0-5.54-4.5-10.02-10-10.02z"></path></svg>
               </div>
-              <h4 class="mod-style-Y29sb3I6">Facebook Page</h4>
-              <p class="mod-style-Y29sb3I6">Sync with your brand's Facebook page to manage content and replies.</p>
-              <button class="btn btn-primary mod-style-d2lkdGg6" data-action="connectOAuthPlatform" data-args="meta">Connect Account</button>
+              <h4 style="color:white; margin:0 0 8px 0; font-size:1.1rem;">Facebook Page</h4>
+              <p style="color:var(--text-muted); font-size:0.85rem; margin:0 0 20px 0; line-height:1.4;">Sync with your brand's Facebook page to manage content and replies.</p>
+              <button class="btn btn-primary" style="width: 100%;" data-action="connectOAuthPlatform" data-args="meta">Connect Account</button>
             </div>
 
             <!-- X (Twitter) -->
-            <div class="mod-style-YmFja2dy">
-              <div class="mod-style-d2lkdGg6">
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+              <div style="width:64px; height:64px; border-radius:16px; background: #000000; border: 1px solid #333; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
                 <svg fill="white" viewBox="0 0 24 24" width="32" height="32"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
               </div>
-              <h4 class="mod-style-Y29sb3I6">X (Twitter)</h4>
-              <p class="mod-style-Y29sb3I6">Schedule threads, engage with followers, and track viral reach.</p>
-              <button class="btn btn-primary mod-style-d2lkdGg6" data-action="showToast" data-args="OAuth Integration Mode: Waiting for Developer API Keys.|info">Connect Account</button>
+              <h4 style="color:white; margin:0 0 8px 0; font-size:1.1rem;">X (Twitter)</h4>
+              <p style="color:var(--text-muted); font-size:0.85rem; margin:0 0 20px 0; line-height:1.4;">Schedule threads, engage with followers, and track viral reach.</p>
+              <button class="btn btn-primary" style="width: 100%;" data-action="showToast" data-args="OAuth Integration Mode: Waiting for Developer API Keys.|info">Connect Account</button>
             </div>
 
             <!-- WhatsApp Business -->
-            <div class="mod-style-YmFja2dy">
-              <div class="mod-style-d2lkdGg6">
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+              <div style="width:64px; height:64px; border-radius:16px; background: #25D366; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
                 <svg fill="white" viewBox="0 0 24 24" width="36" height="36"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.06-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path></svg>
               </div>
-              <h4 class="mod-style-Y29sb3I6">WhatsApp Business</h4>
-              <p class="mod-style-Y29sb3I6">Automate customer support replies directly from the unified Social Inbox.</p>
-              <button class="btn btn-primary mod-style-d2lkdGg6" data-action="showToast" data-args="OAuth Integration Mode: Waiting for Developer API Keys.|info">Connect Account</button>
+              <h4 style="color:white; margin:0 0 8px 0; font-size:1.1rem;">WhatsApp Business</h4>
+              <p style="color:var(--text-muted); font-size:0.85rem; margin:0 0 20px 0; line-height:1.4;">Automate customer support replies directly from the unified Social Inbox.</p>
+              <button class="btn btn-primary" style="width: 100%;" data-action="showToast" data-args="OAuth Integration Mode: Waiting for Developer API Keys.|info">Connect Account</button>
             </div>
           </div>
         </div>
@@ -1166,24 +1159,24 @@
         <div class="calendar-layout">
           <div class="calendar-header-bar">
             <div>
-              <h3 class="mod-style-Y29sb3I6">June 2026</h3>
-              <span class="mod-style-Zm9udC1z">Queue Schedule conflicts: <strong class="mod-style-Y29sb3I6">None Detected</strong></span>
+              <h3 style="color:white;">June 2026</h3>
+              <span style="font-size:0.8rem; color:var(--text-muted);">Queue Schedule conflicts: <strong style="color:var(--accent-green);">None Detected</strong></span>
             </div>
             
-            <div class="mod-style-ZGlzcGxh">
-              <select id="calendar-timezone-select" class="mod-style-d2lkdGg6">
+            <div style="display:flex; gap:12px;">
+              <select id="calendar-timezone-select" style="width:180px; padding:6px 12px;">
                 <option value="EST">New York (EST)</option>
                 <option value="GMT">London (GMT)</option>
                 <option value="UTC+3" selected>Istanbul (UTC+3)</option>
               </select>
-              <button class="btn btn-danger mod-style-YmFja2dy" data-action="clearAllCalendarPosts">Clear All Posts</button>
+              <button class="btn btn-danger" style="background-color: var(--accent-red);" data-action="clearAllCalendarPosts">Clear All Posts</button>
               <button class="btn btn-primary" data-action="openCalendarPostModal">Schedule New Post</button>
             </div>
           </div>
 
           <div class="glass-card">
             <!-- Day labels -->
-            <div class="calendar-grid-month mod-style-bWFyZ2lu">
+            <div class="calendar-grid-month" style="margin-bottom:8px;">
               <div class="calendar-day-header">Sun</div>
               <div class="calendar-day-header">Mon</div>
               <div class="calendar-day-header">Tue</div>
@@ -1205,9 +1198,9 @@
       <section id="view-content-studio" class="view-panel">
         <div class="glass-card">
           <h3 class="card-title">AI Content Studio</h3>
-          <div class="card-subtitle mod-style-bWFyZ2lu">Draft, rephrase, and generate platform-optimized variant campaigns automatically.</div>
+          <div class="card-subtitle" style="margin-bottom: 20px;">Draft, rephrase, and generate platform-optimized variant campaigns automatically.</div>
           
-          <div class="mod-style-ZGlzcGxh">
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px;">
             <div>
               <div class="form-group">
                 <label for="studio-platform">Target Channel Platform</label>
@@ -1220,10 +1213,10 @@
               </div>
 
               <div class="form-group">
-                <div class="mod-style-ZGlzcGxh">
-                  <label for="studio-prompt" class="mod-style-bWFyZ2lu">Campaign Topic / Features Outline</label>
-                  <button id="btn-recycle-content" class="btn btn-outline mod-style-Zm9udC1z" data-action="recycleStudioContent">
-                    <svg fill="currentColor" viewBox="0 0 24 24" width="14" height="14" class="mod-style-bWFyZ2lu"><path d="M12 2.75a9.25 9.25 0 104.737 17.197l-1.423-1.424A7.25 7.25 0 1119.25 12h-2l3.5-3.5 3.5 3.5h-2a9.25 9.25 0 00-10.25-9.25z"></path></svg>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <label for="studio-prompt" style="margin-bottom: 0;">Campaign Topic / Features Outline</label>
+                  <button id="btn-recycle-content" class="btn btn-outline" style="font-size: 0.8rem; padding: 4px 10px;" data-action="recycleStudioContent">
+                    <svg fill="currentColor" viewBox="0 0 24 24" width="14" height="14" style="margin-right: 4px; vertical-align: text-bottom;"><path d="M12 2.75a9.25 9.25 0 104.737 17.197l-1.423-1.424A7.25 7.25 0 1119.25 12h-2l3.5-3.5 3.5 3.5h-2a9.25 9.25 0 00-10.25-9.25z"></path></svg>
                     Recycle Winning Content
                   </button>
                 </div>
@@ -1257,17 +1250,17 @@
                 </select>
               </div>
 
-              <div class="mod-style-ZGlzcGxh">
-                <button class="btn btn-primary mod-style-ZmxleDox" data-action="generateStudioContent">Draft Copy Variants</button>
-                <button class="btn btn-outline mod-style-ZmxleDox" data-action="generateStudioImage">Generate Image Asset (10 Credits)</button>
+              <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-primary" style="flex:1;" data-action="generateStudioContent">Draft Copy Variants</button>
+                <button class="btn btn-outline" style="flex:1;" data-action="generateStudioImage">Generate Image Asset</button>
               </div>
             </div>
 
-            <div class="glass-card mod-style-YmFja2dy">
-              <h4 class="mod-style-Y29sb3I6">Studio Copy Output</h4>
+            <div class="glass-card" style="background: rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.04);">
+              <h4 style="color: white; margin-bottom: 12px;">Studio Copy Output</h4>
               
-              <div class="mod-style-ZGlzcGxh" id="studio-outputs-block">
-                <div class="mod-style-Y29sb3I6">
+              <div style="display:flex; flex-direction:column; gap:16px;" id="studio-outputs-block">
+                <div style="color: var(--text-sub); text-align: center; padding: 40px 0;">
                   Enter details and click 'Draft Studio Content' to generate variants.
                 </div>
               </div>
@@ -1279,82 +1272,82 @@
       <!-- VIEW 5.2.b: CONTENT INTELLIGENCE & PERFORMANCE ANALYZER (NEW) -->
       <section id="view-content-intelligence" class="view-panel">
         <!-- KPI Ribbon -->
-        <div class="mod-style-ZGlzcGxh">
+        <div style="display: grid; grid-template-columns: 1fr 3fr; gap: 24px; margin-bottom: 24px;">
           <!-- Score gauge card -->
-          <div class="glass-card mod-style-ZGlzcGxh">
-            <h4 class="mod-style-Y29sb3I6">Average Success Score</h4>
-            <div id="intel-score-gauge" class="mod-style-d2lkdGg6">
-              <div class="mod-style-d2lkdGg6">
-                <span id="intel-score-label" class="mod-style-Zm9udC1z">74.5</span>
+          <div class="glass-card" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px;">
+            <h4 style="color:white; font-size:0.9rem; margin-bottom:12px;">Average Success Score</h4>
+            <div id="intel-score-gauge" style="width:100px; height:100px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative; box-shadow: 0 0 15px rgba(99,102,241,0.2);">
+              <div style="width:84px; height:84px; border-radius:50%; background:#0b0f19; display:flex; align-items:center; justify-content:center;">
+                <span id="intel-score-label" style="font-size:2rem; font-weight:800; color:white;">74.5</span>
               </div>
             </div>
-            <span class="mod-style-Zm9udC1z">Overall Portfolio Health</span>
+            <span style="font-size:0.7rem; color:var(--text-sub); margin-top:10px;">Overall Portfolio Health</span>
           </div>
 
           <!-- General stats card -->
-          <div class="glass-card mod-style-ZGlzcGxh">
-            <h4 class="mod-style-Y29sb3I6">Portfolio Conversion Attribution</h4>
-            <div class="kpi-grid mod-style-Z3JpZC10">
-              <div class="mod-style-YmFja2dy">
-                <div class="mod-style-Zm9udC1z">Attributed Revenue</div>
-                <div id="intel-revenue-stat" class="mod-style-Zm9udC1z">$28,450</div>
+          <div class="glass-card" style="display:flex; flex-direction:column; justify-content:center; padding:24px;">
+            <h4 style="color:white; font-size:1rem; margin-bottom:16px;">Portfolio Conversion Attribution</h4>
+            <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 0;">
+              <div style="background:rgba(255,255,255,0.02); padding:14px; border:1px solid var(--border-glass); border-radius:6px;">
+                <div style="font-size:0.75rem; color:var(--text-sub);">Attributed Revenue</div>
+                <div id="intel-revenue-stat" style="font-size:1.4rem; font-weight:800; color:var(--accent-green); margin-top:4px;">$28,450</div>
               </div>
-              <div class="mod-style-YmFja2dy">
-                <div class="mod-style-Zm9udC1z">Attributed Downloads</div>
-                <div id="intel-downloads-stat" class="mod-style-Zm9udC1z">12,450</div>
+              <div style="background:rgba(255,255,255,0.02); padding:14px; border:1px solid var(--border-glass); border-radius:6px;">
+                <div style="font-size:0.75rem; color:var(--text-sub);">Attributed Downloads</div>
+                <div id="intel-downloads-stat" style="font-size:1.4rem; font-weight:800; color:white; margin-top:4px;">12,450</div>
               </div>
-              <div class="mod-style-YmFja2dy">
-                <div class="mod-style-Zm9udC1z">Attributed Leads</div>
-                <div id="intel-leads-stat" class="mod-style-Zm9udC1z">3,100</div>
+              <div style="background:rgba(255,255,255,0.02); padding:14px; border:1px solid var(--border-glass); border-radius:6px;">
+                <div style="font-size:0.75rem; color:var(--text-sub);">Attributed Leads</div>
+                <div id="intel-leads-stat" style="font-size:1.4rem; font-weight:800; color:var(--primary); margin-top:4px;">3,100</div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="mod-style-ZGlzcGxh">
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; margin-bottom: 24px;">
           <!-- Predictor Card -->
           <div class="glass-card">
             <h3 class="card-title">AI Success Predictor</h3>
-            <div class="card-subtitle mod-style-bWFyZ2lu">Test post copies before publishing to estimate reach and receive optimization tips.</div>
+            <div class="card-subtitle" style="margin-bottom:16px;">Test post copies before publishing to estimate reach and receive optimization tips.</div>
             
-            <div class="form-group mod-style-bWFyZ2lu">
+            <div class="form-group" style="margin-bottom:12px;">
               <label for="intel-predict-input">Post Copy Draft</label>
-              <textarea id="intel-predict-input" rows="4" class="mod-style-YmFja2dy" placeholder="Paste your social campaign copy draft here..."></textarea>
+              <textarea id="intel-predict-input" rows="4" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:10px; border-radius:4px; font-size:0.85rem;" placeholder="Paste your social campaign copy draft here..."></textarea>
             </div>
             
-            <div class="mod-style-ZGlzcGxh">
-              <button class="btn btn-secondary mod-style-Zm9udC1z" data-action="prefillLaunchPrompt" data-args="Launch my app">Load Test Draft</button>
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+              <button class="btn btn-secondary" style="font-size:0.75rem;" data-action="prefillLaunchPrompt" data-args="Launch my app">Load Test Draft</button>
               <button class="btn btn-primary" data-action="runSuccessPrediction">Predict Performance</button>
             </div>
 
             <!-- Prediction output -->
-            <div id="intel-prediction-results" class="mod-style-YmFja2dy">
-              <div class="mod-style-ZGlzcGxh" id="intel-predict-score-block">
-                <div class="mod-style-Zm9udC1z">--</div>
-                <span class="mod-style-Zm9udC1z">Success Score</span>
+            <div id="intel-prediction-results" style="background:rgba(0,0,0,0.2); border:1px solid var(--border-glass); border-radius:6px; padding:16px; min-height:140px; display:flex; gap:20px;">
+              <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; min-width:120px; border-right:1px solid var(--border-glass); padding-right:20px;" id="intel-predict-score-block">
+                <div style="font-size:2.5rem; font-weight:800; color:var(--text-sub);">--</div>
+                <span style="font-size:0.75rem; color:var(--text-muted);">Success Score</span>
               </div>
-              <div class="mod-style-ZmxleDox" id="intel-predict-details-block">
-                <p class="mod-style-Y29sb3I6">Click 'Predict Performance' to evaluate this draft copy.</p>
+              <div style="flex:1;" id="intel-predict-details-block">
+                <p style="color:var(--text-muted); text-align:center; padding-top:40px; font-size:0.8rem;">Click 'Predict Performance' to evaluate this draft copy.</p>
               </div>
             </div>
           </div>
 
           <!-- Coach Card -->
-          <div class="glass-card mod-style-ZGlzcGxh">
+          <div class="glass-card" style="display:flex; flex-direction:column; justify-content:space-between;">
             <div>
               <h3 class="card-title">AI Content Coach</h3>
-              <div class="card-subtitle mod-style-bWFyZ2lu">Ask the strategy brain questions regarding conversions and patterns.</div>
+              <div class="card-subtitle" style="margin-bottom:12px;">Ask the strategy brain questions regarding conversions and patterns.</div>
               
               <!-- Chat logs window -->
-              <div id="intel-coach-chat-logs" class="mod-style-YmFja2dy">
+              <div id="intel-coach-chat-logs" style="background:#02050b; border:1px solid var(--border-glass); border-radius:6px; height:240px; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px; margin-bottom:12px;">
                 <div class="chat-bubble-row received">
-                  <div class="agent-avatar growth mod-style-d2lkdGg6">C</div>
-                  <div class="chat-bubble mod-style-YmFja2dy">
+                  <div class="agent-avatar growth" style="width:28px; height:28px; font-size:0.75rem; align-self:flex-end;">C</div>
+                  <div class="chat-bubble" style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass);">
                     Hi Founder! I am your strategy Coach. Ask me anything about what content drives growth or choose a preset question:
-                    <div class="mod-style-ZGlzcGxh">
-                      <button class="btn btn-secondary mod-style-cGFkZGlu" data-action="askContentCoach" data-args="Why did this post fail?">Why did this post fail?</button>
-                      <button class="btn btn-secondary mod-style-cGFkZGlu" data-action="askContentCoach" data-args="Which content drives downloads?">Which content drives downloads?</button>
-                      <button class="btn btn-secondary mod-style-cGFkZGlu" data-action="askContentCoach" data-args="What should I post next week?">What should I post next week?</button>
+                    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;">
+                      <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.65rem;" data-action="askContentCoach" data-args="Why did this post fail?">Why did this post fail?</button>
+                      <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.65rem;" data-action="askContentCoach" data-args="Which content drives downloads?">Which content drives downloads?</button>
+                      <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.65rem;" data-action="askContentCoach" data-args="What should I post next week?">What should I post next week?</button>
                     </div>
                   </div>
                 </div>
@@ -1362,29 +1355,29 @@
             </div>
 
             <!-- Input area -->
-            <div class="mod-style-ZGlzcGxh">
-              <input type="text" id="intel-coach-input" placeholder="Type a custom query (e.g. Which platform performs best?)..." class="mod-style-YmFja2dy">
+            <div style="display:flex; gap:8px;">
+              <input type="text" id="intel-coach-input" placeholder="Type a custom query (e.g. Which platform performs best?)..." style="background:#040711; border:1px solid var(--border-glass); color:white; flex:1; padding:10px; border-radius:4px; font-size:0.8rem;">
               <button class="btn btn-primary" data-action="askContentCoach">Ask Coach</button>
             </div>
           </div>
         </div>
 
-        <div class="mod-style-ZGlzcGxh">
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; margin-bottom: 24px;">
           <!-- Timing and Hashtags -->
           <div class="glass-card">
             <h3 class="card-title">Optimal Timing & Hashtags</h3>
-            <div class="card-subtitle mod-style-bWFyZ2lu">AI analyzed times and hashtags with highest reach impact.</div>
+            <div class="card-subtitle" style="margin-bottom:16px;">AI analyzed times and hashtags with highest reach impact.</div>
             
-            <div class="mod-style-ZGlzcGxh">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
               <div>
-                <h4 class="mod-style-Y29sb3I6">Best Times to Post</h4>
-                <div class="mod-style-ZGlzcGxh" id="intel-best-times-list">
+                <h4 style="color:white; font-size:0.85rem; margin-bottom:8px;">Best Times to Post</h4>
+                <div style="display:flex; flex-direction:column; gap:8px;" id="intel-best-times-list">
                   <!-- Rendered via JS -->
                 </div>
               </div>
               <div>
-                <h4 class="mod-style-Y29sb3I6">Hashtag Reach Impact</h4>
-                <table class="competitor-table mod-style-Zm9udC1z">
+                <h4 style="color:white; font-size:0.85rem; margin-bottom:8px;">Hashtag Reach Impact</h4>
+                <table class="competitor-table" style="font-size:0.75rem;">
                   <thead>
                     <tr><th>Hashtag</th><th>Reach Impact</th></tr>
                   </thead>
@@ -1399,9 +1392,9 @@
           <!-- CTA Analytics -->
           <div class="glass-card">
             <h3 class="card-title">CTA Conversion Rankings</h3>
-            <div class="card-subtitle mod-style-bWFyZ2lu">Comparing calls-to-action click-through rates and downloads.</div>
+            <div class="card-subtitle" style="margin-bottom:16px;">Comparing calls-to-action click-through rates and downloads.</div>
             
-            <table class="competitor-table mod-style-Zm9udC1z">
+            <table class="competitor-table" style="font-size:0.78rem;">
               <thead>
                 <tr>
                   <th>Call-to-Action</th>
@@ -1418,42 +1411,42 @@
         </div>
 
         <!-- Hall of Fame -->
-        <div class="glass-card mod-style-bWFyZ2lu">
+        <div class="glass-card" style="margin-bottom: 24px;">
           <h3 class="card-title">Content Hall of Fame</h3>
-          <div class="card-subtitle mod-style-bWFyZ2lu">Your top 1% and 5% highest-performing campaign posts.</div>
+          <div class="card-subtitle" style="margin-bottom: 16px;">Your top 1% and 5% highest-performing campaign posts.</div>
           
-          <div class="roadmap-board mod-style-Z3JpZC10" id="intel-hall-grid">
+          <div class="roadmap-board" style="grid-template-columns: repeat(3, 1fr);" id="intel-hall-grid">
             <!-- Rendered via JS -->
           </div>
         </div>
 
         <!-- Recycler panel -->
-        <div class="mod-style-ZGlzcGxh">
+        <div style="display:grid; grid-template-columns: 1fr 1.2fr; gap:24px; margin-bottom:24px;">
           <div class="glass-card">
             <h3 class="card-title">AI Content Recycler</h3>
-            <div class="card-subtitle mod-style-bWFyZ2lu">Re-draft and scale high-performing captions into other channels automatically.</div>
+            <div class="card-subtitle" style="margin-bottom:16px;">Re-draft and scale high-performing captions into other channels automatically.</div>
             
-            <div class="form-group mod-style-bWFyZ2lu">
+            <div class="form-group" style="margin-bottom:12px;">
               <label for="intel-recycle-input">Source Caption Text</label>
-              <textarea id="intel-recycle-input" rows="4" class="mod-style-YmFja2dy" placeholder="Select a post from the Hall of Fame above or type copy to recycle here..."></textarea>
+              <textarea id="intel-recycle-input" rows="4" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:10px; border-radius:4px; font-size:0.85rem;" placeholder="Select a post from the Hall of Fame above or type copy to recycle here..."></textarea>
             </div>
             <button class="btn btn-primary" data-action="runSaaSContentRecycle">Recycle Content Copy</button>
           </div>
 
           <div class="glass-card">
-            <h4 class="mod-style-Y29sb3I6">Recycled Variants Output</h4>
+            <h4 style="color:white; margin-bottom:12px;">Recycled Variants Output</h4>
             <div id="intel-recycle-outputs">
-              <p class="mod-style-Y29sb3I6">Enter source text and click 'Recycle Content Copy' to generate variations.</p>
+              <p style="color:var(--text-sub); text-align:center; padding-top:40px; font-size:0.8rem;">Enter source text and click 'Recycle Content Copy' to generate variations.</p>
             </div>
           </div>
         </div>
 
         <!-- Weekly Strategy Card -->
-        <div class="glass-card mod-style-YmFja2dy">
-          <div class="mod-style-ZGlzcGxh">
+        <div class="glass-card" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)); border: 1px solid var(--primary-glow);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
-              <h3 class="card-title mod-style-Y29sb3I6">Weekly Growth Strategy Review</h3>
-              <div class="card-subtitle mod-style-bWFyZ2lu">Compile and download the portfolio-wide weekly content performance audit.</div>
+              <h3 class="card-title" style="color:white;">Weekly Growth Strategy Review</h3>
+              <div class="card-subtitle" style="margin:4px 0 0 0; color:rgba(255,255,255,0.75);">Compile and download the portfolio-wide weekly content performance audit.</div>
             </div>
             <button class="btn btn-primary" data-action="downloadWeeklyReport">Download Strategy Report</button>
           </div>
@@ -1462,53 +1455,53 @@
 
       <!-- VIEW 5.3: MEDIA ASSET MANAGER (NEW) -->
       <section id="view-media-asset" class="view-panel">
-        <div class="glass-card mod-style-bWFyZ2lu">
+        <div class="glass-card" style="margin-bottom: 24px;">
           <h3 class="card-title">Media Asset Manager</h3>
-          <div class="card-subtitle mod-style-bWFyZ2lu">Upload image cards, promotional videos, and brand guidelines with automatic AI-descriptions.</div>
+          <div class="card-subtitle" style="margin-bottom: 20px;">Upload image cards, promotional videos, and brand guidelines with automatic AI-descriptions.</div>
           
-          <div class="mod-style-ZGlzcGxh">
-            <div class="mod-style-ZGlzcGxh" id="media-folder-chips">
+          <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+            <div style="display:flex; gap:8px;" id="media-folder-chips">
               <!-- Rendered via JS -->
             </div>
             <button class="btn btn-primary" data-action="simulateMediaUploadClick">Upload Asset</button>
-            <input type="file" id="media-upload-dummy-input" class="mod-style-ZGlzcGxh">
+            <input type="file" id="media-upload-dummy-input" style="display:none;">
           </div>
 
           <!-- Folders -->
           <div class="media-folder-grid">
             <div class="media-folder-card active" id="media-folder-all" data-action="selectMediaFolder" data-args="all">
-              <span class="mod-style-Zm9udC1z">📁</span>
+              <span style="font-size:1.5rem;">📁</span>
               <div>
-                <div class="mod-style-Zm9udC13">All Assets</div>
-                <span class="mod-style-Zm9udC1z" id="media-total-count">4 items</span>
+                <div style="font-weight:600; color:white; font-size:0.85rem;">All Assets</div>
+                <span style="font-size:0.7rem; color:var(--text-sub);" id="media-total-count">4 items</span>
               </div>
             </div>
             <div class="media-folder-card" id="media-folder-brand" data-action="selectMediaFolder" data-args="Brand Assets">
-              <span class="mod-style-Zm9udC1z">📂</span>
+              <span style="font-size:1.5rem;">📂</span>
               <div>
-                <div class="mod-style-Zm9udC13">Brand Assets</div>
-                <span class="mod-style-Zm9udC1z">1 item</span>
+                <div style="font-weight:600; color:white; font-size:0.85rem;">Brand Assets</div>
+                <span style="font-size:0.7rem; color:var(--text-sub);">1 item</span>
               </div>
             </div>
             <div class="media-folder-card" id="media-folder-ai" data-action="selectMediaFolder" data-args="AI Generated">
-              <span class="mod-style-Zm9udC1z">🤖</span>
+              <span style="font-size:1.5rem;">🤖</span>
               <div>
-                <div class="mod-style-Zm9udC13">AI Generated</div>
-                <span class="mod-style-Zm9udC1z">Auto</span>
+                <div style="font-weight:600; color:white; font-size:0.85rem;">AI Generated</div>
+                <span style="font-size:0.7rem; color:var(--text-sub);">Auto</span>
               </div>
             </div>
             <div class="media-folder-card" id="media-folder-promo" data-action="selectMediaFolder" data-args="Promotions">
-              <span class="mod-style-Zm9udC1z">📂</span>
+              <span style="font-size:1.5rem;">📂</span>
               <div>
-                <div class="mod-style-Zm9udC13">Promotions</div>
-                <span class="mod-style-Zm9udC1z">1 item</span>
+                <div style="font-weight:600; color:white; font-size:0.85rem;">Promotions</div>
+                <span style="font-size:0.7rem; color:var(--text-sub);">1 item</span>
               </div>
             </div>
             <div class="media-folder-card" id="media-folder-screens" data-action="selectMediaFolder" data-args="Screenshots">
-              <span class="mod-style-Zm9udC1z">📂</span>
+              <span style="font-size:1.5rem;">📂</span>
               <div>
-                <div class="mod-style-Zm9udC13">Screenshots</div>
-                <span class="mod-style-Zm9udC1z">1 item</span>
+                <div style="font-weight:600; color:white; font-size:0.85rem;">Screenshots</div>
+                <span style="font-size:0.7rem; color:var(--text-sub);">1 item</span>
               </div>
             </div>
           </div>
@@ -1530,7 +1523,7 @@
             </div>
           </div>
           
-          <div class="mod-style-ZGlzcGxh">
+          <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 24px;">
             <div>
               <div class="form-group">
                 <label for="release-version">Release Version Number</label>
@@ -1543,22 +1536,22 @@
               <button class="btn btn-primary" data-action="generateReleaseCampaign">Formulate Release Assets</button>
             </div>
             
-            <div class="glass-card mod-style-YmFja2dy">
-              <h4 class="mod-style-bWFyZ2lu">AI Generated Release Package</h4>
+            <div class="glass-card" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.04);">
+              <h4 style="margin-bottom: 12px; color: white;">AI Generated Release Package</h4>
               
-              <div class="tabs-navigation mod-style-bWFyZ2lu">
+              <div class="tabs-navigation" style="margin-bottom: 12px;">
                 <button class="sub-tab-btn active" id="rel-tab-social" data-action="switchReleaseTab" data-args="social">Social Thread</button>
                 <button class="sub-tab-btn" id="rel-tab-email" data-action="switchReleaseTab" data-args="email">User Email</button>
                 <button class="sub-tab-btn" id="rel-tab-changelog" data-action="switchReleaseTab" data-args="changelog">Store Changelog</button>
               </div>
               
-              <div class="mod-style-bWluLWhl" id="release-output-container">
-                <div class="mod-style-Y29sb3I6">
+              <div style="min-height: 220px;" id="release-output-container">
+                <div style="color: var(--text-sub); text-align: center; padding: 40px 0;">
                   Enter details and click 'Formulate Release Assets' to load the templates.
                 </div>
               </div>
               
-              <div class="mod-style-ZGlzcGxh">
+              <div style="display: flex; gap: 12px; margin-top: 16px; border-top: 1px solid var(--border-glass); padding-top: 16px;">
                 <button class="btn btn-primary" data-action="approveAndScheduleRelease">Approve & Schedule Campaign</button>
                 <button class="btn btn-secondary" data-action="copyReleaseToClipboard">Copy to Clipboard</button>
               </div>
@@ -1576,8 +1569,8 @@
               <div class="card-subtitle">Keep users updated, manage feature requests, and announce progress.</div>
             </div>
             
-            <div class="mod-style-ZGlzcGxh">
-              <span class="mod-style-Zm9udC1z">Toggle Visibility:</span>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Toggle Visibility:</span>
               <label class="switch-label">
                 <input type="checkbox" checked class="switch-input" id="roadmap-visibility-toggle" onchange="toggleRoadmapVisibility()">
                 <span class="switch-slider"></span>
@@ -1591,33 +1584,33 @@
             <div class="roadmap-col">
               <div class="roadmap-col-title planned">
                 <span>Planned</span>
-                <span class="filter-chip mod-style-cGFkZGlu" id="roadmap-count-planned">0</span>
+                <span class="filter-chip" style="padding: 2px 8px; font-size: 0.7rem;" id="roadmap-count-planned">0</span>
               </div>
-              <div class="mod-style-ZGlzcGxh" id="roadmap-list-planned"></div>
+              <div style="display: flex; flex-direction: column; gap: 10px;" id="roadmap-list-planned"></div>
             </div>
             
             <!-- In Progress -->
             <div class="roadmap-col">
               <div class="roadmap-col-title inprogress">
                 <span>In Progress</span>
-                <span class="filter-chip mod-style-cGFkZGlu" id="roadmap-count-inprogress">0</span>
+                <span class="filter-chip" style="padding: 2px 8px; font-size: 0.7rem;" id="roadmap-count-inprogress">0</span>
               </div>
-              <div class="mod-style-ZGlzcGxh" id="roadmap-list-inprogress"></div>
+              <div style="display: flex; flex-direction: column; gap: 10px;" id="roadmap-list-inprogress"></div>
             </div>
             
             <!-- Completed -->
             <div class="roadmap-col">
               <div class="roadmap-col-title completed">
                 <span>Completed</span>
-                <span class="filter-chip mod-style-cGFkZGlu" id="roadmap-count-completed">0</span>
+                <span class="filter-chip" style="padding: 2px 8px; font-size: 0.7rem;" id="roadmap-count-completed">0</span>
               </div>
-              <div class="mod-style-ZGlzcGxh" id="roadmap-list-completed"></div>
+              <div style="display: flex; flex-direction: column; gap: 10px;" id="roadmap-list-completed"></div>
             </div>
           </div>
           
-          <div class="mod-style-ZGlzcGxh">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; border-top: 1px solid var(--border-glass); padding-top: 24px;">
             <div>
-              <h4 class="mod-style-bWFyZ2lu">Submit Feature Proposal</h4>
+              <h4 style="margin-bottom: 12px; color: white;">Submit Feature Proposal</h4>
               <div class="form-group">
                 <label for="new-feature-title">Feature Title</label>
                 <input type="text" id="new-feature-title" placeholder="e.g. Calendar Integration">
@@ -1629,9 +1622,9 @@
               <button class="btn btn-secondary" data-action="addNewRoadmapItem">Add Feature Proposal</button>
             </div>
             
-            <div class="glass-card mod-style-YmFja2dy">
-              <h4 class="mod-style-bWFyZ2lu">AI Promotional Content Generator</h4>
-              <p class="mod-style-Zm9udC1z">
+            <div class="glass-card" style="background: rgba(0,0,0,0.15);">
+              <h4 style="margin-bottom: 8px; color: white;">AI Promotional Content Generator</h4>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">
                 Generate promotional announcement copy immediately from any roadmap feature.
               </p>
               <div class="form-group">
@@ -1640,7 +1633,7 @@
               </div>
               <button class="btn btn-primary" data-action="generateRoadmapAnnouncementPost">Generate Announcement Copy</button>
               
-              <div class="mod-style-bWFyZ2lu" id="roadmap-announcement-result">
+              <div style="margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: 6px; font-size: 0.8rem; min-height: 80px;" id="roadmap-announcement-result">
                 Select feature and generate to preview post drafts.
               </div>
             </div>
@@ -1650,10 +1643,10 @@
 
       <!-- VIEW 7: CONTENT RECYCLER & COPILOT -->
       <section id="view-content-recycler" class="view-panel">
-        <div class="mod-style-ZGlzcGxh">
+        <div style="display: grid; grid-template-columns: 1.5fr 1.5fr; gap: 24px;">
           <div class="glass-card">
-            <h3 class="card-title mod-style-bWFyZ2lu">Marketing Content Recycler</h3>
-            <div class="card-subtitle mod-style-bWFyZ2lu">Refurbish high-performing copy to match other channels without posting duplicates.</div>
+            <h3 class="card-title" style="margin-bottom: 6px;">Marketing Content Recycler</h3>
+            <div class="card-subtitle" style="margin-bottom: 20px;">Refurbish high-performing copy to match other channels without posting duplicates.</div>
             
             <div class="form-group">
               <label for="recycle-input-post">High-Performing Original Content</label>
@@ -1671,9 +1664,9 @@
             
             <button class="btn btn-primary" data-action="recycleContent">Re-phrase & Generate Variation</button>
             
-            <div class="glass-card mod-style-YmFja2dy">
-              <h4 class="mod-style-bWFyZ2lu">Refreshed Variation</h4>
-              <div class="mod-style-Zm9udC1z" id="recycler-output">
+            <div class="glass-card" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.04); margin-top: 20px;">
+              <h4 style="margin-bottom: 8px; color: white;">Refreshed Variation</h4>
+              <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; min-height: 120px;" id="recycler-output">
                 Input your top-performing text above to view fresh rephrasing outputs.
               </div>
             </div>
@@ -1687,11 +1680,11 @@
               </div>
             </div>
             
-            <div class="mod-style-ZGlzcGxh" id="copilot-recommendations-list"></div>
+            <div style="display: flex; flex-direction: column; gap: 16px;" id="copilot-recommendations-list"></div>
             
-            <div class="mod-style-bWFyZ2lu">
-              <h4 class="mod-style-bWFyZ2lu">Generate Weekly Strategy Review</h4>
-              <p class="mod-style-Zm9udC1z">
+            <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-glass);">
+              <h4 style="margin-bottom: 12px; color: white;">Generate Weekly Strategy Review</h4>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 16px;">
                 Compile a comprehensive strategic brief highlighting competitors, keyword opportunities, and target recommendations.
               </p>
               <button class="btn btn-secondary" data-action="generateWeeklyGrowthReport">Generate Strategic Report</button>
@@ -1702,7 +1695,7 @@
 
       <!-- VIEW 8: ECOSYSTEM & COMPETITORS -->
       <section id="view-competitor-ecosystem" class="view-panel">
-        <div class="mod-style-ZGlzcGxh">
+        <div style="display: grid; grid-template-columns: 1.4fr 1.6fr; gap: 24px;">
           <div class="glass-card">
             <h3 class="card-title">Competitor Business Intelligence</h3>
             <div class="card-subtitle">Live market share, audience tracking, and strategic gaps.</div>
@@ -1719,9 +1712,9 @@
               <tbody id="competitor-list-tbody"></tbody>
             </table>
             
-            <div class="glass-card mod-style-YmFja2dy">
-              <h4 class="mod-style-bWFyZ2lu">Competitor Launch Opportunities</h4>
-              <p class="mod-style-Zm9udC1z" id="competitor-analysis-tip">
+            <div class="glass-card" style="background: rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.04); margin-top: 20px;">
+              <h4 style="margin-bottom: 6px; color: white;">Competitor Launch Opportunities</h4>
+              <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;" id="competitor-analysis-tip">
                 Loading competitor insights...
               </p>
             </div>
@@ -1729,20 +1722,20 @@
           
           <div class="glass-card">
             <h3 class="card-title">Multi-App Portfolio Ecosystem</h3>
-            <div class="card-subtitle mod-style-bWFyZ2lu">Launch bundle campaigns and direct cross-promotion across shared audiences.</div>
+            <div class="card-subtitle" style="margin-bottom: 20px;">Launch bundle campaigns and direct cross-promotion across shared audiences.</div>
             
-            <div class="mod-style-YmFja2dy">
-              <h4 class="mod-style-Y29sb3I6">AI Cross-Promotion Recommendation</h4>
-              <p class="mod-style-Zm9udC1z" id="crosspromo-tip-content">
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); padding: 20px; margin-bottom: 20px;">
+              <h4 style="color: white; font-size: 0.95rem; margin-bottom: 8px;">AI Cross-Promotion Recommendation</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;" id="crosspromo-tip-content">
                 Choose another app in the selector to check target opportunities.
               </p>
               
-              <div class="mod-style-cGFkZGlu">
-                <h5 class="mod-style-Y29sb3I6">
-                  <span class="mod-style-ZGlzcGxh"></span>
+              <div style="padding: 12px; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 6px; margin-bottom: 16px;">
+                <h5 style="color: white; font-size: 0.8rem; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                  <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--primary);"></span>
                   Suggested Shared Campaign
                 </h5>
-                <p class="mod-style-Zm9udC1z" id="crosspromo-campaign-pitch">
+                <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;" id="crosspromo-campaign-pitch">
                   Select app to build promotional drafts.
                 </p>
               </div>
@@ -1750,13 +1743,13 @@
               <button class="btn btn-primary" data-action="createCrossPromoAssets">Draft Bundle Offer Post</button>
             </div>
 
-            <div id="crosspromo-assets-result" class="mod-style-ZGlzcGxh">
-              <div class="glass-card mod-style-YmFja2dy">
-                <div class="mod-style-ZGlzcGxh">
-                  <span class="mod-style-Zm9udC1z">CROSS-PROMOTION COPY</span>
-                  <span class="filter-chip mod-style-cGFkZGlu" data-action="copyCrossPromoText">Copy</span>
+            <div id="crosspromo-assets-result" style="display: none;">
+              <div class="glass-card" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.04);">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                  <span style="font-size:0.75rem; font-weight:700; color:var(--secondary);">CROSS-PROMOTION COPY</span>
+                  <span class="filter-chip" style="padding: 2px 6px; font-size: 0.65rem;" data-action="copyCrossPromoText">Copy</span>
                 </div>
-                <div class="mod-style-Zm9udC1z" id="crosspromo-post-text"></div>
+                <div style="font-size: 0.85rem; color: white; line-height: 1.5;" id="crosspromo-post-text"></div>
               </div>
             </div>
           </div>
@@ -1775,21 +1768,21 @@
             <button class="btn btn-primary" data-action="downloadExecutiveReport">Download PDF Report</button>
           </div>
           
-          <div class="mod-style-ZGlzcGxh">
-            <div class="glass-card mod-style-YmFja2dy">
-              <h4 id="exec-kpi1-title" class="mod-style-bWFyZ2lu">Metric 1 Trends</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="glass-card" style="background: rgba(0,0,0,0.15);">
+              <h4 id="exec-kpi1-title" style="margin-bottom: 12px; color: white;">Metric 1 Trends</h4>
               <div class="analytics-chart-container" id="exec-mrr-trend-chart"></div>
             </div>
             
-            <div class="glass-card mod-style-YmFja2dy">
-              <h4 id="exec-kpi2-title" class="mod-style-bWFyZ2lu">Metric 2 Trends</h4>
+            <div class="glass-card" style="background: rgba(0,0,0,0.15);">
+              <h4 id="exec-kpi2-title" style="margin-bottom: 12px; color: white;">Metric 2 Trends</h4>
               <div class="analytics-chart-container" id="exec-roi-trend-chart"></div>
             </div>
           </div>
           
-          <div class="glass-card mod-style-YmFja2dy">
-            <h4 class="mod-style-Y29sb3I6">Strategic Executive Assessment</h4>
-            <div class="mod-style-Zm9udC1z" id="exec-strategic-text"></div>
+          <div class="glass-card" style="background: rgba(99, 102, 241, 0.05); border-color: rgba(99,102,241,0.15);">
+            <h4 style="color: white; margin-bottom: 10px;">Strategic Executive Assessment</h4>
+            <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;" id="exec-strategic-text"></div>
           </div>
         </div>
       </section>
@@ -1804,33 +1797,33 @@
             </div>
           </div>
           
-          <div class="terminal-container mod-style-aGVpZ2h0" id="memory-search-results">
-            <div class="mod-style-Y29sb3I6">[System] Growth Memory Database Online. Awaiting query...</div>
+          <div class="terminal-container" style="height: 120px; border: 1px solid var(--border-glass); border-radius: 8px; padding: 15px; overflow-y: auto; background: rgba(0, 0, 0, 0.5); margin-bottom: 20px;" id="memory-search-results">
+            <div style="color: var(--text-muted); font-size: 0.85rem;">[System] Growth Memory Database Online. Awaiting query...</div>
           </div>
           
-          <div class="mod-style-ZGlzcGxh">
-            <input type="text" id="memory-search-input" class="mod-style-ZmxleDog" placeholder="e.g. What was our most successful campaign?">
+          <div style="display: flex; gap: 10px;">
+            <input type="text" id="memory-search-input" style="flex: 1; background: #040711; border: 1px solid var(--border-glass); color: white; padding: 10px; border-radius: 4px;" placeholder="e.g. What was our most successful campaign?">
             <button class="btn btn-primary" data-action="searchGrowthMemoryUI">Search Memory</button>
           </div>
         </div>
         
-        <div class="mod-style-ZGlzcGxh">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px;">
           <div class="glass-card">
             <h3 class="card-title">Growth DNA Profile</h3>
             <div class="card-subtitle mb-4">Live best practices for the active application.</div>
-            <div id="growth-dna-container" class="mod-style-Zm9udC1z">
-              <div class="mod-style-ZGlzcGxh"><span>Best Time to Post:</span> <span class="mod-style-Y29sb3I6">Wednesdays at 10 AM</span></div>
-              <div class="mod-style-ZGlzcGxh"><span>Top CTA Pattern:</span> <span class="mod-style-Y29sb3I6">"Start Free Trial"</span></div>
-              <div class="mod-style-ZGlzcGxh"><span>Best Visual Style:</span> <span class="mod-style-Y29sb3I6">Tutorial Carousels</span></div>
+            <div id="growth-dna-container" style="font-size: 0.85rem; color: #fff;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border-glass);"><span>Best Time to Post:</span> <span style="color: var(--accent);">Wednesdays at 10 AM</span></div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border-glass);"><span>Top CTA Pattern:</span> <span style="color: var(--accent);">"Start Free Trial"</span></div>
+              <div style="display: flex; justify-content: space-between;"><span>Best Visual Style:</span> <span style="color: var(--accent);">Tutorial Carousels</span></div>
             </div>
           </div>
           
           <div class="glass-card">
             <h3 class="card-title">Success Pattern Library</h3>
             <div class="card-subtitle mb-4">Patterns extracted from recent campaigns.</div>
-            <div id="pattern-library-container" class="mod-style-Zm9udC1z">
-              <div><span class="mod-style-Y29sb3I6">●</span> <strong>Tutorial Carousel Pattern</strong> (+18% conversions in March)</div>
-              <div class="mod-style-bWFyZ2lu"><span class="mod-style-Y29sb3I6">●</span> <strong>Founder Story Pattern</strong> (+24% engagement on Twitter)</div>
+            <div id="pattern-library-container" style="font-size: 0.85rem; color: #fff; line-height: 1.6;">
+              <div><span style="color: #10b981;">●</span> <strong>Tutorial Carousel Pattern</strong> (+18% conversions in March)</div>
+              <div style="margin-top: 10px;"><span style="color: #10b981;">●</span> <strong>Founder Story Pattern</strong> (+24% engagement on Twitter)</div>
             </div>
           </div>
         </div>
@@ -1845,7 +1838,7 @@
               <div class="card-subtitle">An orchestration module where autonomous subagents collaborate on scheduling, research, copy, and analysis.</div>
             </div>
             
-            <div class="mod-style-ZGlzcGxh">
+            <div style="display: flex; gap: 10px;">
               <button class="btn btn-secondary" data-action="clearAgentTerminal">Clear Log</button>
               <button class="btn btn-primary" id="toggle-agent-simulation-btn" data-action="toggleAgentSimulation">Start Agent Simulation</button>
             </div>
@@ -1907,10 +1900,10 @@
                 </div>
               </div>
               
-              <div class="mod-style-Ym9yZGVy">
-                <span class="mod-style-Y29sb3I6">&gt;</span>
-                <input type="text" id="agent-console-input" class="mod-style-YmFja2dy" placeholder="Direct the team (e.g. 'Optimize ASO keywords')...">
-                <button class="btn btn-primary mod-style-cGFkZGlu" data-action="submitAgentConsoleCommand">Send</button>
+              <div style="border-top: 1px solid var(--border-glass); padding: 10px; display: flex; gap: 10px; background: rgba(0,0,0,0.3);">
+                <span style="color: #10b981; font-weight: 700; align-self: center; padding-left: 8px;">&gt;</span>
+                <input type="text" id="agent-console-input" style="background: transparent; border: none; padding: 6px 0; color: #a5b4fc; font-family: monospace; font-size: 0.85rem;" placeholder="Direct the team (e.g. 'Optimize ASO keywords')...">
+                <button class="btn btn-primary" style="padding: 4px 12px; font-size: 0.75rem;" data-action="submitAgentConsoleCommand">Send</button>
               </div>
             </div>
           </div>
@@ -1919,12 +1912,12 @@
 
       <!-- VIEW 10.2: MULTI-AGENT ORCHESTRATION EVENT FLOW (NEW) -->
       <section id="view-agent-orchestration" class="view-panel">
-        <div class="glass-card mod-style-bWFyZ2lu">
+        <div class="glass-card" style="margin-bottom: 24px;">
           <h3 class="card-title">Multi-Agent Collaboration Engine</h3>
-          <div class="card-subtitle mod-style-bWFyZ2lu">Watch automated agents analyze metrics, deploy content updates, and trigger keyword tracking synchronously.</div>
+          <div class="card-subtitle" style="margin-bottom: 20px;">Watch automated agents analyze metrics, deploy content updates, and trigger keyword tracking synchronously.</div>
           
           <!-- Orchestration line diagram nodes -->
-          <div class="agent-flow-chart-container mod-style-ZmxleC13">
+          <div class="agent-flow-chart-container" style="flex-wrap: wrap; justify-content: center; gap: 30px;">
             <div class="agent-flow-node active" id="node-strategy">
               <div class="agent-avatar">🧠</div>
               <div class="agent-flow-label">Strategy</div>
@@ -1981,10 +1974,10 @@
             </div>
           </div>
           
-          <div class="mod-style-ZGlzcGxh">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px;">
             <div>
-              <h4 class="mod-style-Y29sb3I6">Current Status: <span id="orch-status-text" class="mod-style-Y29sb3I6">Awaiting Action</span></h4>
-              <p class="mod-style-Zm9udC1z" id="orch-desc-text">Trigger pipeline execution simulation to see how autonomous subagents coordinate.</p>
+              <h4 style="color:white;">Current Status: <span id="orch-status-text" style="color:var(--primary);">Awaiting Action</span></h4>
+              <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;" id="orch-desc-text">Trigger pipeline execution simulation to see how autonomous subagents coordinate.</p>
             </div>
             <button class="btn btn-primary" data-action="startOrchestrationPipelineSimulation">Execute Pipeline Run</button>
           </div>
@@ -1993,13 +1986,13 @@
 
       <!-- VIEW 11: AUTH & TEAM SETTINGS (NEW) -->
       <section id="view-auth-team" class="view-panel">
-        <div class="glass-card mod-style-bWFyZ2lu">
+        <div class="glass-card" style="margin-bottom: 24px;">
           <h3 class="card-title">Supabase Database Authentication</h3>
-          <div class="card-subtitle mod-style-bWFyZ2lu">Manage project environments, API secrets, OAuth providers, and user sessions.</div>
+          <div class="card-subtitle" style="margin-bottom: 20px;">Manage project environments, API secrets, OAuth providers, and user sessions.</div>
           
-          <div class="mod-style-ZGlzcGxh">
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px;">
             <div>
-              <h4 class="mod-style-Y29sb3I6">Supabase Credentials</h4>
+              <h4 style="color: white; margin-bottom: 12px;">Supabase Credentials</h4>
               <div class="form-group">
                 <label for="auth-sb-url">Supabase Project URL</label>
                 <input type="text" id="auth-sb-url" value="https://xyzwijkmopqrstuv.supabase.co">
@@ -2009,22 +2002,22 @@
                 <input type="password" id="auth-sb-key" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
               </div>
               
-              <div class="mod-style-ZGlzcGxh">
+              <div style="display:flex; gap:10px; margin-top:20px;">
                 <button class="btn btn-primary" data-action="simulateSbAuthVerify">Verify Environment</button>
                 <button class="btn btn-secondary" data-action="simulateSbAuthSignout">Simulate Logout</button>
               </div>
             </div>
 
-            <div class="glass-card mod-style-YmFja2dy">
-              <h4 class="mod-style-Y29sb3I6">Active User Profile</h4>
-              <div class="mod-style-ZGlzcGxh">
-                <img id="auth-user-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" class="mod-style-d2lkdGg6">
+            <div class="glass-card" style="background: rgba(0,0,0,0.15);">
+              <h4 style="color: white; margin-bottom: 12px;">Active User Profile</h4>
+              <div style="display:flex; gap:16px; align-items:center; margin-bottom: 20px;">
+                <img id="auth-user-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" style="width: 50px; height: 50px; border-radius: 50%;">
                 <div>
-                  <h5 class="mod-style-Y29sb3I6" id="auth-user-name">Shadi</h5>
-                  <span class="mod-style-Zm9udC1z" id="auth-user-role">Owner (CyberVentures Ltd)</span>
+                  <h5 style="color:white; font-size:1.05rem;" id="auth-user-name">Shadi</h5>
+                  <span style="font-size:0.75rem; color:var(--primary); font-weight:700;" id="auth-user-role">Owner (CyberVentures Ltd)</span>
                 </div>
               </div>
-              <div class="mod-style-Zm9udC1z">
+              <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
                 <strong>Session Token status:</strong> Valid (Auto refresh active)<br>
                 <strong>Authentication Scope:</strong> full_dashboard_write, team_rbac_admin, db_console_access.
               </div>
@@ -2061,9 +2054,9 @@
 
       <!-- VIEW 12: DATABASE & JOBS CONSOLE (NEW) -->
       <section id="view-db-console" class="view-panel">
-        <div class="glass-card mod-style-bWFyZ2lu">
+        <div class="glass-card" style="margin-bottom:24px;">
           <h3 class="card-title">PostgreSQL Database Schema</h3>
-          <div class="card-subtitle mod-style-bWFyZ2lu">Inspect production table layouts, execute mock SQL statements, and check BullMQ worker queues.</div>
+          <div class="card-subtitle" style="margin-bottom: 20px;">Inspect production table layouts, execute mock SQL statements, and check BullMQ worker queues.</div>
           
           <div class="db-console-grid">
             <!-- Table tree list -->
@@ -2072,23 +2065,23 @@
             </ul>
             
             <!-- SQL Console editor -->
-            <div class="glass-card mod-style-YmFja2dy">
-              <h4 class="mod-style-Y29sb3I6">SQL Query Executor</h4>
-              <textarea id="db-sql-input" rows="4" class="mod-style-Zm9udC1m" placeholder="SELECT * FROM audit_logs LIMIT 5;"></textarea>
-              <div class="mod-style-ZGlzcGxh">
-                <button class="btn btn-secondary mod-style-Zm9udC1z" data-action="prefillSQLConsoleQuery">Prefill Sample Query</button>
+            <div class="glass-card" style="background:rgba(0,0,0,0.3); padding:20px; display:flex; flex-direction:column; gap:16px;">
+              <h4 style="color:white;">SQL Query Executor</h4>
+              <textarea id="db-sql-input" rows="4" style="font-family:monospace; background:#040711; color:#38bdf8; border:1px solid var(--border-glass);" placeholder="SELECT * FROM audit_logs LIMIT 5;"></textarea>
+              <div style="display:flex; justify-content:space-between;">
+                <button class="btn btn-secondary" style="font-size:0.75rem;" data-action="prefillSQLConsoleQuery">Prefill Sample Query</button>
                 <button class="btn btn-primary" data-action="executeSQLQueryOnConsole">Execute Statement</button>
               </div>
               
               <!-- Query Output terminal box -->
-              <div class="mod-style-YmFja2dy" id="db-sql-output-terminal">
+              <div style="background:#02050b; border:1px solid var(--border-glass); border-radius:4px; padding:12px; min-height:100px; font-family:monospace; font-size:0.75rem; color:#a5b4fc; overflow-x:auto;" id="db-sql-output-terminal">
                 Statement output terminal logs...
               </div>
             </div>
           </div>
         </div>
 
-        <div class="mod-style-ZGlzcGxh">
+        <div style="display:grid; grid-template-columns: 1.5fr 1.5fr; gap:24px;">
           <!-- BullMQ Redis status -->
           <div class="glass-card">
             <h3 class="card-title">BullMQ Background Jobs</h3>
@@ -2111,7 +2104,7 @@
           <!-- RLS Policies -->
           <div class="glass-card">
             <h3 class="card-title">Row-Level Security (RLS)</h3>
-            <div class="mod-style-ZGlzcGxh" id="db-rls-list-box">
+            <div style="display:flex; flex-direction:column; gap:12px; margin-top:16px;" id="db-rls-list-box">
               <!-- Rendered via JS -->
             </div>
           </div>
@@ -2133,7 +2126,7 @@
         <div class="glass-card">
           <h3 class="card-title">Revenue Intelligence Engine</h3>
           <div class="card-subtitle">Track MRR, LTV, CAC, ROAS, and connect marketing to revenue outcomes.</div>
-          <div id="revenue-intelligence-container" class="mod-style-bWFyZ2lu">
+          <div id="revenue-intelligence-container" style="margin-top: 24px;">
             <div class="kpi-grid" id="revenue-kpi-grid">
               <!-- Rendered by revenueIntelligenceModule.js -->
             </div>
@@ -2146,7 +2139,7 @@
         <div class="glass-card">
           <h3 class="card-title">Sales Intelligence Engine</h3>
           <div class="card-subtitle">Analyze leads, deals, conversion rates, and generate revenue forecasts.</div>
-          <div id="sales-intelligence-container" class="mod-style-bWFyZ2lu">
+          <div id="sales-intelligence-container" style="margin-top: 24px;">
             <div id="sales-pipeline-board">
               <!-- Rendered by salesIntelligenceModule.js -->
             </div>
@@ -2159,7 +2152,7 @@
         <div class="glass-card">
           <h3 class="card-title">Attribution Engine</h3>
           <div class="card-subtitle">Track the full journey: Content → Clicks → Leads → Customers → Revenue.</div>
-          <div id="attribution-container" class="mod-style-bWFyZ2lu">
+          <div id="attribution-container" style="margin-top: 24px;">
             <div id="attribution-funnel">
               <!-- Rendered by attributionModule.js -->
             </div>
@@ -2172,7 +2165,7 @@
         <div class="glass-card">
           <h3 class="card-title">Customer Intelligence Engine</h3>
           <div class="card-subtitle">Analyze reviews, messages, feedback. Identify pain points, churn risks, and upsell opportunities.</div>
-          <div id="customer-intelligence-container" class="mod-style-bWFyZ2lu">
+          <div id="customer-intelligence-container" style="margin-top: 24px;">
             <!-- Rendered by customerIntelligenceModule.js -->
           </div>
         </div>
@@ -2183,7 +2176,7 @@
         <div class="glass-card">
           <h3 class="card-title">Reputation Management Center</h3>
           <div class="card-subtitle">Monitor Google, Facebook, and industry reviews. Track sentiment and reputation score.</div>
-          <div id="reputation-container" class="mod-style-bWFyZ2lu">
+          <div id="reputation-container" style="margin-top: 24px;">
             <div id="reputation-dashboard">
               <!-- Rendered by reputationModule.js -->
             </div>
@@ -2196,7 +2189,7 @@
         <div class="glass-card">
           <h3 class="card-title">Industry Benchmarks</h3>
           <div class="card-subtitle">Compare your performance against industry averages for SaaS, Dental, Restaurant, E-commerce, and more.</div>
-          <div id="benchmarks-container" class="mod-style-bWFyZ2lu">
+          <div id="benchmarks-container" style="margin-top: 24px;">
             <div id="benchmarks-grid">
               <!-- Rendered by industryBenchmarkModule.js -->
             </div>
@@ -2209,7 +2202,7 @@
         <div class="glass-card">
           <h3 class="card-title">Business Health Score</h3>
           <div class="card-subtitle">Universal score measuring Marketing, Sales, Revenue, Satisfaction, Growth, Retention, Reputation, and Advertising.</div>
-          <div id="health-score-container" class="mod-style-bWFyZ2lu">
+          <div id="health-score-container" style="margin-top: 24px;">
             <div id="health-score-gauge">
               <!-- Rendered by healthScoreModule.js -->
             </div>
@@ -2223,8 +2216,8 @@
   <!-- FLOATING NOTIFICATION DRAWER -->
   <div id="notif-drawer">
     <div class="drawer-header">
-      <h3 class="mod-style-Y29sb3I6">Alert Center</h3>
-      <button class="btn btn-secondary mod-style-cGFkZGlu" data-action="toggleNotificationDrawer">✕</button>
+      <h3 style="color:white;">Alert Center</h3>
+      <button class="btn btn-secondary" style="padding:6px; border-radius:50%;" data-action="toggleNotificationDrawer">✕</button>
     </div>
     <div class="drawer-body" id="notif-drawer-container">
       <!-- Rendered via JS -->
@@ -2232,97 +2225,37 @@
   </div>
   
   <!-- Pop up Success Message Alert -->
-  <div id="toast-notification" class="mod-style-cG9zaXRp">
-    <span class="mod-style-Y29sb3I6">✓</span>
+  <div id="toast-notification" style="position: fixed; bottom: 30px; right: 30px; background: var(--bg-card); border: 1px solid var(--accent-green); color: white; padding: 12px 24px; border-radius: var(--radius-sm); backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; gap: 10px; animation: slide-up 0.3s ease-out;">
+    <span style="color: var(--accent-green); font-size: 1.25rem;">✓</span>
     <span id="toast-message">Success message here</span>
   </div>
 
   <!-- Modular App Architecture -->
   <script type="module" src="/app.js"></script>
 
-  <!-- BILLING & UPGRADE MODAL -->
-  <div id="billing-modal" class="custom-modal-overlay">
-    <div class="custom-modal mod-style-bWF4LXdp">
-      <div class="mod-style-ZGlzcGxh">
-        <h2 class="mod-style-Zm9udC1z">Upgrade Your Plan</h2>
-        <button onclick="document.getElementById('billing-modal').style.display='none'" class="mod-style-YmFja2dy">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-        </button>
-      </div>
-      
-      <p class="mod-style-Y29sb3I6">Power your business with advanced AI agents and unlock more Growth Credits. Select a plan below.</p>
-
-      <div class="mod-style-ZGlzcGxh">
-        <!-- Starter Plan -->
-        <div class="glass-panel mod-style-cGFkZGlu">
-          <h3 class="mod-style-bWFyZ2lu">Starter</h3>
-          <h1 class="mod-style-bWFyZ2lu">$19<span class="mod-style-Zm9udC1z">/mo</span></h1>
-          <p class="mod-style-Y29sb3I6">100 Credits/mo<br>1 Business</p>
-          <button onclick="window.billingModule && window.billingModule.checkout('starter')" class="btn btn-secondary mod-style-d2lkdGg6">Upgrade</button>
-        </div>
-        
-        <!-- Growth Plan -->
-        <div class="glass-panel mod-style-cGFkZGlu">
-          <div class="mod-style-cG9zaXRp">RECOMMENDED</div>
-          <h3 class="mod-style-bWFyZ2lu">Growth</h3>
-          <h1 class="mod-style-bWFyZ2lu">$49<span class="mod-style-Zm9udC1z">/mo</span></h1>
-          <p class="mod-style-Y29sb3I6">500 Credits/mo<br>3 Businesses</p>
-          <button onclick="window.billingModule && window.billingModule.checkout('growth')" class="btn btn-primary mod-style-d2lkdGg6">Upgrade</button>
-        </div>
-
-        <!-- Pro Plan -->
-        <div class="glass-panel mod-style-cGFkZGlu">
-          <h3 class="mod-style-bWFyZ2lu">Pro</h3>
-          <h1 class="mod-style-bWFyZ2lu">$99<span class="mod-style-Zm9udC1z">/mo</span></h1>
-          <p class="mod-style-Y29sb3I6">1500 Credits/mo<br>10 Businesses</p>
-          <button onclick="window.billingModule && window.billingModule.checkout('pro')" class="btn btn-secondary mod-style-d2lkdGg6">Upgrade</button>
-        </div>
-
-        <!-- Agency Plan -->
-        <div class="glass-panel mod-style-cGFkZGlu">
-          <h3 class="mod-style-bWFyZ2lu">Agency</h3>
-          <h1 class="mod-style-bWFyZ2lu">$299<span class="mod-style-Zm9udC1z">/mo</span></h1>
-          <p class="mod-style-Y29sb3I6">5000 Credits/mo<br>Unlimited</p>
-          <button onclick="window.billingModule && window.billingModule.checkout('agency')" class="btn btn-secondary mod-style-d2lkdGg6">Upgrade</button>
-        </div>
-      </div>
-
-      <h3 class="mod-style-bWFyZ2lu">Need more credits?</h3>
-      <div class="mod-style-ZGlzcGxh">
-        <button onclick="window.billingModule && window.billingModule.checkout('starter', true)" class="btn btn-secondary mod-style-ZmxleDog">+200 Credits ($10)</button>
-        <button onclick="window.billingModule && window.billingModule.checkout('growth', true)" class="btn btn-secondary mod-style-ZmxleDog">+600 Credits ($25)</button>
-        <button onclick="window.billingModule && window.billingModule.checkout('scale', true)" class="btn btn-secondary mod-style-ZmxleDog">+1500 Credits ($50)</button>
-      </div>
-      
-      <div class="mod-style-bWFyZ2lu">
-        <button onclick="window.billingModule && window.billingModule.openPortal()" class="btn btn-secondary mod-style-YmFja2dy">Manage Billing & Invoices</button>
-      </div>
-    </div>
-  </div>
-
   <!-- USER PROFILE MODAL -->
   <div id="user-profile-modal" class="custom-modal-overlay">
-    <div class="custom-modal-content mod-style-bWF4LXdp">
+    <div class="custom-modal-content" style="max-width: 400px;">
       <div class="modal-header">
-        <h3 class="mod-style-Y29sb3I6">Edit Profile</h3>
-        <button class="btn btn-secondary mod-style-cGFkZGlu" data-action="closeModal" data-args="user-profile-modal">✕</button>
+        <h3 style="color:white; margin:0;">Edit Profile</h3>
+        <button class="btn btn-secondary" style="padding:6px; border-radius:50%;" data-action="closeModal" data-args="user-profile-modal">✕</button>
       </div>
-      <div class="modal-body mod-style-ZGlzcGxh">
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:20px; align-items:center;">
         
-        <div class="mod-style-cG9zaXRp" onclick="document.getElementById('profile-avatar-upload').click()">
-          <img id="profile-modal-avatar-preview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" class="mod-style-d2lkdGg6">
-          <div class="mod-style-cG9zaXRp">
+        <div style="position: relative; cursor: pointer;" onclick="document.getElementById('profile-avatar-upload').click()">
+          <img id="profile-modal-avatar-preview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-green);">
+          <div style="position: absolute; bottom: 0; right: 0; background: var(--accent-green); border-radius: 50%; padding: 6px;">
             <svg fill="none" viewBox="0 0 24 24" stroke="black" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
           </div>
-          <input type="file" id="profile-avatar-upload" accept="image/*" class="mod-style-ZGlzcGxh" onchange="window.previewAvatarUpload(event)">
+          <input type="file" id="profile-avatar-upload" accept="image/*" style="display: none;" onchange="window.previewAvatarUpload(event)">
         </div>
 
-        <div class="form-group mod-style-d2lkdGg6">
+        <div class="form-group" style="width: 100%;">
           <label>Display Name</label>
           <input type="text" id="profile-modal-name" class="input-field" placeholder="Enter your name">
         </div>
       </div>
-      <div class="modal-footer mod-style-anVzdGlm">
+      <div class="modal-footer" style="justify-content: flex-end;">
         <button class="btn btn-secondary" data-action="closeModal" data-args="user-profile-modal">Cancel</button>
         <button class="btn btn-primary" id="save-profile-btn" data-action="saveUserProfile">Save Changes</button>
       </div>
@@ -2333,20 +2266,20 @@
   <div id="calendar-details-modal" class="custom-modal-overlay">
     <div class="custom-modal-content">
       <div class="modal-header">
-        <h3 class="mod-style-Y29sb3I6" id="modal-post-platform">Platform Name</h3>
-        <button class="btn btn-secondary mod-style-cGFkZGlu" data-action="closeModal" data-args="calendar-details-modal">✕</button>
+        <h3 style="color:white; margin:0;" id="modal-post-platform">Platform Name</h3>
+        <button class="btn btn-secondary" style="padding:6px; border-radius:50%;" data-action="closeModal" data-args="calendar-details-modal">✕</button>
       </div>
       <div class="modal-body">
-        <div class="mod-style-bWFyZ2lu"><strong>Status:</strong> <span id="modal-post-status" class="mod-style-Y29sb3I6">SCHEDULED</span></div>
-        <div class="mod-style-bWFyZ2lu"><strong>Scheduled Time:</strong> <span id="modal-post-date" class="mod-style-Y29sb3I6">2026-06-08 @ 12:00</span></div>
-        <div class="mod-style-bWFyZ2lu"><strong>Post Content Copy:</strong></div>
-        <p id="modal-post-body" class="mod-style-YmFja2dy"></p>
-        <div id="modal-post-media-container" class="mod-style-ZGlzcGxh">
-          <img id="modal-post-media" src="" class="mod-style-bWF4LXdp" />
+        <div style="margin-bottom:12px; font-size:0.85rem;"><strong>Status:</strong> <span id="modal-post-status" style="color:var(--primary); font-weight:700;">SCHEDULED</span></div>
+        <div style="margin-bottom:12px; font-size:0.85rem;"><strong>Scheduled Time:</strong> <span id="modal-post-date" style="color:white;">2026-06-08 @ 12:00</span></div>
+        <div style="margin-bottom:8px; font-size:0.85rem;"><strong>Post Content Copy:</strong></div>
+        <p id="modal-post-body" style="background:#040711; border:1px solid var(--border-glass); border-radius:4px; padding:12px; color:white; font-family:monospace; font-size:0.85rem; line-height:1.4; white-space:pre-wrap; margin:0;"></p>
+        <div id="modal-post-media-container" style="display:none; margin-top:15px; text-align:center;">
+          <img id="modal-post-media" src="" style="max-width:100%; border-radius:8px; border:1px solid var(--border-glass);" />
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-danger mod-style-YmFja2dy" data-action="deleteCalendarPost">Delete Post</button>
+        <button class="btn btn-danger" style="background-color: var(--accent-red); margin-right: 10px;" data-action="deleteCalendarPost">Delete Post</button>
         <button class="btn btn-primary" data-action="closeModal" data-args="calendar-details-modal">Close Details</button>
       </div>
     </div>
@@ -2356,38 +2289,38 @@
   <div id="calendar-create-modal" class="custom-modal-overlay">
     <div class="custom-modal-content">
       <div class="modal-header">
-        <h3 class="mod-style-Y29sb3I6">Schedule New Campaign Post</h3>
-        <button class="btn btn-secondary mod-style-cGFkZGlu" data-action="closeModal" data-args="calendar-create-modal">✕</button>
+        <h3 style="color:white; margin:0;">Schedule New Campaign Post</h3>
+        <button class="btn btn-secondary" style="padding:6px; border-radius:50%;" data-action="closeModal" data-args="calendar-create-modal">✕</button>
       </div>
       <div class="modal-body">
-        <div class="form-group mod-style-bWFyZ2lu">
+        <div class="form-group" style="margin-bottom:12px;">
           <label for="modal-create-platform">Select Channel</label>
-          <select id="modal-create-platform" class="mod-style-YmFja2dy">
+          <select id="modal-create-platform" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:8px; border-radius:4px;">
             <option value="instagram">Instagram</option>
             <option value="tiktok">TikTok</option>
             <option value="facebook">Facebook</option>
             <option value="x">X (Twitter)</option>
           </select>
         </div>
-        <div class="form-group mod-style-bWFyZ2lu">
+        <div class="form-group" style="margin-bottom:12px;">
           <label for="modal-create-date">Scheduled Date</label>
-          <input type="text" id="modal-create-date" value="2026-06-12" class="mod-style-YmFja2dy">
+          <input type="text" id="modal-create-date" value="2026-06-12" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:8px; border-radius:4px;">
         </div>
-        <div class="form-group mod-style-bWFyZ2lu">
+        <div class="form-group" style="margin-bottom:12px;">
           <label for="modal-create-time">Scheduled Time</label>
-          <input type="text" id="modal-create-time" value="12:00" class="mod-style-YmFja2dy">
+          <input type="text" id="modal-create-time" value="12:00" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:8px; border-radius:4px;">
         </div>
-        <div class="form-group mod-style-bWFyZ2lu">
+        <div class="form-group" style="margin-bottom:12px;">
           <label for="modal-create-text">Post Copy details</label>
-          <textarea id="modal-create-text" rows="4" class="mod-style-YmFja2dy" placeholder="Write campaign variant details here..."></textarea>
+          <textarea id="modal-create-text" rows="4" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:8px; border-radius:4px;" placeholder="Write campaign variant details here..."></textarea>
         </div>
-        <div class="form-group mod-style-bWFyZ2lu">
+        <div class="form-group" style="margin-bottom: 15px;">
           <label for="modal-create-media">Media URL (Optional)</label>
-          <input type="text" id="modal-create-media" class="mod-style-YmFja2dy" placeholder="https://example.com/image.jpg">
+          <input type="text" id="modal-create-media" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:8px; border-radius:4px;" placeholder="https://example.com/image.jpg">
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-danger mod-style-YmFja2dy" data-action="clearDayCalendarPosts">Clear All Posts on This Day</button>
+        <button class="btn btn-danger" style="background-color: var(--accent-red); margin-right: auto;" data-action="clearDayCalendarPosts">Clear All Posts on This Day</button>
         <button class="btn btn-secondary" data-action="closeModal" data-args="calendar-create-modal">Cancel</button>
         <button class="btn btn-primary" id="calendar-modal-save-btn">Save to Calendar</button>
       </div>
@@ -2396,33 +2329,33 @@
 
   <!-- Discovery Engine Onboarding Wizard Modal -->
   <div id="discovery-wizard-modal" class="custom-modal-overlay">
-    <div class="modal-content mod-style-bWF4LXdp">
+    <div class="modal-content" style="max-width: 600px; padding: 0;">
       <!-- Header -->
-      <div class="modal-header mod-style-Ym9yZGVy">
-        <h3 class="mod-style-bWFyZ2lu">
+      <div class="modal-header" style="border-bottom: 1px solid var(--border-glass); padding: 20px;">
+        <h3 style="margin: 0; display: flex; align-items: center; gap: 10px;">
           <i class="fa-solid fa-radar"></i> AI Business Discovery Engine
         </h3>
         <button class="modal-close" data-action="closeModal" data-args="discovery-wizard-modal">×</button>
       </div>
 
       <!-- Step 1: Input -->
-      <div id="discovery-step-1" class="mod-style-cGFkZGlu">
-        <p class="mod-style-Y29sb3I6">
+      <div id="discovery-step-1" style="padding: 20px;">
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">
           Enter your URLs below. Our AI will automatically analyze your website, extract your brand identity, and generate a complete marketing foundation.
         </p>
-        <div class="form-group mod-style-bWFyZ2lu">
+        <div class="form-group" style="margin-bottom:15px;">
           <label>App / Business Name *</label>
-          <input type="text" id="discovery-app-name" placeholder="e.g. Zbubble" class="mod-style-YmFja2dy">
+          <input type="text" id="discovery-app-name" placeholder="e.g. Zbubble" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:10px; border-radius:4px;">
         </div>
 
-        <div class="form-group mod-style-bWFyZ2lu">
+        <div class="form-group" style="margin-bottom:15px;">
           <label>Website URL *</label>
-          <input type="url" id="discovery-url-website" placeholder="https://yourwebsite.com" class="mod-style-YmFja2dy">
+          <input type="url" id="discovery-url-website" placeholder="https://yourwebsite.com" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:10px; border-radius:4px;">
         </div>
 
-        <div class="form-group mod-style-bWFyZ2lu">
+        <div class="form-group" style="margin-bottom:15px;">
           <label>Business Type</label>
-          <select id="new-app-business-type" class="mod-style-YmFja2dy">
+          <select id="new-app-business-type" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:10px; border-radius:4px;">
             <option value="saas">SaaS / Software</option>
             <option value="ecommerce">E-commerce</option>
             <option value="restaurant">Restaurant / Cafe</option>
@@ -2432,72 +2365,68 @@
           </select>
         </div>
         
-        <div class="form-group mod-style-bWFyZ2lu">
+        <div class="form-group" style="margin-bottom:15px;">
           <label>Instagram URL</label>
-          <input type="url" id="discovery-url-ig" placeholder="https://instagram.com/yourhandle" class="mod-style-YmFja2dy">
+          <input type="url" id="discovery-url-ig" placeholder="https://instagram.com/yourhandle" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:10px; border-radius:4px;">
         </div>
 
-        <div class="form-group mod-style-bWFyZ2lu">
+        <div class="form-group" style="margin-bottom:15px;">
           <label>Google Business Profile URL</label>
-          <input type="url" id="discovery-url-gmb" placeholder="https://g.page/r/..." class="mod-style-YmFja2dy">
+          <input type="url" id="discovery-url-gmb" placeholder="https://g.page/r/..." style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:10px; border-radius:4px;">
         </div>
 
-        <div class="form-group mod-style-bWFyZ2lu">
+        <div class="form-group" style="margin-bottom:15px;">
           <label>LinkedIn URL</label>
-          <input type="url" id="discovery-url-linkedin" placeholder="https://linkedin.com/company/yourcompany" class="mod-style-YmFja2dy">
+          <input type="url" id="discovery-url-linkedin" placeholder="https://linkedin.com/company/yourcompany" style="background:#040711; border:1px solid var(--border-glass); color:white; width:100%; padding:10px; border-radius:4px;">
         </div>
 
-        <div class="modal-footer mod-style-cGFkZGlu">
+        <div class="modal-footer" style="padding: 20px 0 0 0; border: none;">
           <button class="btn btn-secondary" data-action="closeModal" data-args="discovery-wizard-modal">Cancel</button>
-          <button class="btn btn-primary" id="discovery-start-btn" class="mod-style-YmFja2dy">
+          <button class="btn btn-primary" id="discovery-start-btn" style="background: var(--accent-green); color: black;">
             <i class="fa-solid fa-bolt"></i> Start Discovery
           </button>
         </div>
       </div>
 
       <!-- Step 2: Scanning / Loading -->
-      <div id="discovery-step-2" class="mod-style-cGFkZGlu">
-        <div class="radar-spinner mod-style-bWFyZ2lu"></div>
-        <h3 id="discovery-status-title" class="mod-style-bWFyZ2lu">Scanning Business Footprint...</h3>
-        <p id="discovery-status-text" class="mod-style-Y29sb3I6"></p>
+      <div id="discovery-step-2" style="padding: 40px 20px; text-align: center; display: none;">
+        <div class="radar-spinner" style="margin: 0 auto 20px auto; width: 60px; height: 60px; border: 4px solid var(--border-glass); border-top: 4px solid var(--accent-blue); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <h3 id="discovery-status-title" style="margin-bottom: 10px;">Scanning Business Footprint...</h3>
+        <p id="discovery-status-text" style="color: var(--text-secondary); font-family: monospace;"></p>
         
-        <div class="mod-style-d2lkdGg6">
-          <div id="discovery-progress-bar" class="mod-style-aGVpZ2h0"></div>
+        <div style="width: 100%; height: 8px; background: var(--bg-dark); border-radius: 4px; margin-top: 20px; overflow: hidden;">
+          <div id="discovery-progress-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); transition: width 0.3s ease;"></div>
         </div>
       </div>
 
       <!-- Step 3: Success Presentation -->
-      <div id="discovery-step-3" class="mod-style-cGFkZGlu">
-        <div class="mod-style-dGV4dC1h">
-          <div class="mod-style-d2lkdGg6">
+      <div id="discovery-step-3" style="padding: 20px; display: none;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <div style="width: 60px; height: 60px; background: rgba(34, 197, 94, 0.2); color: var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 15px auto;">
             <i class="fa-solid fa-check"></i>
           </div>
           <h3>Brand Intelligence Complete!</h3>
-          <p class="mod-style-Y29sb3I6">We've successfully generated your brand foundation.</p>
+          <p style="color: var(--text-secondary);">We've successfully generated your brand foundation.</p>
         </div>
         
-        <div class="mod-style-YmFja2dy">
-          <h4 id="discovery-result-name" class="mod-style-bWFyZ2lu">Brand Name</h4>
-          <p id="discovery-result-summary" class="mod-style-Y29sb3I6">Summary...</p>
+        <div style="background: var(--bg-dark); padding: 15px; border-radius: 8px; border: 1px solid var(--border-glass); margin-bottom: 20px;">
+          <h4 id="discovery-result-name" style="margin-top: 0; margin-bottom: 5px;">Brand Name</h4>
+          <p id="discovery-result-summary" style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 15px; line-height: 1.4;">Summary...</p>
           
-          <div class="mod-style-ZGlzcGxh">
-            <div class="mod-style-ZmxleDog">
-              <span class="mod-style-Zm9udC1z">Brand Tone</span>
+          <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <div style="flex: 1; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 4px;">
+              <span style="font-size: 0.8em; color: var(--text-secondary); display: block; margin-bottom: 4px;">Brand Tone</span>
               <strong id="discovery-result-tone">Professional</strong>
             </div>
-            <div class="mod-style-ZmxleDog">
-              <span class="mod-style-Zm9udC1z">Google Rating</span>
-              <strong id="discovery-result-rating" class="mod-style-Y29sb3I6">Not Found</strong>
-            </div>
-            <div class="mod-style-ZmxleDog">
-              <span class="mod-style-Zm9udC1z">Readiness Score</span>
-              <strong id="discovery-result-score" class="mod-style-Y29sb3I6">0/100</strong>
+            <div style="flex: 1; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 4px;">
+              <span style="font-size: 0.8em; color: var(--text-secondary); display: block; margin-bottom: 4px;">Readiness Score</span>
+              <strong id="discovery-result-score" style="color: var(--accent-green);">0/100</strong>
             </div>
           </div>
         </div>
         
-        <div class="modal-footer mod-style-cGFkZGlu">
-          <button class="btn btn-primary" id="discovery-finish-btn" class="mod-style-d2lkdGg6">Enter Dashboard</button>
+        <div class="modal-footer" style="padding: 0; border: none;">
+          <button class="btn btn-primary" id="discovery-finish-btn" style="width: 100%;">Enter Dashboard</button>
         </div>
       </div>
     </div>
