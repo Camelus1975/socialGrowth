@@ -228,7 +228,7 @@ export async function sendInboxMessageReply() {
   if (!threadId) return;
 
   try {
-    const result = await requestApi('/api/inbox/reply', 'POST', { threadId, text });
+    const result = await requestApi('/api/inbox/reply', { method: 'POST', body: JSON.stringify({ threadId, text }) });
     
     if (result.success) {
       const chatBox = document.getElementById('inbox-chat-bubbles');

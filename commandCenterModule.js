@@ -79,12 +79,12 @@ async function submitGoal(goalText) {
     feedEl.scrollTop = feedEl.scrollHeight;
 
     try {
-        const response = await requestApi('/api/agents/orchestration/trigger', 'POST', {
+        const response = await requestApi('/api/agents/orchestration/trigger', { method: 'POST', body: JSON.stringify({
             appId: appId,
             goal: goalText,
             businessType: 'saas',
             campaignType: 'both'
-        });
+        }) });
 
         // Remove loading state
         feedEl.removeChild(loadingMsg);

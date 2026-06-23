@@ -221,10 +221,10 @@ async function refreshPriorityActions(supabase) {
                 if (!appId) return;
                 
                 try {
-                    await requestApi('/api/agents/orchestration/approve', 'POST', {
+                    await requestApi('/api/agents/orchestration/approve', { method: 'POST', body: JSON.stringify({
                         operationId: id,
                         appId: appId
-                    });
+                    }) });
                 } catch (err) {
                     console.error("Failed to approve orchestration:", err);
                 }
