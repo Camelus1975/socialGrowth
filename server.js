@@ -835,24 +835,35 @@ app.post('/api/agents/orchestration/trigger', async (req, res) => {
         console.error("[Orchestrator] jobErr details:", jobErr); 
         // We will NOT throw here. We will gracefully degrade so the pipeline still runs!
         // We just assign a fake ID if jobData is missing
-        if (!jobData) {
-           jobData = { id: require('crypto').randomUUID() };
-        }
-      }
+    }
+    
+    if (!jobData) {
+       jobData = { id: require('crypto').randomUUID() };
+    }
 
-    // 2. Add job to BullMQ queue
-    await agentExecutionQueue.add('orchestrate_campaign', {
-      jobId: jobData.id,
-      appId,
-      goal,
-      authHeader,
-      language,
-      businessType,
-      campaignType,
-      userId
-    });
+    // 2. Add job to BullMQ queue, or fallback to inline if Redis connection fails
+    let finalJobId = jobData ? jobData.id : "fallback-uuid-" + Date.now();
+    try {
+      await agentExecutionQueue.add('orchestrate_campaign', {
+        jobId: finalJobId,
+        appId,
+        goal,
+        authHeader,
+        language,
+        businessType,
+        campaignType,
+        userId
+      });
+    } catch (queueErr) {
+      console.warn("[Orchestrator] Redis/BullMQ failed to enqueue. Falling back to inline execution.", queueErr.message || queueErr);
+      // Fallback to inline execution
+      const { runMarketingOrchestration } = require('./aiOrchestrator');
+      setTimeout(() => {
+        runMarketingOrchestration(finalJobId, appId, goal, authHeader, language, businessType, campaignType, userId).catch(console.error);
+      }, 0);
+    }
 
-    res.json({ success: true, jobId: jobData.id, message: "Orchestration queued successfully." });
+    res.json({ success: true, jobId: finalJobId, message: "Orchestration queued successfully." });
   } catch (error) {
     console.error("[Orchestrator] Failed to enqueue job:", error);
     res.status(500).json({ error: "Failed to start orchestration pipeline. DETAILS: " + JSON.stringify(error) });
