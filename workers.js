@@ -45,9 +45,17 @@ const {
   routeExecution
 } = require('./apiExecutors');
 
-const redisConnection = new Redis(config.REDIS_URL || 'redis://localhost:6379', {
-  maxRetriesPerRequest: null
-});
+const useRedis = !!config.REDIS_URL;
+let redisConnection = null;
+if (useRedis) {
+  redisConnection = new Redis(config.REDIS_URL || 'redis://localhost:6379', {
+    maxRetriesPerRequest: null,
+    retryStrategy: () => null // Do not retry if it fails immediately to prevent crash loops
+  });
+  redisConnection.on('error', (err) => {
+    console.warn('[Redis Worker] Connection failed. Workers are offline.');
+  });
+}
 
 // Define Queue Names
 const queuesList = [
@@ -61,13 +69,16 @@ const queuesList = [
 
 // Initialize Queues
 const activeQueues = {};
-queuesList.forEach(qName => {
-  activeQueues[qName] = new Queue(qName, { connection: redisConnection });
-  console.log(`BullMQ Queue registered: ${qName}`);
-});
+  if (redisConnection) {
+    queuesList.forEach(qName => {
+      activeQueues[qName] = new Queue(qName, { connection: redisConnection });
+      activeQueues[qName].on('error', () => {});
+      console.log(`BullMQ Queue registered: ${qName}`);
+    });
+  }
 
 // 1. Scheduled Publishing Worker
-const publishingWorker = new Worker('scheduled_publishing', async (job) => {
+const publishingWorker = redisConnection ? new Worker('scheduled_publishing', async (job) => {
   if (job.name === 'poll_scheduled_posts') {
     // 1-Minute CRON: Query Supabase for due posts
     console.log(`[Worker - Publishing] Polling database for scheduled posts...`);
@@ -120,10 +131,10 @@ const publishingWorker = new Worker('scheduled_publishing', async (job) => {
       throw err;
     }
   }
-}, { connection: redisConnection });
+}, { connection: redisConnection }) : null;
 
 // 2. Analytics Collection Worker (Materialized View Refresher)
-const analyticsWorker = new Worker('analytics_collection', async (job) => {
+const analyticsWorker = redisConnection ? new Worker('analytics_collection', async (job) => {
   console.log(`[Worker - Analytics] Starting 1-Hour Database Analytics Refresh...`);
   
   try {
@@ -152,20 +163,20 @@ const analyticsWorker = new Worker('analytics_collection', async (job) => {
     console.error(`[Worker - Analytics] Fatal Error:`, err);
     throw err;
   }
-}, { connection: redisConnection });
+}, { connection: redisConnection }) : null;
 
 // 3. Review Imports Worker
-const reviewsWorker = new Worker('review_imports', async (job) => {
+const reviewsWorker = redisConnection ? new Worker('review_imports', async (job) => {
   console.log(`[Worker - Reviews] Crawling App Store Connect RSS feeds and Play Console for app: ${job.data.projectId}`);
   
   // Mock review import & sentiment analysis
   console.log(`[Worker - Reviews] Calculation: Review sentiment classified positive.`);
   return { importedCount: 3, sentimentDistribution: { positive: 2, neutral: 1, negative: 0 } };
-}, { connection: redisConnection });
+}, { connection: redisConnection }) : null;
 
 // 4. Agent Execution Orchestrator Worker
 const { runMarketingOrchestration } = require('./aiOrchestrator');
-const agentWorker = new Worker('agent_execution', async (job) => {
+const agentWorker = redisConnection ? new Worker('agent_execution', async (job) => {
   if (job.name === 'orchestrate_campaign') {
     const { jobId, appId, goal, authHeader, language, businessType, campaignType, userId } = job.data;
     console.log(`[Worker - AI Agents] Executing orchestration job ${jobId} for app ${appId}`);
@@ -241,19 +252,19 @@ const agentWorker = new Worker('agent_execution', async (job) => {
       throw err;
     }
   }
-}, { connection: redisConnection });
+}, { connection: redisConnection }) : null;
 
 // Callback Listeners
-publishingWorker.on('completed', (job, result) => {
+if (publishingWorker) publishingWorker.on('completed', (job, result) => {
   console.log(`[Job Completed] Worker 'scheduled_publishing' finished job ${job.id}`);
 });
 
-publishingWorker.on('failed', (job, err) => {
+if (publishingWorker) publishingWorker.on('failed', (job, err) => {
   console.error(`[Job Failed] Worker 'scheduled_publishing' failed job ${job.id} with error: ${err.message}`);
 });
 
 // 5. Video Rendering Worker
-const videoRenderingWorker = new Worker('video_rendering', async (job) => {
+const videoRenderingWorker = redisConnection ? new Worker('video_rendering', async (job) => {
   if (job.name === 'render_video') {
     const { assetId, prompt, appId } = job.data;
     console.log(`[Worker - Video] Rendering video for asset ${assetId}...`);
@@ -306,9 +317,9 @@ const videoRenderingWorker = new Worker('video_rendering', async (job) => {
       throw err;
     }
   }
-}, { connection: redisConnection });
+}, { connection: redisConnection }) : null;
 
-videoRenderingWorker.on('failed', (job, err) => {
+if (videoRenderingWorker) videoRenderingWorker.on('failed', (job, err) => {
   console.error(`[Job Failed] Worker 'video_rendering' failed job ${job.id} with error: ${err.message}`);
 });
 

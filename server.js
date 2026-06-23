@@ -15,6 +15,7 @@ const { processDiscoveryJob } = require('./discoveryEngine');
 
 const redisConnection = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', { maxRetriesPerRequest: null });
 const agentExecutionQueue = new Queue('agent_execution', { connection: redisConnection });
+    agentExecutionQueue.on('error', () => {});
 
 const app = express();
 const PORT = config.PORT;
