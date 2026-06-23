@@ -104,7 +104,7 @@ Output JSON format: { "simulation_report": { "expected_reach": 10000, "expected_
  * @param {string} campaignType - User preference (organic, paid, or both)
  * @param {string} userId - The user ID to assign generated posts to
  */
-async function runMarketingOrchestration(appId, goal, authHeader, language = 'en', businessType = 'saas', campaignType = 'both', userId = null) {
+async function runMarketingOrchestration(jobId, appId, goal, authHeader, language = 'en', businessType = 'saas', campaignType = 'both', userId = null) {
   const steps = [];
   
   const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {

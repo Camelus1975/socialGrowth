@@ -369,3 +369,9 @@ if (require.main === module) {
   activeQueues['scheduled_publishing'].add('poll_scheduled_posts', { isBoot: true });
   activeQueues['agent_execution'].add('poll_executing_operations', { isBoot: true });
 }
+
+if (publishingWorker) { publishingWorker.on('error', err => console.warn('[Worker Error]', err.message)); }
+if (analyticsWorker) { analyticsWorker.on('error', err => console.warn('[Worker Error]', err.message)); }
+if (reviewsWorker) { reviewsWorker.on('error', err => console.warn('[Worker Error]', err.message)); }
+if (agentWorker) { agentWorker.on('error', err => console.warn('[Worker Error]', err.message)); }
+if (videoRenderingWorker) { videoRenderingWorker.on('error', err => console.warn('[Worker Error]', err.message)); }
