@@ -1153,12 +1153,18 @@ app.get('/api/admin/debug-jobs', async (req, res) => {
   }
 });
 
-// Catch-all: serve index.html for any non-API route (SPA support)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+  // Healthcheck endpoint for Railway
+  app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+  });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Production SaaS backend server running on port ${PORT}`);
-});
+  // Catch-all route to serve the single-page application (SPA)
+  // This must be the very last route
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+  });
+  
+  // Start Server
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Production SaaS backend server running on port ${PORT}`);
+  });
