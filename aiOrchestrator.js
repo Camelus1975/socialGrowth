@@ -107,6 +107,11 @@ Output JSON format: { "simulation_report": { "expected_reach": 10000, "expected_
 async function runMarketingOrchestration(jobId, appId, goal, authHeader, language = 'en', businessType = 'saas', campaignType = 'both', userId = null) {
   const steps = [];
   
+  const pushLog = async (agent, logText) => {
+    console.log(`[${agent}] ${logText}`);
+    steps.push({ agent, log: logText, timestamp: new Date().toISOString() });
+  };
+  
   const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
     global: { headers: { Authorization: authHeader } }
   });
