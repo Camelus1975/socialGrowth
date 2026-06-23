@@ -23,7 +23,7 @@ export function renderCustomerIntelligenceView() {
   
   const app = state.appsData[state.currentActiveApp];
   if (!app) {
-    container.innerHTML = '<div style="padding: 20px; color: var(--text-sub);">Please select a business to view customer intelligence.</div>';
+    container.innerHTML = '<div class="mod-style-cGFkZGlu">Please select a business to view customer intelligence.</div>';
     return;
   }
   
@@ -50,13 +50,13 @@ export function renderCustomerIntelligenceView() {
   sentimentStats.style.marginBottom = '20px';
   
   const positive = createSafeElement('div');
-  positive.innerHTML = '<span style="color:var(--accent-green);font-size:1.5rem;font-weight:bold;">78%</span><br/><span style="color:var(--text-sub);font-size:0.8rem;">Positive</span>';
+  positive.innerHTML = '<span class="mod-style-Y29sb3I6">78%</span><br/><span class="mod-style-Y29sb3I6">Positive</span>';
   
   const neutral = createSafeElement('div');
-  neutral.innerHTML = '<span style="color:var(--accent-blue);font-size:1.5rem;font-weight:bold;">15%</span><br/><span style="color:var(--text-sub);font-size:0.8rem;">Neutral</span>';
+  neutral.innerHTML = '<span class="mod-style-Y29sb3I6">15%</span><br/><span class="mod-style-Y29sb3I6">Neutral</span>';
   
   const negative = createSafeElement('div');
-  negative.innerHTML = '<span style="color:var(--accent-red);font-size:1.5rem;font-weight:bold;">7%</span><br/><span style="color:var(--text-sub);font-size:0.8rem;">Negative</span>';
+  negative.innerHTML = '<span class="mod-style-Y29sb3I6">7%</span><br/><span class="mod-style-Y29sb3I6">Negative</span>';
   
   sentimentStats.appendChild(positive);
   sentimentStats.appendChild(neutral);

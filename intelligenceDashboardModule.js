@@ -119,10 +119,10 @@ async function refreshPriorityActions(supabase) {
 
         if (!data || data.length === 0) {
             listContainer.innerHTML = `
-                <div style="text-align: center; color: var(--text-muted); padding: 20px;">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:12px; opacity:0.3;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <div class="mod-style-dGV4dC1h">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mod-style-bWFyZ2lu"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     <p>No pending actions.</p>
-                    <p style="font-size:0.8rem;">Your autonomous agents are handling everything.</p>
+                    <p class="mod-style-Zm9udC1z">Your autonomous agents are handling everything.</p>
                 </div>
             `;
             return;
@@ -135,8 +135,8 @@ async function refreshPriorityActions(supabase) {
             
             el.innerHTML = `
                 <div>
-                  <div style="font-weight:600; color:white; margin-bottom:4px;">Approve: ${action.task_goal}</div>
-                  <div style="font-size:0.85rem; color:var(--text-sub);">${action.agent_name} recommendation: ${action.recommendation || 'Please review.'}</div>
+                  <div class="mod-style-Zm9udC13">Approve: ${action.task_goal}</div>
+                  <div class="mod-style-Zm9udC1z">${action.agent_name} recommendation: ${action.recommendation || 'Please review.'}</div>
                 </div>
                 <button class="btn btn-primary approve-btn" data-id="${action.id}">Approve</button>
             `;
@@ -168,7 +168,7 @@ async function refreshPriorityActions(supabase) {
     } catch (err) {
         console.error('[Intelligence Dash] Error refreshing actions:', err);
         listContainer.innerHTML = `
-            <div style="text-align: center; color: #f87171; padding: 20px;">
+            <div class="mod-style-dGV4dC1h">
                 Unable to load agent recommendations.
             </div>
         `;

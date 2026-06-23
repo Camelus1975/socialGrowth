@@ -232,15 +232,15 @@ export async function runSuccessPrediction() {
     scoreBlock.appendChild(scoreText);
     
     detailsBlock.innerHTML = `
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:16px; font-size:0.75rem;">
-        <div><strong>Expected Reach:</strong> <span style="color:white;">${result.reach.toLocaleString()}</span></div>
-        <div><strong>Expected Engagement:</strong> <span style="color:white;">${result.engagement.toLocaleString()}</span></div>
-        <div><strong>Expected CTR:</strong> <span style="color:white;">${result.ctr}</span></div>
-        <div><strong>Expected Downloads:</strong> <span style="color:white;">${result.downloads}</span></div>
+      <div class="mod-style-ZGlzcGxh">
+        <div><strong>Expected Reach:</strong> <span class="mod-style-Y29sb3I6">${result.reach.toLocaleString()}</span></div>
+        <div><strong>Expected Engagement:</strong> <span class="mod-style-Y29sb3I6">${result.engagement.toLocaleString()}</span></div>
+        <div><strong>Expected CTR:</strong> <span class="mod-style-Y29sb3I6">${result.ctr}</span></div>
+        <div><strong>Expected Downloads:</strong> <span class="mod-style-Y29sb3I6">${result.downloads}</span></div>
       </div>
-      <div style="font-size:0.8rem; background:rgba(255,255,255,0.02); padding:10px; border-radius:4px; border-left:3px solid var(--primary);">
+      <div class="mod-style-Zm9udC1z">
         <strong>Improvement Suggestions:</strong>
-        <ul style="margin:6px 0 0 16px; padding:0; color:var(--text-muted); line-height:1.4;">
+        <ul class="mod-style-bWFyZ2lu">
           ${result.suggestions.map(s => `<li>${s}</li>`).join('')}
         </ul>
       </div>
@@ -294,13 +294,13 @@ export async function runSaaSContentRecycle() {
   const outputBlock = document.getElementById('intel-recycle-outputs');
   if (outputBlock) {
     outputBlock.innerHTML = `
-      <div class="tabs-navigation" style="margin-bottom:12px;">
+      <div class="tabs-navigation mod-style-bWFyZ2lu">
         <button class="sub-tab-btn active" id="intel-rec-email">Email Campaign</button>
         <button class="sub-tab-btn" id="intel-rec-thread">X Thread</button>
         <button class="sub-tab-btn" id="intel-rec-li">LinkedIn</button>
       </div>
-      <div style="background:#040711; border:1px solid var(--border-glass); padding:14px; border-radius:6px;">
-        <textarea id="intel-rec-textarea" rows="6" readonly style="font-family:monospace; background:transparent; border:none; width:100%; color:white; font-size:0.8rem; line-height:1.4;"></textarea>
+      <div class="mod-style-YmFja2dy">
+        <textarea id="intel-rec-textarea" rows="6" readonly class="mod-style-Zm9udC1m"></textarea>
       </div>
     `;
     

@@ -48,16 +48,24 @@ export async function fetchCalendarPosts() {
       if (error) throw error;
       
       if (data) {
-        state.calendarState[state.currentActiveApp] = data.map(dbPost => ({
-          id: dbPost.id,
-          date: dbPost.scheduled_date,
-          time: dbPost.scheduled_time,
-          platform: dbPost.platform,
-          text: dbPost.content,
-          status: dbPost.status,
-          media_url: dbPost.media_url,
-          approval: "Approved"
-        }));
+        state.calendarState[state.currentActiveApp] = data.map(dbPost => {
+          const pubDate = dbPost.publish_at ? new Date(dbPost.publish_at) : new Date();
+          // Format YYYY-MM-DD
+          const localDate = pubDate.getFullYear() + '-' + String(pubDate.getMonth() + 1).padStart(2, '0') + '-' + String(pubDate.getDate()).padStart(2, '0');
+          // Format HH:MM
+          const localTime = String(pubDate.getHours()).padStart(2, '0') + ':' + String(pubDate.getMinutes()).padStart(2, '0');
+          return {
+            id: dbPost.id,
+            date: localDate,
+            time: localTime,
+            publish_at: dbPost.publish_at,
+            external_id: dbPost.external_id,
+            platform: dbPost.platform,
+            text: dbPost.content,
+            mediaUrl: dbPost.media_url,
+            status: dbPost.status || 'scheduled'
+          };
+        });
       }
     }
   } catch (err) {
@@ -206,11 +214,16 @@ window.clearDayCalendarPosts = async function() {
   try {
     const supabase = getSupabaseClient();
     if (supabase) {
-      const { error } = await supabase
-        .from('scheduled_posts')
-        .delete()
-        .eq('app_id', state.currentActiveApp)
-        .eq('scheduled_date', targetDate);
+        const nextDay = new Date(targetDate);
+        nextDay.setDate(nextDay.getDate() + 1);
+        const nextDayStr = nextDay.toISOString().split('T')[0];
+
+        const { error } = await supabase
+          .from('scheduled_posts')
+          .delete()
+          .eq('app_id', state.currentActiveApp)
+          .gte('publish_at', `${targetDate}T00:00:00Z`)
+          .lt('publish_at', `${nextDayStr}T00:00:00Z`);
         
       if (error) throw error;
       
@@ -252,13 +265,16 @@ async function saveCalendarPostFromModal() {
     if (supabase) {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        // Convert local date and time to UTC timestamp for the database
+        const localDateObj = new Date(`${date}T${time}:00`);
+        const publish_at_iso = localDateObj.toISOString();
+
         const { data, error } = await supabase.from('scheduled_posts').insert({
           user_id: user.id,
           app_id: state.currentActiveApp,
           platform: platform,
           content: text,
-          scheduled_date: date,
-          scheduled_time: time,
+          publish_at: publish_at_iso,
           media_url: mediaUrl,
           status: 'scheduled'
         }).select();

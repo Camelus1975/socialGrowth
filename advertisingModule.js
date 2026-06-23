@@ -8,12 +8,12 @@ export function initAdvertisingModule() {
   const viewAdDash = document.getElementById('view-ad-dash');
   if (viewAdDash) {
     viewAdDash.innerHTML = `
-      <div class="ad-dashboard-header" style="margin-bottom: 24px;">
-        <h3 style="color: white; margin-bottom: 8px;">Advertising Command Center</h3>
-        <p style="color: var(--text-muted);">Manage AI Media Buying, approve budgets, and monitor ROAS.</p>
+      <div class="ad-dashboard-header mod-style-bWFyZ2lu">
+        <h3 class="mod-style-Y29sb3I6">Advertising Command Center</h3>
+        <p class="mod-style-Y29sb3I6">Manage AI Media Buying, approve budgets, and monitor ROAS.</p>
       </div>
 
-      <div class="kpi-grid" style="margin-bottom: 24px;">
+      <div class="kpi-grid mod-style-bWFyZ2lu">
         <div class="glass-card card-primary kpi-card">
           <div class="kpi-title">Total Spend</div>
           <div class="kpi-value" id="ad-spend-kpi">$0.00</div>
@@ -36,21 +36,21 @@ export function initAdvertisingModule() {
         </div>
       </div>
 
-      <div class="ad-sections" style="display: grid; grid-template-columns: 1fr; gap: 24px;">
+      <div class="ad-sections mod-style-ZGlzcGxh">
         <div class="glass-card">
-          <h4 style="margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
-            <span><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display:inline; margin-right:8px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Pending Approvals</span>
-            <span class="badge" style="background: var(--accent-red); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;" id="pending-ad-count">0</span>
+          <h4 class="mod-style-bWFyZ2lu">
+            <span><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="mod-style-ZGlzcGxh"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Pending Approvals</span>
+            <span class="badge mod-style-YmFja2dy" id="pending-ad-count">0</span>
           </h4>
-          <div id="pending-ad-list" style="display: flex; flex-direction: column; gap: 12px;">
-            <div style="color: var(--text-muted); font-size: 14px;">No campaigns pending approval.</div>
+          <div id="pending-ad-list" class="mod-style-ZGlzcGxh">
+            <div class="mod-style-Y29sb3I6">No campaigns pending approval.</div>
           </div>
         </div>
 
         <div class="glass-card">
-          <h4 style="margin-bottom: 16px;">Active Campaigns</h4>
-          <div id="active-ad-list" style="display: flex; flex-direction: column; gap: 12px;">
-            <div style="color: var(--text-muted); font-size: 14px;">No active campaigns running.</div>
+          <h4 class="mod-style-bWFyZ2lu">Active Campaigns</h4>
+          <div id="active-ad-list" class="mod-style-ZGlzcGxh">
+            <div class="mod-style-Y29sb3I6">No active campaigns running.</div>
           </div>
         </div>
       </div>
@@ -92,20 +92,20 @@ function renderCampaigns(campaigns) {
 
   // Render Pending
   if (pending.length === 0) {
-    pendingContainer.innerHTML = `<div style="color: var(--text-muted); font-size: 14px;">No campaigns pending approval.</div>`;
+    pendingContainer.innerHTML = `<div class="mod-style-Y29sb3I6">No campaigns pending approval.</div>`;
   } else {
     pendingContainer.innerHTML = pending.map(c => {
       const budget = parseFloat(c.total_budget || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
       return `
-      <div class="ad-card" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center;">
+      <div class="ad-card mod-style-YmFja2dy">
         <div>
-          <h5 style="margin: 0 0 4px 0; color: white;">${c.name}</h5>
-          <div style="font-size: 12px; color: var(--text-muted);">Objective: ${c.objective.toUpperCase()} | Budget: <strong style="color:var(--accent-green);">${budget}</strong></div>
-          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Created by AI Ad Strategist. Awaiting your approval.</div>
+          <h5 class="mod-style-bWFyZ2lu">${c.name}</h5>
+          <div class="mod-style-Zm9udC1z">Objective: ${c.objective.toUpperCase()} | Budget: <strong class="mod-style-Y29sb3I6">${budget}</strong></div>
+          <div class="mod-style-Zm9udC1z">Created by AI Ad Strategist. Awaiting your approval.</div>
         </div>
-        <div style="display:flex; gap: 8px;">
-          <button class="btn btn-secondary" onclick="window.rejectCampaign('${c.id}')">Reject</button>
-          <button class="btn btn-primary" onclick="window.approveCampaign('${c.id}')" style="background: var(--accent-green); color: black;">Approve Budget</button>
+        <div class="mod-style-ZGlzcGxh">
+          <button class="btn btn-secondary" data-action="rejectCampaign" data-args="${c.id}">Reject</button>
+          <button class="btn btn-primary" data-action="approveCampaign" data-args="${c.id}" class="mod-style-YmFja2dy">Approve Budget</button>
         </div>
       </div>
     `}).join('');
@@ -113,18 +113,18 @@ function renderCampaigns(campaigns) {
 
   // Render Active
   if (active.length === 0) {
-    activeContainer.innerHTML = `<div style="color: var(--text-muted); font-size: 14px;">No active campaigns running.</div>`;
+    activeContainer.innerHTML = `<div class="mod-style-Y29sb3I6">No active campaigns running.</div>`;
   } else {
     activeContainer.innerHTML = active.map(c => {
       const budget = parseFloat(c.total_budget || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
       return `
-      <div class="ad-card" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center;">
+      <div class="ad-card mod-style-YmFja2dy">
         <div>
-          <h5 style="margin: 0 0 4px 0; color: white;">${c.name}</h5>
-          <div style="font-size: 12px; color: var(--text-muted);">Objective: ${c.objective.toUpperCase()} | Budget: ${budget}</div>
+          <h5 class="mod-style-bWFyZ2lu">${c.name}</h5>
+          <div class="mod-style-Zm9udC1z">Objective: ${c.objective.toUpperCase()} | Budget: ${budget}</div>
         </div>
         <div>
-          <span class="badge" style="background: rgba(46, 204, 113, 0.2); color: var(--accent-green); padding: 4px 8px; border-radius: 4px; font-size: 12px;">ACTIVE</span>
+          <span class="badge mod-style-YmFja2dy">ACTIVE</span>
         </div>
       </div>
     `}).join('');

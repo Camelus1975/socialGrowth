@@ -111,7 +111,7 @@ export function renderMediaManager() {
       img.src = asset.url;
       img.alt = asset.name || 'Media asset';
       img.style.cssText = 'width:100%; height:100%; object-fit:cover; border-radius:8px 8px 0 0;';
-      img.onerror = function() { this.style.display='none'; this.parentNode.innerHTML='<span style="font-size:2.5rem">🖼️</span>'; };
+      img.onerror = function() { this.style.display='none'; this.parentNode.innerHTML='<span class="mod-style-Zm9udC1z">🖼️</span>'; };
       preview.style.height = '160px';
       preview.style.display = 'flex';
       preview.style.alignItems = 'center';
@@ -180,11 +180,11 @@ function openMediaLightbox(asset) {
   const info = document.createElement('div');
   info.style.cssText = 'text-align:center; color:white; max-width:500px;';
   info.innerHTML = `
-    <h3 style="margin:0 0 8px 0; font-size:1rem;">${(asset.name || 'Untitled').replace(/</g,'&lt;')}</h3>
-    <p style="margin:0; font-size:0.8rem; color:var(--text-muted);">${(asset.description || '').replace(/</g,'&lt;')}</p>
-    <div style="margin-top:12px; display:flex; gap:8px; justify-content:center;">
-      <span style="font-size:0.7rem; background:rgba(99,102,241,0.2); color:#a5b4fc; padding:3px 8px; border-radius:4px;">${(asset.folder || '').replace(/</g,'&lt;')}</span>
-      <span style="font-size:0.7rem; background:rgba(99,102,241,0.2); color:#a5b4fc; padding:3px 8px; border-radius:4px;">${(asset.tag || '').replace(/</g,'&lt;')}</span>
+    <h3 class="mod-style-bWFyZ2lu">${(asset.name || 'Untitled').replace(/</g,'&lt;')}</h3>
+    <p class="mod-style-bWFyZ2lu">${(asset.description || '').replace(/</g,'&lt;')}</p>
+    <div class="mod-style-bWFyZ2lu">
+      <span class="mod-style-Zm9udC1z">${(asset.folder || '').replace(/</g,'&lt;')}</span>
+      <span class="mod-style-Zm9udC1z">${(asset.tag || '').replace(/</g,'&lt;')}</span>
     </div>
   `;
   container.appendChild(info);

@@ -33,7 +33,7 @@ export async function initCompetitorIntelligence() {
       metricGaps.innerText = '0';
       feedEl.innerHTML = `
         <tr>
-          <td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">No competitors tracked yet. Add competitors to begin intelligence gathering.</td>
+          <td colspan="5" class="mod-style-dGV4dC1h">No competitors tracked yet. Add competitors to begin intelligence gathering.</td>
         </tr>
       `;
       return;
@@ -69,7 +69,7 @@ export async function initCompetitorIntelligence() {
     if (!events || events.length === 0) {
       feedEl.innerHTML = `
         <tr>
-          <td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">No competitor events detected recently.</td>
+          <td colspan="5" class="mod-style-dGV4dC1h">No competitor events detected recently.</td>
         </tr>
       `;
       return;
@@ -118,15 +118,15 @@ export async function initCompetitorIntelligence() {
       const dateStr = new Date(ev.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
       html += `
-        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-          <td style="padding:16px 0; display:flex; align-items:center; gap:8px;">
+        <tr class="mod-style-Ym9yZGVy">
+          <td class="mod-style-cGFkZGlu">
             <div style="width:24px; height:24px; background:${aColor}; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold;">${compName.charAt(0)}</div>
             <strong>${compName}</strong>
           </td>
-          <td style="padding:16px 0;"><span class="alert-tag" style="background:${badgeBg}; color:${badgeColor};">${typeText}</span></td>
-          <td style="padding:16px 0; color:var(--text-sub);">${ev.description || ''}</td>
-          <td style="padding:16px 0; color:var(--text-sub);">${dateStr}</td>
-          <td style="padding:16px 0;"><span style="color:${threatColor};">${threatText}</span></td>
+          <td class="mod-style-cGFkZGlu"><span class="alert-tag" style="background:${badgeBg}; color:${badgeColor};">${typeText}</span></td>
+          <td class="mod-style-cGFkZGlu">${ev.description || ''}</td>
+          <td class="mod-style-cGFkZGlu">${dateStr}</td>
+          <td class="mod-style-cGFkZGlu"><span style="color:${threatColor};">${threatText}</span></td>
         </tr>
       `;
     });
@@ -137,7 +137,7 @@ export async function initCompetitorIntelligence() {
     console.error('[Competitor Intelligence] Error fetching data:', err);
     feedEl.innerHTML = `
       <tr>
-        <td colspan="5" style="text-align:center; padding:20px; color:#f87171;">Failed to load competitor intelligence.</td>
+        <td colspan="5" class="mod-style-dGV4dC1h">Failed to load competitor intelligence.</td>
       </tr>
     `;
   }

@@ -51,9 +51,9 @@ async function submitGoal(goalText) {
     const loadingMsg = document.createElement('div');
     loadingMsg.style = "align-self:flex-start; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:20px; border-radius:16px; border-bottom-left-radius:4px; max-width:80%; animation: fade-in 0.3s ease-out;";
     loadingMsg.innerHTML = `
-        <div style="display:flex; align-items:center; gap:10px;">
+        <div class="mod-style-ZGlzcGxh">
             <div class="spinner"></div>
-            <strong style="color:var(--text-sub);">AI Strategy Planner is orchestrating agents...</strong>
+            <strong class="mod-style-Y29sb3I6">AI Strategy Planner is orchestrating agents...</strong>
         </div>
     `;
     feedEl.appendChild(loadingMsg);
@@ -77,23 +77,23 @@ async function submitGoal(goalText) {
             
             let stepsHtml = '';
             if (response.steps && response.steps.length > 0) {
-                stepsHtml = `<div style="background:rgba(0,0,0,0.3); padding:16px; border-radius:8px; margin-top:16px;">
-                    <strong style="color:white; display:block; margin-bottom:12px;">Orchestration Log:</strong>
-                    <ul style="color:var(--text-sub); margin-left:20px; display:flex; flex-direction:column; gap:8px;">
+                stepsHtml = `<div class="mod-style-YmFja2dy">
+                    <strong class="mod-style-Y29sb3I6">Orchestration Log:</strong>
+                    <ul class="mod-style-Y29sb3I6">
                         ${response.steps.map(s => `<li><strong>${s.agent}:</strong> ${s.log}</li>`).join('')}
                     </ul>
                 </div>`;
             }
 
             sysMsg.innerHTML = `
-                <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
-                    <div style="width:32px; height:32px; background:linear-gradient(135deg, #6366f1, #8b5cf6); border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">▲</div>
-                    <strong style="color:white;">AI Strategy Planner</strong>
+                <div class="mod-style-ZGlzcGxh">
+                    <div class="mod-style-d2lkdGg6">▲</div>
+                    <strong class="mod-style-Y29sb3I6">AI Strategy Planner</strong>
                 </div>
-                <p style="color:var(--text-sub); margin-bottom:16px; line-height:1.6;">I have analyzed your goal and orchestrated the required agents.</p>
+                <p class="mod-style-Y29sb3I6">I have analyzed your goal and orchestrated the required agents.</p>
                 ${stepsHtml}
-                <div style="margin-top:16px; display:flex; gap:12px;">
-                    <button class="btn btn-primary" onclick="switchView('unified-intelligence-dash', this)">Review Actions in Dashboard</button>
+                <div class="mod-style-bWFyZ2lu">
+                    <button class="btn btn-primary" data-action="switchView" data-args="unified-intelligence-dash|this">Review Actions in Dashboard</button>
                 </div>
             `;
             feedEl.appendChild(sysMsg);
@@ -107,7 +107,7 @@ async function submitGoal(goalText) {
         
         const errorMsg = document.createElement('div');
         errorMsg.style = "align-self:flex-start; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); padding:20px; border-radius:16px; border-bottom-left-radius:4px; max-width:80%; animation: fade-in 0.3s ease-out;";
-        errorMsg.innerHTML = `<strong style="color:#f87171;">System Error:</strong> <span style="color:var(--text-sub);">${err.message}</span>`;
+        errorMsg.innerHTML = `<strong class="mod-style-Y29sb3I6">System Error:</strong> <span class="mod-style-Y29sb3I6">${err.message}</span>`;
         feedEl.appendChild(errorMsg);
     } finally {
         inputEl.disabled = false;

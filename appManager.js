@@ -49,7 +49,7 @@ export function renderAppSelectorDropdown() {
     
     selectDiv.innerHTML = `
       <span class="app-dot" style="background: ${app.logoColor || '#666'}; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px;"></span>
-      ${app.name} <span style="opacity: 0.6; font-size: 0.8em; margin-left: 4px;">(${app.category || 'App'})</span>
+      ${app.name} <span class="mod-style-b3BhY2l0">(${app.category || 'App'})</span>
     `;
     
     const deleteBtn = document.createElement('button');

@@ -5,6 +5,7 @@ const Replicate = require('replicate');
 const { createClient } = require('@supabase/supabase-js');
 const config = require('./config');
 const { searchGrowthMemory } = require('./memoryEngine'); // Import new memory engine
+const { requireCredits } = require('./creditGate'); // Import Credit Gate
 
 const openai = new OpenAI({
   apiKey: config.OPENAI_API_KEY,
@@ -100,8 +101,23 @@ async function callLLM(tier, prompt, contextData, memoryData, tone) {
   };
 }
 
+// Helper: Calculate text generation cost
+function calculateGenerationCost(req) {
+  const taskType = req.body.taskType || '';
+  if (taskType === 'post') return 1;
+  if (taskType === 'thread') return 2;
+  if (taskType === 'email') return 3;
+  if (taskType === 'analysis' || taskType === 'competitor_analysis') return 5;
+  if (taskType === 'growth_audit') return 10;
+  if (taskType === 'strategy') return 10;
+  if (taskType === 'deep_market_analysis') return 20;
+  if (taskType === 'copilot' || taskType === 'growth_report') return 25;
+  if (taskType === 'executive_review') return 30;
+  return 1; // Default
+}
+
 // Main Gateway Endpoint
-router.post('/generate', async (req, res) => {
+router.post('/generate', requireCredits(calculateGenerationCost), async (req, res) => {
   const { prompt, taskType, contextData, tone, enable_ab, appId } = req.body;
   
   if (!prompt || !taskType) {
@@ -168,7 +184,7 @@ router.post('/generate', async (req, res) => {
 // ==========================================
 // IMAGE MODEL ROUTER (3-TIER GENERATION)
 // ==========================================
-router.post('/generate-image', async (req, res) => {
+router.post('/generate-image', requireCredits(10), async (req, res) => {
   const { prompt, mode, appId } = req.body;
   if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
 
@@ -244,7 +260,7 @@ router.post('/generate-image', async (req, res) => {
 });
 
 // Endpoint: AI Video Marketing Router
-router.post('/generate-video', async (req, res) => {
+router.post('/generate-video', requireCredits(50), async (req, res) => {
   const { prompt, type, appId } = req.body;
   if (!prompt) return res.status(400).json({ error: 'Missing prompt' });
 

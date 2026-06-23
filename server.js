@@ -7,9 +7,14 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const { createClient } = require('@supabase/supabase-js');
+const { Queue } = require('bullmq');
+const Redis = require('ioredis');
 const config = require('./config');
 const aiGatewayRouter = require('./aiGatewayRouter');
 const { processDiscoveryJob } = require('./discoveryEngine');
+
+const redisConnection = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', { maxRetriesPerRequest: null });
+const agentExecutionQueue = new Queue('agent_execution', { connection: redisConnection });
 
 const app = express();
 const PORT = config.PORT;
@@ -48,7 +53,14 @@ app.use(cors({
 
 // Performance: Compression
 app.use(compression());
-app.use(express.json({ limit: '5mb' }));
+app.use(express.json({ 
+  limit: '5mb',
+  verify: (req, res, buf) => {
+    if (req.originalUrl.startsWith('/api/billing/webhook') || req.originalUrl.startsWith('/api/webhooks/')) {
+      req.rawBody = buf;
+    }
+  }
+}));
 
 // Rate limit all API routes
 app.use('/api', apiLimiter);
@@ -126,7 +138,9 @@ const authenticate = async (req, res, next) => {
 // Apply security auth middleware to all api routes
 app.use('/api', authenticate);
 
-// Register AI Gateway
+// Register Routers
+const billingRouter = require('./billingRouter');
+app.use('/api/billing', billingRouter);
 app.use('/api/ai-gateway', aiGatewayRouter);
 
 // Public endpoint: expose Supabase config for frontend auth (anon key is public by design)
@@ -479,6 +493,9 @@ app.post('/api/calendar/schedule', async (req, res) => {
   try {
     if (isDummyDb) throw new Error("Offline Mode");
 
+    const localDateObj = new Date(`${date}T${time || '12:00'}:00`);
+    const publish_at_iso = localDateObj.toISOString();
+
     const { data, error } = await supabase
       .from('scheduled_posts')
       .insert([{
@@ -486,8 +503,7 @@ app.post('/api/calendar/schedule', async (req, res) => {
         app_id: projectId || 'default',
         platform: platform,
         content: text,
-        scheduled_date: date,
-        scheduled_time: time || '12:00',
+        publish_at: publish_at_iso,
         media_url: mediaUrl,
         status: 'scheduled'
       }]);
@@ -743,33 +759,51 @@ const { runMarketingOrchestration } = require('./aiOrchestrator');
 app.post('/api/agents/orchestration/trigger', async (req, res) => {
   const { goal, appId } = req.body;
   if (!goal) {
-    // Fallback to demo mode for older UI calls
-    return res.json({
-      orchestrationId: crypto.randomUUID(),
-      steps: [
-        { agent: "CMO Agent", log: "Drafting strategy for default pipeline." },
-        { agent: "AnalyticsAgent", log: "Detected MRR conversion drops on fitness segments." },
-        { agent: "GrowthAgent", log: "Scanned competitor pricing models updates." },
-        { agent: "ASOAgent", log: "Optimized app store subtitle metadata tags." },
-        { agent: "MarketingAgent", log: "Planned challenge launch campaign." },
-        { agent: "ContentAgent", log: "Generated copy variants for social threads." },
-        { agent: "System", log: "Awaiting CEO Approval." }
-      ]
-    });
+    return res.status(400).json({ error: "Goal is required." });
   }
 
-  // Real Multi-Agent Orchestration Loop
   const authHeader = req.headers.authorization;
   const language = req.headers['x-app-language'] || 'en';
   const businessType = req.body.businessType || 'saas';
   const campaignType = req.body.campaignType || 'both';
   const userId = req.user?.id;
-  const result = await runMarketingOrchestration(appId, goal, authHeader, language, businessType, campaignType, userId);
-  
-  if (result.success) {
-    res.json(result);
-  } else {
-    res.status(500).json({ error: result.error });
+
+  if (!userId) {
+     return res.status(401).json({ error: "Unauthorized." });
+  }
+
+  try {
+    // 1. Create a tracking record in orchestration_jobs
+    const { data: jobData, error: jobErr } = await supabase
+      .from('orchestration_jobs')
+      .insert([{
+        app_id: appId,
+        user_id: userId,
+        goal: goal,
+        status: 'pending',
+        logs: [{ agent: 'System', log: 'Orchestration queued. Awaiting available AI worker...', timestamp: new Date().toISOString() }]
+      }])
+      .select()
+      .single();
+
+    if (jobErr) throw jobErr;
+
+    // 2. Add job to BullMQ queue
+    await agentExecutionQueue.add('orchestrate_campaign', {
+      jobId: jobData.id,
+      appId,
+      goal,
+      authHeader,
+      language,
+      businessType,
+      campaignType,
+      userId
+    });
+
+    res.json({ success: true, jobId: jobData.id, message: "Orchestration queued successfully." });
+  } catch (error) {
+    console.error("[Orchestrator] Failed to enqueue job:", error);
+    res.status(500).json({ error: "Failed to start orchestration pipeline." });
   }
 });
 

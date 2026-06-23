@@ -23,7 +23,7 @@ export function renderAttributionView() {
   
   const app = state.appsData[state.currentActiveApp];
   if (!app) {
-    container.innerHTML = '<div style="padding: 20px; color: var(--text-sub);">Please select a business to view attribution metrics.</div>';
+    container.innerHTML = '<div class="mod-style-cGFkZGlu">Please select a business to view attribution metrics.</div>';
     return;
   }
   
@@ -47,7 +47,7 @@ export function renderAttributionView() {
   title.style.margin = '0';
   
   const totalRevenue = createSafeElement('div');
-  totalRevenue.innerHTML = '<span style="color:var(--text-sub);font-size:0.8rem;margin-right:10px;">Attributed Revenue</span><span style="color:var(--accent-green);font-size:1.5rem;font-weight:bold;">$34,500</span>';
+  totalRevenue.innerHTML = '<span class="mod-style-Y29sb3I6">Attributed Revenue</span><span class="mod-style-Y29sb3I6">$34,500</span>';
   
   headerCard.appendChild(title);
   headerCard.appendChild(totalRevenue);

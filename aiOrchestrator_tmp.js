@@ -125,10 +125,10 @@ async function runMarketingOrchestration(appId, goal, authHeader, language = 'en
       
       if (bizErr) {
         console.error(`[Orchestrator] Business lookup FAILED:`, bizErr.message, bizErr.code);
-        await pushLog("System", `Business lookup error: ${bizErr.message}. Using basic context.`);
+        await pushLog(, );
       } else if (!bizData) {
         console.log(`[Orchestrator] No business found for business_id="${appId}"`);
-        await pushLog("System", "No business found in database. Run Business Discovery first.");
+        await pushLog(, );
       } else {
         console.log(`[Orchestrator] Found business: name="${bizData.name}", has_profile=${!!bizData.discovery_profile}`);
         appName = bizData.name || '';
@@ -157,17 +157,17 @@ Content Pillars: ${(strategy.contentPillars || []).join(', ') || 'Not specified'
 Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
 ===
 `;
-        await pushLog("System", `Loaded brand intelligence profile for "${profile.name || bizData.name}". AI agents will use real business context.`);
+        await pushLog(, );
       } else {
         businessContext = `Business Name: ${bizData?.name || appId}\nCategory: ${bizData?.category || businessType}\n`;
-        await pushLog("System", "No discovery profile found. Run Business Discovery first for better results.");
+        await pushLog(, );
       }
     } catch (e) {
-      await pushLog("System", "Could not fetch business profile. Using basic context.");
+      await pushLog(, );
     }
 
     // 1. RAG Memory Retrieval Phase
-    await pushLog("System", `Searching Growth Memory Engine for past insights on: "${appId}"...`);
+    await pushLog(, );
     const relevantMemories = await searchGrowthMemory(goal, appId, supabase, 5);
     let memoryContext = "";
     if (relevantMemories.length > 0) {
@@ -175,13 +175,13 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
       relevantMemories.forEach((mem, idx) => {
         memoryContext += `${idx + 1}. ${mem.content_text}\n`;
       });
-      await pushLog("System", `Found ${relevantMemories.length} relevant historical memories. Injecting into CMO context.`);
+      await pushLog(, );
     } else {
-      await pushLog("System", "No relevant historical memories found. Relying on baseline intelligence.");
+      await pushLog(, );
     }
 
     // 2. CMO Strategy Phase
-    await pushLog("CMO Agent", `Drafting strategy for goal: "${goal}"`);
+    await pushLog(, );
     
     const langDirective = language === 'ar' 
       ? "CRITICAL: The user's language is Arabic. ALL generated output, text, copy, strategies, and plans MUST be written strictly in Arabic. Do not use English."
@@ -204,7 +204,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
     });
 
     const cmoData = JSON.parse(cmoResponse.choices[0].message.content);
-    await pushLog("CMO Agent", "Strategy finalized. Delegating tasks to Marketing Team.");
+    await pushLog(, );
     
     // 2. Parallel Agent Execution Phase
     // For cost/speed in this V1 pipeline, we execute a subset of the agents based on the CMO's delegated tasks.
@@ -231,18 +231,18 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
     const agentResults = (await Promise.all(agentPromises)).filter(Boolean);
     
     // Append agent logs to the sequence
-    for (const res of agentResults) {
-      await pushLog(res.agent, res.log);
-    }
+    agentResults.forEach(res => {
+      await pushLog(, );
+    });
 
     // 3. Campaign Manager Phase
-    await pushLog("Campaign Manager", "Aggregating agent outputs into Draft Campaign Portfolio.");
+    await pushLog(, );
     
     // Check if Advertising Strategy was generated
     const adStrategy = agentResults.find(r => r.agent === 'AdStrategist' || r.agent === 'Ad Strategist');
     let campaignId = null;
     if (adStrategy) {
-      await pushLog("Media Buyer", "Simulating ad campaign performance and CPA predictions.");
+      await pushLog(, );
       try {
         const campaign = await createPendingCampaign(appId, adStrategy.result, authHeader);
         campaignId = campaign.id;
@@ -251,7 +251,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
         const budget = adStrategy.result.budget_allocation ? Object.values(adStrategy.result.budget_allocation)[0] || 500 : 500;
         const predictions = predictCampaignOutcomes(budget, 'installs', 'meta');
         
-        await pushLog("Media Buyer", `Campaign "${campaign.name}" created. Pending Approval. Expected CPA: $${predictions.expected_case.cpa}, Expected Reach: ${predictions.expected_case.reach}`);
+        await pushLog(, );
       } catch (err) {
         console.error("Failed to create pending campaign", err);
       }
@@ -262,12 +262,12 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
     console.log(`[Orchestrator] ContentWriter found: ${!!contentWriter}, has copy_variants: ${!!(contentWriter?.result?.copy_variants)}, count: ${contentWriter?.result?.copy_variants?.length || 0}`);
     
     if (contentWriter && contentWriter.result && contentWriter.result.copy_variants) {
-      await pushLog("Publishing Agent", "Pushing organic draft posts to your Content Calendar.");
+      await pushLog(, );
       try {
         const uid = userId;
         if (!uid) {
           console.log('[Orchestrator] WARNING: No userId, skipping calendar push');
-          await pushLog('Publishing Agent', 'Warning: No user ID available. Skipping calendar push.');
+          await pushLog(, );
           return;
         }
         
@@ -281,7 +281,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
         
         if (imagePrompts.length === 0) {
           // Fallback: generate image prompts from the actual post content
-          await pushLog("Creative Director", "No image prompts from agent. Auto-generating visual concepts from post content...");
+          await pushLog(, );
           imagePrompts = contentWriter.result.copy_variants.map(v => 
             `A modern, professional social media graphic related to: ${(v.text || '').substring(0, 300)}. Clean design, vibrant colors, no text overlay.`
           );
@@ -289,7 +289,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
         
         if (imagePrompts.length > 0) {
           const totalImages = Math.min(imagePrompts.length, contentWriter.result.copy_variants.length);
-          await pushLog("Creative Director", `Generating ${totalImages} images via FLUX AI...`);
+          await pushLog(, );
           
           for (let i = 0; i < totalImages; i++) {
             const promptText = imagePrompts[i];
@@ -392,9 +392,9 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
             
             generatedImages.push(imageUrl);
             if (imageUrl) {
-              await pushLog("Creative Director", `Image ${i+1}/${totalImages} generated ✓`);
+              await pushLog(, );
             } else {
-              await pushLog("Creative Director", `Image ${i+1}/${totalImages} could not be generated.`);
+              await pushLog(, );
             }
             
             // Delay between requests
@@ -406,7 +406,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
 
         // Save all generated images to Media Asset Manager
         if (generatedImages.some(url => url)) {
-          await pushLog("Creative Director", "Saving generated images to Media Assets Manager...");
+          await pushLog(, );
           for (let i = 0; i < generatedImages.length; i++) {
             if (!generatedImages[i]) continue;
             try {
@@ -425,7 +425,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
               console.error(`[Orchestrator] Failed to save image ${i+1} to media:`, mediaErr.message);
             }
           }
-          await pushLog("Creative Director", `${generatedImages.filter(u => u).length} images saved to Media Assets ✓`);
+          await pushLog(, );
         }
 
         const postsToInsert = contentWriter.result.copy_variants.map((v, i) => {
@@ -446,7 +446,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
         });
 
         await supabase.from('scheduled_posts').insert(postsToInsert);
-        await pushLog("Publishing Agent", `${postsToInsert.length} organic posts successfully queued in Draft mode.`);
+        await pushLog(, );
       } catch (err) {
         console.error("Failed to queue organic posts", err);
       }
@@ -484,7 +484,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
 
       if (operationsToInsert.length > 0) {
         await supabase.from('agent_operations').insert(operationsToInsert);
-        await pushLog("System", `Created ${operationsToInsert.length} pending agent operations for CEO approval.`);
+        await pushLog(, );
       }
     } catch (opErr) {
       console.error("Failed to create agent operations", opErr);

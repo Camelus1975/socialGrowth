@@ -30,7 +30,7 @@ export function renderRevenueIntelligenceView() {
   
   const app = state.appsData[state.currentActiveApp];
   if (!app) {
-    container.innerHTML = '<div style="padding: 20px; color: var(--text-sub);">Please select a business to view revenue metrics.</div>';
+    container.innerHTML = '<div class="mod-style-cGFkZGlu">Please select a business to view revenue metrics.</div>';
     return;
   }
   

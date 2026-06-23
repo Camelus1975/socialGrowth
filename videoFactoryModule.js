@@ -31,7 +31,7 @@ async function loadHistoricalVideos(appId) {
   const block = document.getElementById('video-factory-outputs-block');
   if (!block) return;
   
-  block.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-sub);">Loading assets...</div>';
+  block.innerHTML = '<div class="mod-style-dGV4dC1h">Loading assets...</div>';
 
   const supabase = getSupabaseClient();
   if (!supabase) return;
@@ -48,7 +48,7 @@ async function loadHistoricalVideos(appId) {
     block.innerHTML = '';
     
     if (!data || data.length === 0) {
-      block.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-sub);">No generated videos yet.</div>';
+      block.innerHTML = '<div class="mod-style-dGV4dC1h">No generated videos yet.</div>';
       return;
     }
 
@@ -57,7 +57,7 @@ async function loadHistoricalVideos(appId) {
     });
   } catch (err) {
     console.error("Failed to load historical videos", err);
-    block.innerHTML = '<div style="text-align:center; padding: 20px; color: #f87171;">Failed to load assets.</div>';
+    block.innerHTML = '<div class="mod-style-dGV4dC1h">Failed to load assets.</div>';
   }
 }
 

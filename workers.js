@@ -63,7 +63,7 @@ const publishingWorker = new Worker('scheduled_publishing', async (job) => {
       .from('scheduled_posts')
       .select('*')
       .eq('status', 'scheduled')
-      .lte('scheduled_date', new Date().toISOString().split('T')[0]); // simplified date check
+      .lte('publish_at', new Date().toISOString());
 
     if (error) {
       if (error.code !== '42P01') { // Ignore missing table errors temporarily
@@ -74,16 +74,10 @@ const publishingWorker = new Worker('scheduled_publishing', async (job) => {
 
     if (!duePosts || duePosts.length === 0) return;
 
-    // Additional filtering for time
-    const nowHourMin = new Date().toISOString().split('T')[1].substring(0, 5); // "HH:MM"
-    const today = new Date().toISOString().split('T')[0];
-
     for (const post of duePosts) {
-      if (post.scheduled_date < today || (post.scheduled_date === today && post.scheduled_time <= nowHourMin)) {
-        // Post is due! Add to execution queue and mark as processing
-        await supabase.from('scheduled_posts').update({ status: 'processing' }).eq('id', post.id);
-        await activeQueues['scheduled_publishing'].add('execute_post', post);
-      }
+      // Post is due! Add to execution queue and mark as processing
+      await supabase.from('scheduled_posts').update({ status: 'processing' }).eq('id', post.id);
+      await activeQueues['scheduled_publishing'].add('execute_post', post);
     }
     return { success: true, processed: duePosts.length };
   }
@@ -166,13 +160,14 @@ const publishingWorker = new Worker('scheduled_publishing', async (job) => {
       }
 
       // 3. Update status to published
-      await supabase.from('scheduled_posts').update({ status: 'published' }).eq('id', post.id);
+      const externalId = apiResponse.id || (apiResponse.post_id ? apiResponse.post_id : null);
+      await supabase.from('scheduled_posts').update({ status: 'published', external_id: externalId }).eq('id', post.id);
       console.log(`[Worker - Publishing] Successfully published post ${post.id}`);
       return { success: true, apiResponse };
 
     } catch (err) {
       console.error(`[Worker - Publishing] Post ${post.id} failed:`, err);
-      await supabase.from('scheduled_posts').update({ status: 'failed' }).eq('id', post.id);
+      await supabase.from('scheduled_posts').update({ status: 'failed', error_log: err.message }).eq('id', post.id);
       throw err;
     }
   }
@@ -220,7 +215,21 @@ const reviewsWorker = new Worker('review_imports', async (job) => {
 }, { connection: redisConnection });
 
 // 4. Agent Execution Orchestrator Worker
+const { runMarketingOrchestration } = require('./aiOrchestrator');
 const agentWorker = new Worker('agent_execution', async (job) => {
+  if (job.name === 'orchestrate_campaign') {
+    const { jobId, appId, goal, authHeader, language, businessType, campaignType, userId } = job.data;
+    console.log(`[Worker - AI Agents] Executing orchestration job ${jobId} for app ${appId}`);
+    try {
+      await supabase.from('orchestration_jobs').update({ status: 'processing' }).eq('id', jobId);
+      await runMarketingOrchestration(jobId, appId, goal, authHeader, language, businessType, campaignType, userId);
+      return { success: true };
+    } catch (err) {
+      console.error(`[Worker - AI Agents] Orchestration job ${jobId} failed:`, err);
+      await supabase.from('orchestration_jobs').update({ status: 'failed' }).eq('id', jobId);
+      throw err;
+    }
+  }
   if (job.name === 'poll_executing_operations') {
     console.log(`[Worker - AI Agents] Polling database for approved executing operations...`);
     

@@ -22,7 +22,7 @@ export async function initMemoryEngine() {
     
     if (!data || data.length === 0) {
       timelineEl.innerHTML = `
-        <div style="color:var(--text-muted); text-align:center; padding: 20px;">
+        <div class="mod-style-Y29sb3I6">
           No growth memories found for this business yet.
         </div>
       `;
@@ -51,16 +51,16 @@ export async function initMemoryEngine() {
       
       let tagsHtml = '';
       if (event.tags && Array.isArray(event.tags)) {
-        tagsHtml = event.tags.map(tag => `<span class="alert-tag" style="background:rgba(255,255,255,0.05); color:var(--text-sub);">${tag}</span>`).join('');
+        tagsHtml = event.tags.map(tag => `<span class="alert-tag mod-style-YmFja2dy">${tag}</span>`).join('');
       }
 
       html += `
-        <div style="position:relative;">
+        <div class="mod-style-cG9zaXRp">
           <div style="position:absolute; left:-39px; top:0; width:16px; height:16px; border-radius:50%; background:${color}; border:4px solid var(--bg-card);"></div>
           <div style="font-size:0.8rem; color:${color}; font-weight:600; margin-bottom:4px;">${typeLabel} • ${dateStr}</div>
-          <h4 style="color:white; font-size:1.1rem; margin-bottom:8px;">${event.title || 'Untitled Memory'}</h4>
-          <p style="color:var(--text-sub); font-size:0.9rem; margin-bottom:12px;">${event.content_text || ''}</p>
-          <div style="display:flex; gap:8px;">
+          <h4 class="mod-style-Y29sb3I6">${event.title || 'Untitled Memory'}</h4>
+          <p class="mod-style-Y29sb3I6">${event.content_text || ''}</p>
+          <div class="mod-style-ZGlzcGxh">
             ${tagsHtml}
           </div>
         </div>
@@ -72,7 +72,7 @@ export async function initMemoryEngine() {
   } catch (err) {
     console.error('[Memory Engine] Failed to fetch timeline:', err);
     timelineEl.innerHTML = `
-      <div style="color:#f87171; text-align:center; padding: 20px;">
+      <div class="mod-style-Y29sb3I6">
         Error loading timeline events.
       </div>
     `;
@@ -86,7 +86,7 @@ export async function searchGrowthMemoryUI() {
   if (!input || !input.value.trim() || !resultsContainer) return;
 
   const query = input.value.trim();
-  resultsContainer.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem;">[System] Querying Growth Engine Time Machine for "${query}"...</div>`;
+  resultsContainer.innerHTML = `<div class="mod-style-Y29sb3I6">[System] Querying Growth Engine Time Machine for "${query}"...</div>`;
   input.value = '';
 
   try {
@@ -94,18 +94,18 @@ export async function searchGrowthMemoryUI() {
     // For this demonstration, we simulate the RAG retrieval response based on the new Phase 4 model.
     setTimeout(() => {
       resultsContainer.innerHTML = `
-        <div style="margin-bottom: 10px; color: #fff; font-size: 0.9rem;">
-          <strong style="color: var(--accent);">[Insight Found]</strong> 
+        <div class="mod-style-bWFyZ2lu">
+          <strong class="mod-style-Y29sb3I6">[Insight Found]</strong> 
           Based on 14 cross-business memories, your most successful lead generation campaign across SaaS and Dental Clinics was "Free Audit Lead Magnet" which generated 120 qualified leads with a 40% close rate. The winning pattern was outbound cold emails sent on Tuesdays at 10 AM, driving traffic to a VSL landing page.
         </div>
-        <div style="color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px;">
+        <div class="mod-style-Y29sb3I6">
           Confidence Score: 92% | Data Sources: BusinessPilot (80%), SmileDental (20%)
         </div>
       `;
     }, 1500);
   } catch (error) {
     console.error("Memory Search Error:", error);
-    resultsContainer.innerHTML = `<div style="color: #ef4444; font-size: 0.85rem;">Error querying memory bank.</div>`;
+    resultsContainer.innerHTML = `<div class="mod-style-Y29sb3I6">Error querying memory bank.</div>`;
   }
 }
 

@@ -48,6 +48,11 @@ export async function requestApi(path, options = {}) {
   }
   
   if (!res.ok) {
+    if (res.status === 402 && window.billingModule) {
+      window.billingModule.handleBillingError(res);
+      throw new Error(`Insufficient Growth Credits.`);
+    }
+
     let errBody = {};
     try {
       errBody = await res.json();

@@ -68,6 +68,17 @@ async function scrapeWebContent(url) {
     
     const html = await response.text();
     
+    // Extract title and meta description before stripping tags
+    let titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+    let title = titleMatch ? titleMatch[1].trim() : '';
+
+    let metaDescMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']*)["'][^>]*>/i) || 
+                        html.match(/<meta[^>]*content=["']([^"']*)["'][^>]*name=["']description["'][^>]*>/i) ||
+                        html.match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']*)["'][^>]*>/i);
+    let metaDesc = metaDescMatch ? metaDescMatch[1].trim() : '';
+
+    let metaInfo = `[META TITLE]: ${title}\n[META DESCRIPTION]: ${metaDesc}\n\n`;
+
     // Strip scripts, styles, and HTML tags to get clean text
     let text = html
       .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
@@ -83,6 +94,8 @@ async function scrapeWebContent(url) {
       .replace(/&#?\w+;/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
+    
+    text = metaInfo + text;
     
     // Limit to ~4000 chars to stay within context limits
     if (text.length > 4000) {
@@ -143,7 +156,6 @@ ${googleBusinessContent || 'No Google Business Profile content available'}
         : 'Limited web content found. Running AI analysis with available data...');
     
     // Step 3: AI Analysis with real scraped content
-    const systemPrompt = `
     You are an AI brand strategist and marketing expert.
     You have been given REAL SCRAPED CONTENT from the brand's website and social media pages.
     Analyze this REAL content carefully to understand:
@@ -152,6 +164,7 @@ ${googleBusinessContent || 'No Google Business Profile content available'}
     - Their brand voice and tone
     - Their visual identity cues
     - Their competitive positioning
+    - For Google Business Profile, specifically look for star ratings, number of reviews, and local address in the META DESCRIPTION.
     
     Business/App Name: ${appName || 'Not provided'}
     Website URL: ${urls.website || 'Not provided'}
@@ -172,7 +185,12 @@ ${googleBusinessContent || 'No Google Business Profile content available'}
         "valueProposition": "Their main value proposition as found in the content",
         "targetAudience": "Who their customers/users are based on the content",
         "products": ["Product/Service 1", "Product/Service 2"],
-        "keyMessages": ["Key message 1 found on their site", "Key message 2"]
+        "keyMessages": ["Key message 1 found on their site", "Key message 2"],
+        "localPresence": {
+          "rating": "Extract rating (e.g. 4.8) or null",
+          "reviews": "Extract review count (e.g. 120) or null",
+          "address": "Extract address if available or null"
+        }
       },
       "brandKit": {
         "colors": {

@@ -19,7 +19,7 @@ export function initI18n() {
     applyRTL(newLang);
     
     // Update toggle button text manually so it never gets locked
-    const toggleBtn = document.querySelector('[onclick="window.toggleLanguage()"]');
+    const toggleBtn = document.querySelector('[data-action="toggleLanguage" data-args=""]');
     if (toggleBtn) {
       toggleBtn.innerHTML = newLang === 'ar' ? 'English' : 'العربية';
     }
@@ -29,7 +29,7 @@ export function initI18n() {
   
   // Apply initial language state
   setTimeout(() => {
-    const toggleBtn = document.querySelector('[onclick="window.toggleLanguage()"]');
+    const toggleBtn = document.querySelector('[data-action="toggleLanguage" data-args=""]');
     if (toggleBtn) {
       toggleBtn.innerHTML = savedLang === 'ar' ? 'English' : 'العربية';
     }

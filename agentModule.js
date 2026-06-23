@@ -1,6 +1,6 @@
-// App Founder Growth Suite - AI Agent Framework Module
 import { state } from './state.js';
 import { requestApi, showToast, createSafeElement } from './common.js';
+import { getSupabaseClient } from './auth.js';
 
 let agentSimInterval = null;
 let agentSimStep = 0;
@@ -92,7 +92,6 @@ export async function submitAgentConsoleCommand() {
     appendTerminalLog('founder', cmd);
     input.value = '';
     appendTerminalLog('CMO Agent', "Received executive command. Drafting strategy and organizing AI task force... (Please wait ~15s)");
-    
     // Call the real backend orchestration
     try {
       const data = await requestApi('/api/agents/orchestration/trigger', {
@@ -104,17 +103,38 @@ export async function submitAgentConsoleCommand() {
         })
       });
       
-      if (data.success && data.steps) {
-        data.steps.forEach(step => {
-          appendTerminalLog(step.agent, step.log);
-        });
+      if (data.success && data.jobId) {
+        // Subscribe to Supabase Realtime for logs
+        const supabase = getSupabaseClient();
+        let lastLogCount = 0;
         
-        // Render final CMO Strategy output
-        if (data.cmoStrategy) {
-          appendTerminalLog('Campaign Manager', "Campaign Portfolio is ready for your review. Check the Strategy Logs.");
-        }
+        const channel = supabase.channel(`orchestration_${data.jobId}`)
+          .on('postgres_changes', { 
+            event: 'UPDATE', 
+            schema: 'public', 
+            table: 'orchestration_jobs',
+            filter: `id=eq.${data.jobId}` 
+          }, (payload) => {
+            const row = payload.new;
+            if (row.logs && row.logs.length > lastLogCount) {
+              const newLogs = row.logs.slice(lastLogCount);
+              newLogs.forEach(step => {
+                appendTerminalLog(step.agent, step.log);
+              });
+              lastLogCount = row.logs.length;
+            }
+            
+            if (row.status === 'complete') {
+              appendTerminalLog('Campaign Manager', "Campaign Portfolio is ready for your review. Check the Strategy Logs.");
+              supabase.removeChannel(channel);
+            } else if (row.status === 'failed') {
+              appendTerminalLog('System', "Orchestration Pipeline failed to process request.");
+              supabase.removeChannel(channel);
+            }
+          })
+          .subscribe();
       } else {
-        appendTerminalLog('System', "Orchestration Pipeline failed to process request.");
+        appendTerminalLog('System', "Orchestration Pipeline failed to queue request.");
       }
     } catch (err) {
       console.error(err);

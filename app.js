@@ -124,6 +124,7 @@ import {
 import { initBusinessDiscovery } from './businessDiscoveryModule.js';
 import { initHealthScore } from './healthScoreModule.js';
 import { initIndustryBenchmarks } from './industryBenchmarkModule.js';
+import { initBillingModule } from './billingModule.js';
 
 // Initialize Application
 window.addEventListener('DOMContentLoaded', async () => {
@@ -138,6 +139,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize auth - checks for existing session
   const session = await initAuth();
+
+  // Initialize Billing and Subscriptions right after Auth
+  if (session) {
+    await initBillingModule();
+  }
 
   // Listen for auth state changes (handles OAuth redirects)
   onAuthStateChange((session) => {
@@ -575,26 +581,26 @@ export function renderWarRoom() {
   const list = document.getElementById('war-room-agent-activity');
   if (!list) return;
   list.innerHTML = `
-    <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:6px; padding:12px;">
-      <h5 style="color:white; font-size:0.85rem; display:flex; justify-content:space-between;">
+    <div class="mod-style-YmFja2dy">
+      <h5 class="mod-style-Y29sb3I6">
         <span>ASO Agent Task</span>
-        <span style="color:var(--accent-green); font-size:0.75rem;">Completed</span>
+        <span class="mod-style-Y29sb3I6">Completed</span>
       </h5>
-      <p style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">Crawled Apple App Store listings metadata search indices. Found 2 keyword gaps.</p>
+      <p class="mod-style-Zm9udC1z">Crawled Apple App Store listings metadata search indices. Found 2 keyword gaps.</p>
     </div>
-    <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:6px; padding:12px;">
-      <h5 style="color:white; font-size:0.85rem; display:flex; justify-content:space-between;">
+    <div class="mod-style-YmFja2dy">
+      <h5 class="mod-style-Y29sb3I6">
         <span>Content Agent Task</span>
-        <span style="color:var(--accent-orange); font-size:0.75rem;">Active</span>
+        <span class="mod-style-Y29sb3I6">Active</span>
       </h5>
-      <p style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">Drafting A/B copy variants for June calendar countdown challenge queues.</p>
+      <p class="mod-style-Zm9udC1z">Drafting A/B copy variants for June calendar countdown challenge queues.</p>
     </div>
-    <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:6px; padding:12px;">
-      <h5 style="color:white; font-size:0.85rem; display:flex; justify-content:space-between;">
+    <div class="mod-style-YmFja2dy">
+      <h5 class="mod-style-Y29sb3I6">
         <span>Analytics Agent Task</span>
-        <span style="color:var(--text-sub); font-size:0.75rem;">Idle</span>
+        <span class="mod-style-Y29sb3I6">Idle</span>
       </h5>
-      <p style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">Awaiting background hourly BullMQ stats collection jobs sync triggers.</p>
+      <p class="mod-style-Zm9udC1z">Awaiting background hourly BullMQ stats collection jobs sync triggers.</p>
     </div>
   `;
 }
@@ -880,53 +886,38 @@ export function toggleThemeMode() {
 // EVENT DELEGATION ROUTER (XSS RESISTANT)
 // ------------------------------------------
 document.addEventListener('click', (e) => {
-  const target = e.target.closest('[data-on-click]');
+  const target = e.target.closest('[data-action]');
   if (!target) return;
   
-  const actionStr = target.getAttribute('data-on-click');
+  const fnName = target.dataset.action;
+  const argsStr = target.dataset.args;
+  
   try {
-    executeAction(actionStr, target, e);
+    const args = [];
+    if (argsStr) {
+      const rawArgs = argsStr.split('|');
+      rawArgs.forEach(arg => {
+        const trimmed = arg.trim();
+        if (trimmed === 'this') {
+          args.push(target);
+        } else if (trimmed === 'event') {
+          args.push(e);
+        } else if (trimmed === 'true') {
+          args.push(true);
+        } else if (trimmed === 'false') {
+          args.push(false);
+        } else if (!isNaN(trimmed) && trimmed !== '') {
+          args.push(Number(trimmed));
+        } else {
+          args.push(trimmed);
+        }
+      });
+    }
+    callFunction(fnName, args, target, e);
   } catch (err) {
-    console.error("Action execution failed: " + actionStr, err);
+    console.error("Action execution failed: " + fnName, err);
   }
 });
-
-function executeAction(actionStr, element, event) {
-  const match = actionStr.match(/^([a-zA-Z0-9_]+)\((.*)\)$/);
-  if (!match) {
-    const fnName = actionStr.replace(/\(\)$/, '');
-    callFunction(fnName, [], element, event);
-    return;
-  }
-  
-  const fnName = match[1];
-  const argsStr = match[2].trim();
-  
-  const args = [];
-  if (argsStr) {
-    const rawArgs = argsStr.split(/,\s*/);
-    rawArgs.forEach(arg => {
-      const trimmed = arg.trim();
-      if (trimmed === 'this') {
-        args.push(element);
-      } else if (trimmed === 'event') {
-        args.push(event);
-      } else if ((trimmed.startsWith("'") && trimmed.endsWith("'")) || (trimmed.startsWith('"') && trimmed.endsWith('"'))) {
-        args.push(trimmed.slice(1, -1));
-      } else if (trimmed === 'true') {
-        args.push(true);
-      } else if (trimmed === 'false') {
-        args.push(false);
-      } else if (!isNaN(trimmed)) {
-        args.push(Number(trimmed));
-      } else {
-        args.push(trimmed);
-      }
-    });
-  }
-  
-  callFunction(fnName, args, element, event);
-}
 
 export function connectOAuthPlatform(platform) {
   const appId = state.currentActiveApp;

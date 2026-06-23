@@ -157,6 +157,17 @@ async function finalizeDiscovery(appId, appName, businessType, bizUuid) {
   document.getElementById('discovery-result-tone').innerText = discoveryProfile.brandVoice?.tone || 'Professional';
   document.getElementById('discovery-result-score').innerText = (discoveryProfile.audits?.marketingReadinessScore || 0) + '/100';
   
+  const ratingEl = document.getElementById('discovery-result-rating');
+  if (ratingEl) {
+    if (profile.localPresence?.rating) {
+      ratingEl.innerText = `${profile.localPresence.rating} ⭐ (${profile.localPresence.reviews || 0} reviews)`;
+      ratingEl.style.color = '#F59E0B';
+    } else {
+      ratingEl.innerText = 'Not Found';
+      ratingEl.style.color = 'var(--text-muted)';
+    }
+  }
+  
   const template = getTemplateForBusiness(businessType);
   const kpiData = {};
   template.kpis.forEach(kpi => {

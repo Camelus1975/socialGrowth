@@ -106,11 +106,11 @@ export async function executeAutonomousGrowth() {
     }
 
     successCard.innerHTML = `
-      <h4 style="color: #10b981; margin-bottom: 10px;">Real Pipeline Executed Successfully!</h4>
-      <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Target:</strong> ${targetPlatforms}</p>
-      <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Predicted Success Score:</strong> ${score}/100</p>
-      <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>${metricLabel}:</strong> ${metricValue}</p>
-      <p style="font-size: 0.8rem; color: #9ca3af; margin-top: 15px;">The AI Multi-Agent Cluster has generated strategy and queued pending campaigns in your Advertising Command Center.</p>
+      <h4 class="mod-style-Y29sb3I6">Real Pipeline Executed Successfully!</h4>
+      <p class="mod-style-Zm9udC1z"><strong>Target:</strong> ${targetPlatforms}</p>
+      <p class="mod-style-Zm9udC1z"><strong>Predicted Success Score:</strong> ${score}/100</p>
+      <p class="mod-style-Zm9udC1z"><strong>${metricLabel}:</strong> ${metricValue}</p>
+      <p class="mod-style-Zm9udC1z">The AI Multi-Agent Cluster has generated strategy and queued pending campaigns in your Advertising Command Center.</p>
     `;
     
     block.appendChild(successCard);

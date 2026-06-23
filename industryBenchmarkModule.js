@@ -23,7 +23,7 @@ export function renderBenchmarksView() {
   
   const app = state.appsData[state.currentActiveApp];
   if (!app) {
-    container.innerHTML = '<div style="padding: 20px; color: var(--text-sub);">Please select a business to view Industry Benchmarks.</div>';
+    container.innerHTML = '<div class="mod-style-cGFkZGlu">Please select a business to view Industry Benchmarks.</div>';
     return;
   }
   

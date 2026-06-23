@@ -254,12 +254,12 @@ export function runASOAnalysis() {
   const output = document.getElementById('aso-output-block');
   if (output) {
     output.innerHTML = `
-      <div style="display:flex; flex-direction:column; gap:12px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:0.85rem; font-weight:600; color:white;">ASO Score Card:</span>
-          <span style="font-size:1.1rem; font-weight:700; color:var(--accent-green);">82 / 100</span>
+      <div class="mod-style-ZGlzcGxh">
+        <div class="mod-style-ZGlzcGxh">
+          <span class="mod-style-Zm9udC1z">ASO Score Card:</span>
+          <span class="mod-style-Zm9udC1z">82 / 100</span>
         </div>
-        <p style="font-size:0.75rem; color:var(--text-muted);">Optimization index shows stable backlinks crawl parameters. Found 2 content description changes recommended for target store titles.</p>
+        <p class="mod-style-Zm9udC1z">Optimization index shows stable backlinks crawl parameters. Found 2 content description changes recommended for target store titles.</p>
       </div>
     `;
   }

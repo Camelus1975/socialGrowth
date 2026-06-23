@@ -189,7 +189,7 @@ export function renderWarRoom() {
   
   const apps = Object.values(state.appsData);
   if (apps.length === 0) {
-    container.innerHTML = `<div style="color:var(--text-muted); font-size:0.9rem;">No active businesses found in your portfolio.</div>`;
+    container.innerHTML = `<div class="mod-style-Y29sb3I6">No active businesses found in your portfolio.</div>`;
     return;
   }
   
