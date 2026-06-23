@@ -13,9 +13,32 @@ const config = require('./config');
 const aiGatewayRouter = require('./aiGatewayRouter');
 const { processDiscoveryJob } = require('./discoveryEngine');
 
-const redisConnection = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', { maxRetriesPerRequest: null });
-const agentExecutionQueue = new Queue('agent_execution', { connection: redisConnection });
+
+let agentExecutionQueue;
+const useRedis = !!process.env.REDIS_URL;
+if (useRedis) {
+  try {
+    const redisConnection = new Redis(process.env.REDIS_URL, { maxRetriesPerRequest: null, retryStrategy: () => null });
+    redisConnection.on('error', (err) => console.warn('[Redis] Connection failed. BullMQ queues will be offline.'));
+    agentExecutionQueue = new Queue('agent_execution', { connection: redisConnection });
     agentExecutionQueue.on('error', () => {});
+  } catch (e) {
+    console.warn('[Redis] Initialization error:', e.message);
+  }
+}
+
+if (!agentExecutionQueue) {
+  agentExecutionQueue = {
+    add: async (name, data) => {
+      console.log(`[Fallback Queue] Executing ${name} inline because Redis is unavailable.`);
+      const { runMarketingOrchestration } = require('./aiOrchestrator');
+      setTimeout(() => {
+        runMarketingOrchestration(data.jobId, data.appId, data.goal, data.authHeader, data.language, data.businessType, data.campaignType, data.userId).catch(console.error);
+      }, 0);
+    }
+  };
+}
+
 
 const app = express();
 const PORT = config.PORT;
