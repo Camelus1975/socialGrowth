@@ -156,6 +156,7 @@ ${googleBusinessContent || 'No Google Business Profile content available'}
         : 'Limited web content found. Running AI analysis with available data...');
     
     // Step 3: AI Analysis with real scraped content
+    const systemPrompt = \`
     You are an AI brand strategist and marketing expert.
     You have been given REAL SCRAPED CONTENT from the brand's website and social media pages.
     Analyze this REAL content carefully to understand:
