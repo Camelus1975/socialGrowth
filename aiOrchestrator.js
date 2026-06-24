@@ -240,6 +240,44 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
       await pushLog(res.agent, res.log);
     }
 
+    // 4. Create Agent Operations (for Dashboard feed)
+    try {
+      const operationsToInsert = agentResults.map(res => {
+        let recommendation = 'Please review agent output.';
+        
+        // Extract a meaningful recommendation string from the JSON output if possible
+        if (res.result) {
+          if (res.result.strategy_summary) recommendation = res.result.strategy_summary.substring(0, 200);
+          else if (res.result.content_roadmap) recommendation = res.result.content_roadmap.substring(0, 200);
+          else if (res.result.creative_brief) recommendation = res.result.creative_brief.substring(0, 200);
+          else if (res.result.aso_recommendations) recommendation = res.result.aso_recommendations.substring(0, 200);
+          else if (res.result.video_concept) recommendation = res.result.video_concept.substring(0, 200);
+          else if (res.result.simulation_report) recommendation = `Expected CPA: ${res.result.simulation_report.expected_cpa || 'N/A'}`;
+          else if (res.result.roi_analysis) recommendation = res.result.roi_analysis.substring(0, 200);
+          else if (res.result.campaign_blueprint) recommendation = res.result.campaign_blueprint.substring(0, 200);
+          else if (res.result.copy_variants) recommendation = `Drafted ${res.result.copy_variants.length} content variants.`;
+        }
+
+        return {
+          user_id: userId || null,
+          app_id: appId,
+          agent_name: res.agent,
+          task_goal: goal,
+          requires_approval: true,
+          approved: false,
+          status: 'pending',
+          recommendation: recommendation
+        };
+      });
+
+      if (operationsToInsert.length > 0) {
+        await supabase.from('agent_operations').insert(operationsToInsert);
+        await pushLog("System", `Created ${operationsToInsert.length} pending agent operations for CEO approval.`);
+      }
+    } catch (opErr) {
+      console.error("Failed to create agent operations", opErr);
+    }
+
     // 3. Campaign Manager Phase
     await pushLog("Campaign Manager", "Aggregating agent outputs into Draft Campaign Portfolio.");
     
@@ -457,43 +495,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
       }
     }
 
-    // 4. Create Agent Operations (for Dashboard feed)
-    try {
-      const operationsToInsert = agentResults.map(res => {
-        let recommendation = 'Please review agent output.';
-        
-        // Extract a meaningful recommendation string from the JSON output if possible
-        if (res.result) {
-          if (res.result.strategy_summary) recommendation = res.result.strategy_summary.substring(0, 200);
-          else if (res.result.content_roadmap) recommendation = res.result.content_roadmap.substring(0, 200);
-          else if (res.result.creative_brief) recommendation = res.result.creative_brief.substring(0, 200);
-          else if (res.result.aso_recommendations) recommendation = res.result.aso_recommendations.substring(0, 200);
-          else if (res.result.video_concept) recommendation = res.result.video_concept.substring(0, 200);
-          else if (res.result.simulation_report) recommendation = `Expected CPA: $${res.result.simulation_report.expected_cpa || 'N/A'}`;
-          else if (res.result.roi_analysis) recommendation = res.result.roi_analysis.substring(0, 200);
-          else if (res.result.campaign_blueprint) recommendation = res.result.campaign_blueprint.substring(0, 200);
-          else if (res.result.copy_variants) recommendation = `Drafted ${res.result.copy_variants.length} content variants.`;
-        }
-
-        return {
-          user_id: userId || null,
-          app_id: appId,
-          agent_name: res.agent,
-          task_goal: goal,
-          requires_approval: true,
-          approved: false,
-          status: 'pending',
-          recommendation: recommendation
-        };
-      });
-
-      if (operationsToInsert.length > 0) {
-        await supabase.from('agent_operations').insert(operationsToInsert);
-        await pushLog("System", `Created ${operationsToInsert.length} pending agent operations for CEO approval.`);
-      }
-    } catch (opErr) {
-      console.error("Failed to create agent operations", opErr);
-    }
+    
 
     return {
       success: true,
@@ -513,3 +515,4 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
 module.exports = {
   runMarketingOrchestration
 };
+
