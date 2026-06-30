@@ -259,7 +259,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
         }
 
         return {
-          user_id: userId || null,
+          
           app_id: appId,
           agent_name: res.agent,
           task_goal: goal,
@@ -515,4 +515,5 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
 module.exports = {
   runMarketingOrchestration
 };
+
 
