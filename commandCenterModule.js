@@ -1,4 +1,5 @@
 import { requestApi } from './common.js';
+import { switchView } from './app.js';
 import { state } from './state.js';
 
 let isInitialized = false;
@@ -109,13 +110,14 @@ async function submitGoal(goalText) {
                     <div class="mod-style-d2lkdGg6">▲</div>
                     <strong class="mod-style-Y29sb3I6">AI Strategy Planner</strong>
                 </div>
-                <p class="mod-style-Y29sb3I6">I have analyzed your goal and orchestrated the required agents.</p>
+                <p class="mod-style-Y29sb3I6">I have started orchestrating your strategy. Redirecting you to the Intelligence Dashboard to monitor progress in real-time...</p>
                 ${stepsHtml}
                 <div class="mod-style-bWFyZ2lu">
                     <button class="btn btn-primary" data-action="switchView" data-args="unified-intelligence-dash|this">Review Actions in Dashboard</button>
                 </div>
             `;
             feedEl.appendChild(sysMsg);
+            setTimeout(() => switchView('unified-intelligence-dash'), 1500);
         } else {
             throw new Error(response?.error || 'Orchestration failed');
         }
@@ -135,3 +137,4 @@ async function submitGoal(goalText) {
         inputEl.focus();
     }
 }
+
