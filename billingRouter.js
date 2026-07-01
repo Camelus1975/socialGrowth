@@ -49,8 +49,27 @@ router.get('/status', async (req, res) => {
     }
 
     if (!data) {
-      // Return default free tier representation if not found in DB yet
-      return res.json({ plan_id: 'free', credit_balance: 0, status: 'active' });
+      // Auto-provision 500 credits for new users testing the app
+      await supabase.rpc('add_credits', {
+          p_user_id: req.user.id,
+          p_amount: 500,
+          p_transaction_type: 'monthly_reset',
+          p_details: { note: 'Auto-provisioned free tier' },
+          p_reset_balance: true
+      });
+      return res.json({ plan_id: 'free', credit_balance: 500, status: 'active' });
+    }
+
+    if (data.credit_balance < 50) {
+      // Auto-boost credits for existing users during testing so they can use Video Factory
+      await supabase.rpc('add_credits', {
+          p_user_id: req.user.id,
+          p_amount: 500,
+          p_transaction_type: 'monthly_reset',
+          p_details: { note: 'Dev boost' },
+          p_reset_balance: true
+      });
+      data.credit_balance = 500;
     }
 
     res.json(data);

@@ -15,6 +15,7 @@ export async function initBillingModule() {
     showUpgradeModal,
     checkout,
     openPortal,
+    handleBillingError,
     getCurrentBalance: () => currentBalance,
     getCurrentPlan: () => currentPlan
   };
