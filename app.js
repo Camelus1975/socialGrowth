@@ -515,25 +515,25 @@ export function refreshViewData() {
       import('./advertisingModule.js?v=2').then(module => module.startAdPolling());
       break;
     case 'revenue-intelligence':
-      import('./revenueModule.js').then(module => module.renderRevenueIntelligence());
+      import('./revenueIntelligenceModule.js').then(module => module.renderRevenueIntelligenceView());
       break;
     case 'sales-intelligence':
-      import('./salesModule.js').then(module => module.renderSalesIntelligence());
+      import('./salesIntelligenceModule.js').then(module => module.renderSalesIntelligenceView());
       break;
     case 'attribution-engine':
-      import('./attributionModule.js').then(module => module.renderAttributionEngine());
+      import('./attributionModule.js').then(module => module.renderAttributionView());
       break;
     case 'customer-intelligence':
-      import('./customerIntelligenceModule.js').then(module => module.renderCustomerIntelligence());
+      import('./customerIntelligenceModule.js').then(module => module.renderCustomerIntelligenceView());
       break;
     case 'reputation-center':
-      import('./reputationModule.js').then(module => module.renderReputationCenter());
+      import('./reputationModule.js').then(module => module.renderReputationView());
       break;
     case 'industry-benchmarks':
-      import('./benchmarkModule.js').then(module => module.renderBenchmarks());
+      import('./industryBenchmarkModule.js').then(module => module.renderBenchmarksView());
       break;
     case 'health-score':
-      import('./healthScoreModule.js').then(module => module.renderHealthScore());
+      import('./healthScoreModule.js').then(module => module.renderHealthScoreView());
       break;
   }
 }
