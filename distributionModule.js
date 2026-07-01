@@ -59,14 +59,12 @@ export async function executeAutonomousGrowth() {
 
     block.innerHTML = ''; // clear loading
 
-    if (data.success && data.steps) {
-      for (const step of data.steps) {
-        const el = createSafeElement('div', [], `✅ [${step.agent}] ${step.log}`);
-        el.style.padding = '10px';
-        el.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
-        el.style.color = 'var(--primary)';
-        block.appendChild(el);
-      }
+    if (data.success) {
+      const el = createSafeElement('div', [], `✅ Pipeline launched successfully. Agents are working in the background.`);
+      el.style.padding = '10px';
+      el.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+      el.style.color = 'var(--primary)';
+      block.appendChild(el);
     } else {
       throw new Error(data.error || "Pipeline failed to execute");
     }
