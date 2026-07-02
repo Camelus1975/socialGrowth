@@ -41,5 +41,6 @@ module.exports = {
   REPLICATE_API_TOKEN: process.env.REPLICATE_API_TOKEN,
   META_REDIRECT_URI: process.env.META_REDIRECT_URI,
   CORS_ORIGIN: process.env.CORS_ORIGIN,
+  REDIS_URL: process.env.REDIS_URL,
   PORT: process.env.PORT || 3000
 };

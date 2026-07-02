@@ -320,6 +320,13 @@ router.post('/generate-video', requireCredits(50), async (req, res) => {
 
     // If it's a real AI generation, queue it up in BullMQ
     if (generationMode === 'premium_ai' && assetId) {
+      if (!activeQueues['video_rendering']) {
+        console.warn('[Video Router] BullMQ not configured. Cannot render video asynchronously.');
+        // Fallback: update status to failed so the UI doesn't hang
+        await userSupabase.from('video_factory_assets').update({ status: 'failed' }).eq('id', assetId);
+        return res.status(503).json({ error: 'Video rendering service is temporarily unavailable.' });
+      }
+
       await activeQueues['video_rendering'].add('render_video', {
         assetId,
         prompt,
