@@ -132,10 +132,19 @@ function renderVideoCard(video, container, prepend = false) {
     contentArea.style.flexDirection = 'column';
     contentArea.style.alignItems = 'center';
     contentArea.style.justifyContent = 'center';
+    contentArea.style.padding = '10px';
+    contentArea.style.textAlign = 'center';
     
-    const errorMsg = createSafeElement('div', [], "Generation Failed (Replicate API Error)");
+    const errorMsg = createSafeElement('div', [], "Generation Failed");
     errorMsg.style.color = "#f87171";
+    errorMsg.style.fontWeight = 'bold';
+    errorMsg.style.marginBottom = '8px';
     contentArea.appendChild(errorMsg);
+
+    const errorDetails = createSafeElement('div', [], video.title || 'Unknown Error');
+    errorDetails.style.color = "#fca5a5";
+    errorDetails.style.fontSize = "0.8rem";
+    contentArea.appendChild(errorDetails);
   } else if (video.video_url === 'template_mode' || video.video_url === 'assembly_mode') {
     // Mode 1/2/3 Placeholder Render
     contentArea = createSafeElement('div');

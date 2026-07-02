@@ -273,8 +273,8 @@ const videoRenderingWorker = redisConnection ? new Worker('video_rendering', asy
 
     try {
       // 1. Run Replicate
-      const output = await replicate.run("minimax/video-01", { 
-        input: { prompt: prompt } 
+      const output = await replicate.run("ali-vilab/modelscope-text-to-video-synthesis:1e205ea73084bd17a0a3b43396e49ba0d6bc2e754e9283b2df49fad2dcf95755", { 
+        input: { prompt: prompt, num_frames: 16 } 
       });
 
       let buffer;
@@ -322,7 +322,8 @@ const videoRenderingWorker = redisConnection ? new Worker('video_rendering', asy
     } catch (err) {
       console.error(`[Worker - Video] Error rendering asset ${assetId}:`, err);
       await supabase.from('video_factory_assets').update({
-        status: 'failed'
+        status: 'failed',
+        title: `ERR: ${err.message}`.substring(0, 100)
       }).eq('id', assetId);
       throw err;
     }
