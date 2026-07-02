@@ -344,7 +344,7 @@ router.post('/generate-video', requireCredits(50), async (req, res) => {
       } catch (queueErr) {
         console.warn('[Video Router] BullMQ Queue error:', queueErr);
         await userSupabase.from('video_factory_assets').update({ status: 'failed' }).eq('id', assetId);
-        return res.status(503).json({ error: `Video rendering service error: ${queueErr.message}` });
+        return res.status(503).json({ error: `Video rendering service error: ${String(queueErr)}` });
       }
     }
 

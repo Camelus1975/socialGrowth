@@ -49,11 +49,10 @@ const useRedis = !!config.REDIS_URL;
 let redisConnection = null;
 if (useRedis) {
   redisConnection = new Redis(config.REDIS_URL || 'redis://localhost:6379', {
-    maxRetriesPerRequest: null,
-    retryStrategy: () => null // Do not retry if it fails immediately to prevent crash loops
+    maxRetriesPerRequest: null
   });
   redisConnection.on('error', (err) => {
-    console.warn('[Redis Worker] Connection failed. Workers are offline.');
+    console.warn('[Redis Worker] Connection error:', err.message);
   });
 }
 

@@ -58,7 +58,10 @@ export async function requestApi(path, options = {}) {
       errBody = await res.json();
       console.error("API Error Details:", errBody);
     } catch(e) {}
-    throw new Error(`API Error: ${res.status} - ${errBody.details || errBody.error || 'Unknown'}`);
+    
+    let errMsg = `API Error: ${res.status} - ${errBody.error || res.statusText}`;
+    if (errBody.details) errMsg += ` DETAILS: ${errBody.details}`;
+    throw new Error(errMsg);
   }
   return res.json();
 }
