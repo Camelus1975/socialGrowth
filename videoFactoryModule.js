@@ -121,6 +121,21 @@ function renderVideoCard(video, container, prepend = false) {
     spinner.style.color = "var(--primary)";
     spinner.className = 'pulse-animation'; // Assuming there's a pulse-animation class in styles.css
     contentArea.appendChild(spinner);
+  } else if (video.status === 'failed') {
+    contentArea = createSafeElement('div');
+    contentArea.style.position = 'relative';
+    contentArea.style.width = '100%';
+    contentArea.style.aspectRatio = '16/9';
+    contentArea.style.background = `linear-gradient(135deg, #450a0a, #0f172a)`;
+    contentArea.style.borderRadius = '8px';
+    contentArea.style.display = 'flex';
+    contentArea.style.flexDirection = 'column';
+    contentArea.style.alignItems = 'center';
+    contentArea.style.justifyContent = 'center';
+    
+    const errorMsg = createSafeElement('div', [], "Generation Failed (Replicate API Error)");
+    errorMsg.style.color = "#f87171";
+    contentArea.appendChild(errorMsg);
   } else if (video.video_url === 'template_mode' || video.video_url === 'assembly_mode') {
     // Mode 1/2/3 Placeholder Render
     contentArea = createSafeElement('div');

@@ -270,11 +270,11 @@ const videoRenderingWorker = redisConnection ? new Worker('video_rendering', asy
 
     try {
       // 1. Run Replicate
-      const output = await replicate.run("lucataco/hotshot-xl:78b3a6257e16e4b241245d65c8b2b80ea2fac59353d5167683935de984e7ec9e", { 
-        input: { prompt: prompt, mp4: true, steps: 30 } 
+      const output = await replicate.run("minimax/video-01", { 
+        input: { prompt: prompt } 
       });
 
-      const replicateUrl = output;
+      const replicateUrl = Array.isArray(output) ? output[0] : output;
       
       // 2. Download the MP4 into a buffer
       const response = await fetch(replicateUrl);
