@@ -272,9 +272,9 @@ async function processVideoGeneration(jobData) {
   console.log(`[Worker - Video] Rendering video for asset ${assetId}...`);
 
     try {
-      // 1. Run Replicate
-      const output = await replicate.run("ali-vilab/modelscope-text-to-video-synthesis:1e205ea73084bd17a0a3b43396e49ba0d6bc2e754e9283b2df49fad2dcf95755", { 
-        input: { prompt: prompt, num_frames: 16 } 
+      // 1. Run Replicate (High-Quality Model)
+      const output = await replicate.run("minimax/video-01", { 
+        input: { prompt: prompt } 
       });
 
       let buffer;
