@@ -105,6 +105,7 @@ export function renderMediaManager() {
     preview.style.overflow = 'hidden';
     
     const isImage = (asset.type || '').startsWith('image') || (asset.url || '').match(/\.(png|jpg|jpeg|webp|gif|svg)/i);
+    const isVideo = (asset.type || '').startsWith('video') || (asset.url || '').match(/\.(mp4|webm|mov)/i);
     
     if (isImage && asset.url) {
       const img = createSafeElement('img', []);
@@ -118,6 +119,19 @@ export function renderMediaManager() {
       preview.style.justifyContent = 'center';
       preview.style.background = '#0a0e1a';
       preview.appendChild(img);
+    } else if (isVideo && asset.url) {
+      const vid = createSafeElement('video', []);
+      vid.src = asset.url;
+      vid.autoplay = true;
+      vid.loop = true;
+      vid.muted = true;
+      vid.style.cssText = 'width:100%; height:100%; object-fit:cover; border-radius:8px 8px 0 0; pointer-events:none;';
+      preview.style.height = '160px';
+      preview.style.display = 'flex';
+      preview.style.alignItems = 'center';
+      preview.style.justifyContent = 'center';
+      preview.style.background = '#0a0e1a';
+      preview.appendChild(vid);
     } else {
       const emoji = createSafeElement('span', [], '📁');
       emoji.style.fontSize = '2.5rem';
@@ -168,6 +182,7 @@ function openMediaLightbox(asset) {
   container.addEventListener('click', e => e.stopPropagation());
   
   const isImage = (asset.type || '').startsWith('image') || (asset.url || '').match(/\.(png|jpg|jpeg|webp|gif|svg)/i);
+  const isVideo = (asset.type || '').startsWith('video') || (asset.url || '').match(/\.(mp4|webm|mov)/i);
   
   if (isImage && asset.url) {
     const img = document.createElement('img');
@@ -175,6 +190,13 @@ function openMediaLightbox(asset) {
     img.alt = asset.name || 'Media';
     img.style.cssText = 'max-width:90vw; max-height:70vh; object-fit:contain; border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,0.5);';
     container.appendChild(img);
+  } else if (isVideo && asset.url) {
+    const vid = document.createElement('video');
+    vid.src = asset.url;
+    vid.controls = true;
+    vid.autoplay = true;
+    vid.style.cssText = 'max-width:90vw; max-height:70vh; object-fit:contain; border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,0.5);';
+    container.appendChild(vid);
   }
   
   const info = document.createElement('div');
