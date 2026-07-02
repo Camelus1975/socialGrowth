@@ -811,6 +811,17 @@
                 <textarea id="video-factory-prompt" rows="4" placeholder="e.g. Announce our new AI scheduling dashboard with an energetic hook..."></textarea>
               </div>
 
+              <div class="form-group">
+                <label for="video-factory-duration">Target Duration (Clips)</label>
+                <select id="video-factory-duration" class="form-control" style="background: rgba(15, 23, 42, 0.6); color: white; border: 1px solid var(--border-glass); padding: 8px; border-radius: 4px; width: 100%;">
+                  <option value="5">5 Seconds (1 Scene)</option>
+                  <option value="10">10 Seconds (2 Scenes)</option>
+                  <option value="15">15 Seconds (3 Scenes)</option>
+                  <option value="20">20 Seconds (4 Scenes)</option>
+                </select>
+                <small style="color: #94a3b8; font-size: 0.75rem; margin-top: 4px; display: block;">Each 5s scene is generated independently and costs 1 generation credit.</small>
+              </div>
+
               <button class="btn btn-primary" style="width: 100%;" data-action="generateStudioVideo">Initialize Video Assembly</button>
             </div>
 

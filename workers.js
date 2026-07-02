@@ -268,8 +268,8 @@ if (publishingWorker) publishingWorker.on('failed', (job, err) => {
 
 // 5. Video Rendering Worker
 async function processVideoGeneration(jobData) {
-  const { assetId, prompt, appId } = jobData;
-  console.log(`[Worker - Video] Rendering video for asset ${assetId}...`);
+  const { assetId, prompt, appId, sceneInfo } = jobData;
+  console.log(`[Worker - Video] Rendering video for asset ${assetId} ${sceneInfo ? '('+sceneInfo+')' : ''}...`);
 
     try {
       // 1. Run Replicate (High-Quality Model)
@@ -317,9 +317,13 @@ async function processVideoGeneration(jobData) {
       }).eq('id', assetId);
 
       // 6. Save to Media Library
+      const mediaName = sceneInfo 
+        ? `AI Video [${sceneInfo}]: ${prompt.substring(0, 30)}`
+        : `AI Video: ${prompt.substring(0, 30)}`;
+
       await supabase.from('media').insert({
         app_id: appId || 'default',
-        name: `AI Video: ${prompt.substring(0, 30)}`,
+        name: mediaName,
         file_type: 'video/mp4',
         folder: 'AI Generated',
         description: prompt,

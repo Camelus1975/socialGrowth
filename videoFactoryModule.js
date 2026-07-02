@@ -200,6 +200,9 @@ function renderVideoCard(video, container, prepend = false) {
 
 export async function generateStudioVideo() {
   const promptText = document.getElementById('video-factory-prompt')?.value?.trim();
+  const durationStr = document.getElementById('video-factory-duration')?.value || '5';
+  const duration = parseInt(durationStr, 10);
+
   if (!promptText) {
     showToast("Please input a prompt to generate a video!", "error");
     return;
@@ -217,7 +220,7 @@ export async function generateStudioVideo() {
   try {
     const data = await requestApi('/api/ai-gateway/generate-video', {
       method: 'POST',
-      body: JSON.stringify({ prompt: promptText, type: 'campaign', appId: state.currentActiveApp })
+      body: JSON.stringify({ prompt: promptText, type: 'campaign', appId: state.currentActiveApp, duration })
     });
 
     loadingDiv.remove();

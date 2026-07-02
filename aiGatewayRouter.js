@@ -262,8 +262,9 @@ router.post('/generate-image', requireCredits(10), async (req, res) => {
 
 // Endpoint: AI Video Marketing Router
 router.post('/generate-video', requireCredits(50), async (req, res) => {
-  const { prompt, type, appId } = req.body;
-  if (!prompt) return res.status(400).json({ error: 'Missing prompt' });
+  const userId = req.user.id;
+  const { prompt, type, appId, duration } = req.body;
+  const generationModeState = req.body.generationMode || 'premium_ai';
 
   const token = req.headers.authorization?.split(' ')[1];
   let userSupabase = supabase;
@@ -300,78 +301,125 @@ router.post('/generate-video', requireCredits(50), async (req, res) => {
       costEstimated = 0.080;
     }
     
-    // Save to video_factory_assets as 'processing'
-    let assetId = null;
+    // Multi-clip calculation
+    const numScenes = Math.max(1, Math.floor(parseInt(duration || 5) / 5));
+    let scenePrompts = [prompt];
+
+    if (numScenes > 1 && generationMode === 'premium_ai') {
+      try {
+        console.log(`[Video Router] Splitting prompt into ${numScenes} scenes...`);
+        const response = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: `You are an expert AI Video Director. The user wants to generate a continuous ${duration}-second video based on their master prompt. Since the generative AI model can only output 5 seconds at a time, you must split the user's master prompt into EXACTLY ${numScenes} sequential 5-second scene prompts. Each scene prompt must be highly detailed, descriptive, and visually contiguous with the previous scene. DO NOT include any text other than a JSON array of strings.`
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          response_format: { type: 'json_object' }
+        });
+        
+        const rawResponse = response.choices[0].message.content;
+        let parsed;
+        try {
+           parsed = JSON.parse(rawResponse);
+           if (parsed.scenes && Array.isArray(parsed.scenes)) scenePrompts = parsed.scenes;
+           else if (Array.isArray(parsed)) scenePrompts = parsed;
+        } catch(e) {
+           scenePrompts = Array.from({length: numScenes}, (_, i) => `${prompt} - Scene ${i+1}`);
+        }
+        
+        scenePrompts = scenePrompts.slice(0, numScenes);
+        while (scenePrompts.length < numScenes) {
+          scenePrompts.push(`${prompt} - Scene ${scenePrompts.length+1}`);
+        }
+      } catch (err) {
+        console.warn('[Video Router] LLM storyboarding failed, using basic splitting.', err);
+        scenePrompts = Array.from({length: numScenes}, (_, i) => `${prompt} - Part ${i+1}`);
+      }
+    }
+
     let fallbackUrl = (generationMode === 'template' || generationMode === 'motion_graphics') ? 'template_mode' : 'assembly_mode';
     if (generationMode === 'premium_ai') fallbackUrl = ''; // It will be generated
 
-    if (appId) {
-      const { data, error } = await userSupabase.from('video_factory_assets').insert({
-        app_id: appId,
-        title: (prompt || 'Untitled Video').substring(0, 50),
-        platform: 'shorts',
-        video_url: fallbackUrl,
-        status: generationMode === 'premium_ai' ? 'processing' : 'published'
-      }).select().single();
+    let generatedAssetIds = [];
+    
+    // Loop and insert/queue each scene
+    for (let i = 0; i < numScenes; i++) {
+      let scenePrompt = scenePrompts[i];
+      let sceneTitle = numScenes > 1 ? `(Scene ${i+1}/${numScenes}) ${prompt.substring(0, 30)}` : (prompt || 'Untitled Video').substring(0, 50);
+      let assetId = null;
 
-      if (error) {
-        console.error("[Video Router] DB Insert Error:", error);
-        return res.status(500).json({ error: `Database Error: ${error.message || JSON.stringify(error)}` });
-      }
-      assetId = data.id;
-    }
+      if (appId) {
+        const { data, error } = await userSupabase.from('video_factory_assets').insert({
+          app_id: appId,
+          title: sceneTitle,
+          platform: 'shorts',
+          video_url: fallbackUrl,
+          status: generationMode === 'premium_ai' ? 'processing' : 'published'
+        }).select().single();
 
-    // If it's a real AI generation, queue it up in BullMQ
-    if (generationMode === 'premium_ai' && assetId) {
-      try {
-        if (!activeQueues['video_rendering']) {
-          throw new Error('BullMQ not configured');
+        if (error) {
+          console.error("[Video Router] DB Insert Error:", error);
+          continue;
         }
+        assetId = data.id;
+        generatedAssetIds.push(assetId);
+      }
 
-        const addJobPromise = activeQueues['video_rendering'].add('render_video', {
-          assetId,
-          prompt,
-          appId
-        });
+      // If it's a real AI generation, queue it up in BullMQ
+      if (generationMode === 'premium_ai' && assetId) {
+        try {
+          if (!activeQueues['video_rendering']) {
+            throw new Error('BullMQ not configured');
+          }
 
-        // 10 second timeout for queue.add to prevent 502 Bad Gateway
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Redis connection timeout')), 10000)
-        );
+          const addJobPromise = activeQueues['video_rendering'].add('render_video', {
+            assetId,
+            prompt: scenePrompt,
+            appId,
+            sceneInfo: numScenes > 1 ? `Scene ${i+1} of ${numScenes}` : null
+          });
 
-        await Promise.race([addJobPromise, timeoutPromise]);
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Redis connection timeout')), 10000)
+          );
 
-        return res.status(202).json({
-          id: assetId,
-          url: '', // Frontend should poll
-          mode: generationMode,
-          cost: costEstimated,
-          status: 'queued'
-        });
-      } catch (queueErr) {
-        console.warn('[Video Router] BullMQ Queue error:', queueErr);
-        
-        // Fallback to in-memory processing if Redis is down
-        if (queueErr.message === 'Redis connection timeout' || queueErr.message === 'BullMQ not configured') {
-          console.log('[Video Router] Falling back to in-memory video generation due to Redis unavailability.');
-          const { processVideoGeneration } = require('./workers');
-          if (processVideoGeneration) {
-            processVideoGeneration({ assetId, prompt, appId }).catch(err => {
-              console.error('[Video Router] In-memory generation failed:', err);
-            });
-            return res.status(202).json({
-              id: assetId,
-              url: '',
-              mode: generationMode,
-              cost: costEstimated,
-              status: 'queued'
-            });
+          await Promise.race([addJobPromise, timeoutPromise]);
+
+        } catch (queueErr) {
+          console.warn('[Video Router] BullMQ Queue error:', queueErr);
+          
+          if (queueErr.message === 'Redis connection timeout' || queueErr.message === 'BullMQ not configured') {
+            console.log('[Video Router] Falling back to in-memory video generation due to Redis unavailability.');
+            const { processVideoGeneration } = require('./workers');
+            if (processVideoGeneration) {
+              processVideoGeneration({ assetId, prompt: scenePrompt, appId, sceneInfo: numScenes > 1 ? `Scene ${i+1} of ${numScenes}` : null }).catch(err => {
+                console.error('[Video Router] In-memory generation failed:', err);
+              });
+            }
+          } else {
+            await userSupabase.from('video_factory_assets').update({ status: 'failed' }).eq('id', assetId);
+            if (i === 0) return res.status(503).json({ error: `Video rendering service error: ${String(queueErr)}` });
           }
         }
-        
-        await userSupabase.from('video_factory_assets').update({ status: 'failed' }).eq('id', assetId);
-        return res.status(503).json({ error: `Video rendering service error: ${String(queueErr)}` });
       }
+    }
+
+    // Return the response containing the first ID, and the array
+    if (generationMode === 'premium_ai') {
+      return res.status(202).json({
+        id: generatedAssetIds[0] || null,
+        ids: generatedAssetIds,
+        url: '',
+        mode: generationMode,
+        cost: costEstimated * numScenes,
+        status: 'queued'
+      });
     }
 
     // For mock modes, return immediately
