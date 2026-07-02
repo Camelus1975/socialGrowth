@@ -308,38 +308,44 @@ router.post('/generate-video', requireCredits(50), async (req, res) => {
     if (appId) {
       const { data, error } = await userSupabase.from('video_factory_assets').insert({
         app_id: appId,
-        title: prompt.substring(0, 50),
+        title: (prompt || 'Untitled Video').substring(0, 50),
         platform: 'shorts',
         video_url: fallbackUrl,
         status: generationMode === 'premium_ai' ? 'processing' : 'published'
       }).select().single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("[Video Router] DB Insert Error:", error);
+        return res.status(500).json({ error: `Database Error: ${error.message || JSON.stringify(error)}` });
+      }
       assetId = data.id;
     }
 
     // If it's a real AI generation, queue it up in BullMQ
     if (generationMode === 'premium_ai' && assetId) {
-      if (!activeQueues['video_rendering']) {
-        console.warn('[Video Router] BullMQ not configured. Cannot render video asynchronously.');
-        // Fallback: update status to failed so the UI doesn't hang
+      try {
+        if (!activeQueues['video_rendering']) {
+          throw new Error('BullMQ not configured');
+        }
+
+        await activeQueues['video_rendering'].add('render_video', {
+          assetId,
+          prompt,
+          appId
+        });
+
+        return res.status(202).json({
+          id: assetId,
+          url: '', // Frontend should poll
+          mode: generationMode,
+          cost: costEstimated,
+          status: 'queued'
+        });
+      } catch (queueErr) {
+        console.warn('[Video Router] BullMQ Queue error:', queueErr);
         await userSupabase.from('video_factory_assets').update({ status: 'failed' }).eq('id', assetId);
-        return res.status(503).json({ error: 'Video rendering service is temporarily unavailable.' });
+        return res.status(503).json({ error: `Video rendering service error: ${queueErr.message}` });
       }
-
-      await activeQueues['video_rendering'].add('render_video', {
-        assetId,
-        prompt,
-        appId
-      });
-
-      return res.status(202).json({
-        id: assetId,
-        url: '', // Frontend should poll
-        mode: generationMode,
-        cost: costEstimated,
-        status: 'queued'
-      });
     }
 
     // For mock modes, return immediately
@@ -348,12 +354,12 @@ router.post('/generate-video', requireCredits(50), async (req, res) => {
       url: fallbackUrl,
       mode: generationMode,
       cost: costEstimated,
-      status: 'completed'
+      status: 'published'
     });
 
   } catch (err) {
-    console.error("[Video Router] Generation Error:", err);
-    res.status(500).json({ error: 'Video generation failed.' });
+    console.error(`[Video Router] Generation Error: ${err.message}`, err);
+    res.status(500).json({ error: `Video generation failed: ${err.message}`, details: err.stack });
   }
 });
 
