@@ -48,9 +48,12 @@ const {
 const useRedis = !!config.REDIS_URL;
 let redisConnection = null;
 if (useRedis) {
+  const isTls = config.REDIS_URL && config.REDIS_URL.startsWith('rediss://');
   redisConnection = new Redis(config.REDIS_URL || 'redis://localhost:6379', {
-    maxRetriesPerRequest: null
+    maxRetriesPerRequest: null,
+    ...(isTls ? { tls: { rejectUnauthorized: false } } : {})
   });
+  
   redisConnection.on('error', (err) => {
     console.warn('[Redis Worker] Connection error:', err.message);
   });

@@ -328,11 +328,18 @@ router.post('/generate-video', requireCredits(50), async (req, res) => {
           throw new Error('BullMQ not configured');
         }
 
-        await activeQueues['video_rendering'].add('render_video', {
+        const addJobPromise = activeQueues['video_rendering'].add('render_video', {
           assetId,
           prompt,
           appId
         });
+
+        // 10 second timeout for queue.add to prevent 502 Bad Gateway
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Redis connection timeout')), 10000)
+        );
+
+        await Promise.race([addJobPromise, timeoutPromise]);
 
         return res.status(202).json({
           id: assetId,
