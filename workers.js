@@ -267,10 +267,9 @@ if (publishingWorker) publishingWorker.on('failed', (job, err) => {
 });
 
 // 5. Video Rendering Worker
-const videoRenderingWorker = redisConnection ? new Worker('video_rendering', async (job) => {
-  if (job.name === 'render_video') {
-    const { assetId, prompt, appId } = job.data;
-    console.log(`[Worker - Video] Rendering video for asset ${assetId}...`);
+async function processVideoGeneration(jobData) {
+  const { assetId, prompt, appId } = jobData;
+  console.log(`[Worker - Video] Rendering video for asset ${assetId}...`);
 
     try {
       // 1. Run Replicate
@@ -328,6 +327,11 @@ const videoRenderingWorker = redisConnection ? new Worker('video_rendering', asy
       }).eq('id', assetId);
       throw err;
     }
+}
+
+const videoRenderingWorker = redisConnection ? new Worker('video_rendering', async (job) => {
+  if (job.name === 'render_video') {
+    return await processVideoGeneration(job.data);
   }
 }, { connection: redisConnection }) : null;
 
@@ -342,7 +346,8 @@ module.exports = {
   analyticsWorker,
   reviewsWorker,
   agentWorker,
-  videoRenderingWorker
+  videoRenderingWorker,
+  processVideoGeneration
 };
 
 // Start Repeating Jobs if running directly

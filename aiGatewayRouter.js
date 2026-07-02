@@ -350,6 +350,25 @@ router.post('/generate-video', requireCredits(50), async (req, res) => {
         });
       } catch (queueErr) {
         console.warn('[Video Router] BullMQ Queue error:', queueErr);
+        
+        // Fallback to in-memory processing if Redis is down
+        if (queueErr.message === 'Redis connection timeout' || queueErr.message === 'BullMQ not configured') {
+          console.log('[Video Router] Falling back to in-memory video generation due to Redis unavailability.');
+          const { processVideoGeneration } = require('./workers');
+          if (processVideoGeneration) {
+            processVideoGeneration({ assetId, prompt, appId }).catch(err => {
+              console.error('[Video Router] In-memory generation failed:', err);
+            });
+            return res.status(202).json({
+              id: assetId,
+              url: '',
+              mode: generationMode,
+              cost: costEstimated,
+              status: 'queued'
+            });
+          }
+        }
+        
         await userSupabase.from('video_factory_assets').update({ status: 'failed' }).eq('id', assetId);
         return res.status(503).json({ error: `Video rendering service error: ${String(queueErr)}` });
       }
