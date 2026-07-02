@@ -274,12 +274,20 @@ const videoRenderingWorker = redisConnection ? new Worker('video_rendering', asy
         input: { prompt: prompt } 
       });
 
-      const replicateUrl = Array.isArray(output) ? output[0] : output;
-      
-      // 2. Download the MP4 into a buffer
-      const response = await fetch(replicateUrl);
-      if (!response.ok) throw new Error('Failed to download video from Replicate');
-      const buffer = await response.arrayBuffer();
+      let buffer;
+      if (typeof output === 'string') {
+        const response = await fetch(output);
+        if (!response.ok) throw new Error('Failed to download video from Replicate');
+        buffer = await response.arrayBuffer();
+      } else if (Array.isArray(output)) {
+        const response = await fetch(output[0]);
+        if (!response.ok) throw new Error('Failed to download video from Replicate');
+        buffer = await response.arrayBuffer();
+      } else {
+        // Handle ReadableStream from new Replicate API versions
+        const response = new Response(output);
+        buffer = await response.arrayBuffer();
+      }
 
       // 3. Upload to Supabase Storage
       const fileName = `video_${assetId}.mp4`;
