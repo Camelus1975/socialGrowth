@@ -316,6 +316,16 @@ async function processVideoGeneration(jobData) {
         status: 'published'
       }).eq('id', assetId);
 
+      // 6. Save to Media Library
+      await supabase.from('media').insert({
+        app_id: appId || 'default',
+        name: `AI Video: ${prompt.substring(0, 30)}`,
+        file_type: 'video/mp4',
+        folder: 'AI Generated',
+        description: prompt,
+        storage_path: finalUrl
+      });
+
       console.log(`[Worker - Video] Successfully rendered and uploaded asset ${assetId}`);
       return { success: true, url: finalUrl };
 
