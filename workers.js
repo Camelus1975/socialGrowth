@@ -51,6 +51,7 @@ if (useRedis) {
   const isTls = config.REDIS_URL && config.REDIS_URL.startsWith('rediss://');
   redisConnection = new Redis(config.REDIS_URL || 'redis://localhost:6379', {
     maxRetriesPerRequest: null,
+    family: 0, // Railway internal networking uses IPv6
     ...(isTls ? { tls: { rejectUnauthorized: false } } : {})
   });
   
