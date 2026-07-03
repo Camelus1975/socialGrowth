@@ -167,7 +167,7 @@ async function refreshPriorityActions(supabase) {
             el.style = "padding:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;";
             
             let actionHtml = '';
-            if (!action.approved) {
+            if (action.requires_approval && action.status === 'pending') {
               actionHtml = `
                 <div>
                   <div class="mod-style-Zm9udC13">Pending: ${action.task_goal}</div>

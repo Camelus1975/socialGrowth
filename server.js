@@ -897,7 +897,7 @@ app.post('/api/agents/orchestration/approve', async (req, res) => {
     // 1. Mark operation as executing
     const { error: opError } = await userSupabase
       .from('agent_operations')
-      .update({ approved: true, status: 'executing' })
+      .update({ status: 'executing' })
       .eq('id', operationId);
 
     if (opError) throw opError;

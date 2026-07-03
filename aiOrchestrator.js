@@ -264,7 +264,6 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
           agent_name: res.agent,
           task_goal: goal,
           requires_approval: true,
-          approved: false,
           status: 'pending',
           recommendation: recommendation
         };
