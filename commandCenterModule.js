@@ -1,6 +1,7 @@
 import { requestApi } from './common.js';
-import { switchView } from './app.js';
+import { switchView, renderWarRoom } from './app.js';
 import { state } from './state.js';
+import { getSupabaseClient } from './auth.js';
 
 let isInitialized = false;
 
@@ -11,7 +12,28 @@ export function initCommandCenter() {
         state.on('appChanged', () => {
             const feedEl = document.getElementById('command-center-feed');
             if (feedEl) feedEl.innerHTML = ''; // Clear feed when switching apps
+            if (state.currentActiveView === 'war-room') {
+                renderWarRoom();
+            }
         });
+
+        const supabase = getSupabaseClient();
+        if (supabase) {
+            supabase
+                .channel('warroom-updates')
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public', table: 'agent_operations' },
+                    (payload) => {
+                        console.log('[War Room] Realtime agent_operations update:', payload);
+                        if (state.currentActiveView === 'war-room') {
+                            renderWarRoom();
+                        }
+                    }
+                )
+                .subscribe();
+        }
+
         isInitialized = true;
     }
     

@@ -576,33 +576,78 @@ export function renderNotifications() {
   });
 }
 
-// Executive War Room Mock logs
-export function renderWarRoom() {
+// Executive War Room Dynamic Logs
+export async function renderWarRoom() {
   const list = document.getElementById('war-room-agent-activity');
   if (!list) return;
-  list.innerHTML = `
-    <div class="mod-style-YmFja2dy">
-      <h5 class="mod-style-Y29sb3I6">
-        <span>ASO Agent Task</span>
-        <span class="mod-style-Y29sb3I6">Completed</span>
-      </h5>
-      <p class="mod-style-Zm9udC1z">Crawled Apple App Store listings metadata search indices. Found 2 keyword gaps.</p>
-    </div>
-    <div class="mod-style-YmFja2dy">
-      <h5 class="mod-style-Y29sb3I6">
-        <span>Content Agent Task</span>
-        <span class="mod-style-Y29sb3I6">Active</span>
-      </h5>
-      <p class="mod-style-Zm9udC1z">Drafting A/B copy variants for June calendar countdown challenge queues.</p>
-    </div>
-    <div class="mod-style-YmFja2dy">
-      <h5 class="mod-style-Y29sb3I6">
-        <span>Analytics Agent Task</span>
-        <span class="mod-style-Y29sb3I6">Idle</span>
-      </h5>
-      <p class="mod-style-Zm9udC1z">Awaiting background hourly BullMQ stats collection jobs sync triggers.</p>
-    </div>
-  `;
+
+  const supabase = getSupabaseClient();
+  if (!supabase) {
+    list.innerHTML = '<div class="mod-style-Zm9udC1z">Waiting for Supabase connection...</div>';
+    return;
+  }
+
+  try {
+    let query = supabase.from('agent_operations').select('*').order('created_at', { ascending: false }).limit(5);
+    
+    if (state.currentActiveApp) {
+      query = query.eq('app_id', state.currentActiveApp);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      list.innerHTML = '<div class="mod-style-Zm9udC1z">No recent agent activity.</div>';
+      return;
+    }
+
+    list.innerHTML = '';
+    data.forEach(op => {
+      const card = createSafeElement('div');
+      card.style.background = 'rgba(255,255,255,0.02)';
+      card.style.border = '1px solid var(--border-glass)';
+      card.style.padding = '12px';
+      card.style.borderRadius = '8px';
+      card.style.marginBottom = '12px';
+
+      const header = createSafeElement('h5');
+      header.style.display = 'flex';
+      header.style.justifyContent = 'space-between';
+      header.style.color = 'white';
+      header.style.fontSize = '0.85rem';
+      header.style.margin = '0 0 8px 0';
+
+      const agentName = createSafeElement('span', [], op.agent_name || 'System Agent');
+      const statusBadge = createSafeElement('span', [], op.status ? op.status.toUpperCase() : 'UNKNOWN');
+      
+      if (op.status === 'completed' || op.status === 'published' || op.status === 'success') {
+        statusBadge.style.color = '#10b981'; // green
+      } else if (op.status === 'failed') {
+        statusBadge.style.color = '#ef4444'; // red
+      } else {
+        statusBadge.style.color = '#f59e0b'; // amber
+      }
+      statusBadge.style.fontSize = '0.7rem';
+      statusBadge.style.fontWeight = 'bold';
+
+      header.appendChild(agentName);
+      header.appendChild(statusBadge);
+
+      const desc = createSafeElement('p', [], op.task_goal || 'Background synchronization task');
+      desc.style.fontSize = '0.75rem';
+      desc.style.color = 'var(--text-muted)';
+      desc.style.margin = '0';
+
+      card.appendChild(header);
+      card.appendChild(desc);
+      list.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error("[War Room] Failed to fetch agent operations:", err);
+    list.innerHTML = '<div class="mod-style-Zm9udC1z">Failed to load war room activity.</div>';
+  }
 }
 
 // ------------------------------------------
