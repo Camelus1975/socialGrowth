@@ -17,8 +17,8 @@ function requireCredits(actionCostCalculator) {
       // Calculate dynamic cost
       const cost = typeof actionCostCalculator === 'function' ? actionCostCalculator(req) : actionCostCalculator;
       
-      if (cost <= 0) {
-        return next(); // Free action, proceed
+      if (cost <= 0 || req.user.isServiceAccount) {
+        return next(); // Free action or internal service account, proceed
       }
 
       // Minimal details for the ledger
