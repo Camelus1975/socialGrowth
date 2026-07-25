@@ -135,6 +135,13 @@ const authenticate = async (req, res, next) => {
   if (req.originalUrl.startsWith('/api/auth/') || req.originalUrl.startsWith('/api/webhooks/')) {
     return next();
   }
+  // Bypass for internal microservice requests
+  const serviceKey = req.headers['x-service-key'];
+  const expectedKey = process.env.SERVICE_API_KEY || 'bp_local_service_key_123';
+  if (serviceKey && serviceKey === expectedKey) {
+    req.user = { id: 'service_account', email: 'service@businesspilot.ai', isServiceAccount: true };
+    return next();
+  }
   
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
