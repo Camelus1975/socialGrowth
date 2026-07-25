@@ -231,8 +231,9 @@ router.post('/generate-image', requireCredits(10), async (req, res) => {
           }
         }
       );
-      // Replicate returns an array of streams/URLs
-      imageUrl = Array.isArray(output) ? output[0] : output;
+      // Replicate returns an array of streams/URLs/objects
+      const rawImg = Array.isArray(output) ? output[0] : output;
+      imageUrl = rawImg.toString();
       costEstimated = 0.003; // Approx Replicate FLUX Schnell cost
       
     } else {
