@@ -425,7 +425,7 @@ router.post('/generate-video', requireCredits(50), async (req, res) => {
 
     // For mock modes, return immediately
     res.json({
-      id: assetId,
+      id: generatedAssetIds[0] || null,
       url: fallbackUrl,
       mode: generationMode,
       cost: costEstimated,
