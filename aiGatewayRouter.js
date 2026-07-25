@@ -413,6 +413,27 @@ router.post('/generate-video', requireCredits(50), async (req, res) => {
 
     // Return the response containing the first ID, and the array
     if (generationMode === 'premium_ai') {
+      if (req.headers['x-service-key']) {
+        console.log('[Video Router] Synchronous generation requested via service key');
+        const { processVideoGeneration } = require('./workers');
+        if (processVideoGeneration) {
+          try {
+             const result = await processVideoGeneration({ assetId: generatedAssetIds[0], prompt: scenePrompts[0], appId, sceneInfo: null });
+             if (result && result.url) {
+                return res.status(200).json({
+                  id: generatedAssetIds[0] || null,
+                  ids: generatedAssetIds,
+                  url: result.url,
+                  mode: generationMode,
+                  cost: costEstimated * numScenes,
+                  status: 'published'
+                });
+             }
+          } catch(e) {
+             console.error('[Video Router] Synchronous video generation failed:', e);
+          }
+        }
+      }
       return res.status(202).json({
         id: generatedAssetIds[0] || null,
         ids: generatedAssetIds,
