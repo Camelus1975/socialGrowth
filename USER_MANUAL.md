@@ -1,18 +1,20 @@
-# App Founder Growth Suite - User Manual
+# Social Growth AI — User Manual & Growth OS Guide
 
-Welcome to the **App Founder Growth Suite**! This platform is your all-in-one "mission control" for marketing, managing, and scaling your software application or startup. You don't need to be a technical expert to use this tool. This manual will guide you through the features and how to use them effectively.
-
----
-
-## 🚀 Getting Started
-
-When you open the app, you will see a navigation menu on the left side of your screen (the sidebar). From here, you can switch between different "Views" or modules. Each module is designed to handle a specific part of your app's growth strategy.
-
-At the very top left, you can switch between the different apps you are managing using the dropdown menu.
+Welcome to **Social Growth AI**! This platform is your autonomous **AI Growth Operating System** — an AI Growth Team (*CMO Strategy Agent, Content Writer Agent, Competitor Radar Agent, Social Publisher, Revenue Intelligence*) that works 24/7 in the background to achieve your business goals (*"🚀 Launch Product"*, *"📈 Grow Followers"*, *"💵 Drive Sales"*, *"🎯 Beat Competitors"*).
 
 ---
 
-## 🗺️ Core Modules & Features
+## 🚀 Getting Started with the AI Growth OS
+
+When you log in, the Home page displays your **Bento Mission Control**:
+- **Outcome Goal Selector**: Click any target outcome (*"🚀 Launch Product"*, *"📈 Grow Followers"*, *"💵 Drive Sales"*, *"🎯 Beat Competitors"*) to trigger multi-agent workflows automatically.
+- **Today's Focus Panel**: Action-first cards structured as **What happened?** → **Why?** → **⚡ 1-Click Execution**.
+- **AI Agent Network Visualizer**: Live status cards for your 12 autonomous AI agents running in real time.
+- **Global Command Palette**: Press **`Ctrl + K`** (or `Cmd + K`) anywhere to search tools or execute actions instantly.
+
+---
+
+## 🗺️ 12 Goal-Oriented Workspaces
 
 ### 1. Launch Command Center
 **What it is:** The place to plan your app launches or new feature releases.
