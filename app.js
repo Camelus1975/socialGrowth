@@ -409,6 +409,9 @@ export function switchView(viewId, element) {
     activePanel.classList.add('active');
   }
   
+  // Smooth scroll to top when changing views
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
   // Close mobile sidebar automatically after navigation
   const sidebar = document.querySelector('aside');
   const overlay = document.getElementById('mobile-sidebar-overlay');
