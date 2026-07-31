@@ -1657,7 +1657,11 @@ app.get('/api/admin/debug-jobs', async (req, res) => {
   // Catch-all route to serve the single-page application (SPA)
   // This must be the very last route
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    if (req.path.startsWith('/v2')) {
+      res.sendFile(path.join(__dirname, 'index_v2.html'));
+    } else {
+      res.sendFile(path.join(__dirname, 'index.html'));
+    }
   });
   
   // Start Server
