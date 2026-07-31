@@ -284,8 +284,8 @@ async function sendCopilotMessage(text, inputEl, btnEl, messagesEl) {
         // Remove typing
         if (typingMsg.parentNode) messagesEl.removeChild(typingMsg);
 
-        if (response && response.success) {
-            const aiText = response.message || response.reply || response.text || 'I understood your request.';
+        if (response && (response.success || response.reply)) {
+            const aiText = response.reply || response.message || response.text || 'I understood your request.';
             
             const aiMsg = document.createElement('div');
             aiMsg.style.cssText = `

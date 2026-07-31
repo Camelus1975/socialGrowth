@@ -1422,7 +1422,7 @@ Rules:
     });
 
     const reply = completion.choices[0].message.content;
-    res.json({ reply, usage: completion.usage });
+    res.json({ success: true, reply, usage: completion.usage });
 
   } catch (err) {
     console.error('[Copilot] Error:', err);
