@@ -8,6 +8,18 @@ import {
   requestApi 
 } from './common.js';
 
+// ── Auth ──────────────────────────────────────────────────────────────────────
+import {
+  initAuth,
+  loginWithEmail,
+  signupWithEmail,
+  loginWithOAuth,
+  logout,
+  toggleAuthMode,
+  onAuthStateChange
+} from './auth.js';
+
+// ── Modules ───────────────────────────────────────────────────────────────────
 import { initDashboard, renderDashboard } from './dashboardModule.js';
 import { initIntelligenceDashboard } from './intelligenceDashboardModule.js';
 import { initCommandCenter } from './commandCenterModule.js';
@@ -28,21 +40,56 @@ import { initCopilot } from './copilotModule.js';
 import { initBrandKit } from './brandKitModule.js';
 import { initOnboarding } from './onboardingModule.js';
 import { initWeeklyReport } from './weeklyReportModule.js';
-import { initAppManager, setSelectActiveAppCallback } from './appManager.js';
+import { 
+  initAppManager, 
+  fetchUserApps, 
+  renderAppSelectorDropdown, 
+  setSelectActiveAppCallback 
+} from './appManager.js';
 import { initHealthScore } from './healthScoreModule.js';
 import { initIndustryBenchmarks } from './industryBenchmarkModule.js';
 
 import { initCommandPaletteV2 } from './commandPalette_v2.js';
 
-// Boot application shell V2
+// ── Entry Point ───────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
   console.log("OS V2 Booting...");
-  
+
+  // Restore theme preference
+  const savedTheme = localStorage.getItem('theme_mode');
+  if (savedTheme === 'light') {
+    document.body.classList.add('light-mode');
+  }
+
+  // Wire auth button listeners BEFORE initAuth so they're ready
+  setupAuthListeners();
+
+  // Bind workspace / UI interactive events
+  setupUIEventListeners();
+
+  // Initialize auth — checks for existing Supabase session
+  const session = await initAuth();
+
+  // Listen for OAuth redirect callbacks
+  onAuthStateChange((session) => {
+    bootApp();
+  });
+
+  // If already logged in, boot immediately
+  if (session) {
+    bootApp();
+  }
+});
+
+// ── Boot App (only after successful auth) ─────────────────────────────────────
+async function bootApp() {
+  console.log("OS V2 — bootApp()");
+
   // Set the application selection callback
   setSelectActiveAppCallback(selectActiveApp);
-  
-  // Bind UI interactive events
-  setupUIEventListeners();
+
+  // Fetch user businesses from Supabase
+  await fetchUserApps();
 
   // Initialize all modular dashboard sub-engines
   initAppManager();
@@ -72,13 +119,75 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Initialize V2 fuzzy command search palette
   initCommandPaletteV2();
 
-  // Refresh active workspace representation
-  if (state.activeAppId) {
-    selectActiveApp(state.activeAppId);
-  }
-});
+  // Render business selector dropdown
+  renderAppSelectorDropdown();
 
-// Setup UI Interactive Routing
+  // Auto-select first app or prompt creation
+  const keys = Object.keys(state.appsData);
+  if (!state.appsData[state.currentActiveApp] && keys.length > 0) {
+    state.currentActiveApp = keys[0];
+  } else if (keys.length === 0) {
+    state.currentActiveApp = null;
+  }
+
+  selectActiveApp(state.currentActiveApp);
+  renderDashboard();
+}
+
+// ── Auth Button Listeners ─────────────────────────────────────────────────────
+function setupAuthListeners() {
+  // Login button
+  const loginBtn = document.getElementById('auth-login-btn');
+  if (loginBtn) {
+    loginBtn.addEventListener('click', () => {
+      const email = document.getElementById('auth-email')?.value;
+      const password = document.getElementById('auth-password')?.value;
+      if (email && password) {
+        loginWithEmail(email, password).then(success => {
+          if (success) bootApp();
+        });
+      }
+    });
+  }
+
+  // Signup button
+  const signupBtn = document.getElementById('auth-signup-btn');
+  if (signupBtn) {
+    signupBtn.addEventListener('click', () => {
+      const email = document.getElementById('auth-signup-email')?.value;
+      const password = document.getElementById('auth-signup-password')?.value;
+      if (email && password) {
+        signupWithEmail(email, password).then(success => {
+          if (success) bootApp();
+        });
+      }
+    });
+  }
+
+  // Toggle login/signup forms
+  const showSignup = document.getElementById('auth-show-signup');
+  if (showSignup) showSignup.addEventListener('click', (e) => { e.preventDefault(); toggleAuthMode(); });
+  
+  const showLogin = document.getElementById('auth-show-login');
+  if (showLogin) showLogin.addEventListener('click', (e) => { e.preventDefault(); toggleAuthMode(); });
+
+  // OAuth buttons
+  const googleBtn = document.getElementById('auth-google-btn');
+  if (googleBtn) googleBtn.addEventListener('click', () => loginWithOAuth('google'));
+
+  const githubBtn = document.getElementById('auth-github-btn');
+  if (githubBtn) githubBtn.addEventListener('click', () => loginWithOAuth('github'));
+
+  // Enter key support for login
+  const passwordInput = document.getElementById('auth-password');
+  if (passwordInput) {
+    passwordInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('auth-login-btn')?.click();
+    });
+  }
+}
+
+// ── Workspace UI Event Routing ────────────────────────────────────────────────
 function setupUIEventListeners() {
   // Global Event Delegation for data-action bindings
   document.addEventListener('click', (e) => {
@@ -116,7 +225,7 @@ function setupUIEventListeners() {
   });
 }
 
-// Workspace Routing & Animations
+// ── Workspace Routing & Animations ────────────────────────────────────────────
 export function switchWorkspace(viewId, element) {
   // Highlight active sidebar navigation links
   const navLinks = document.querySelectorAll('.nav-link');
@@ -169,14 +278,14 @@ export function switchWorkspace(viewId, element) {
   state.setActiveView(viewId);
 }
 
-// Developer Mode Toggle Helper
+// ── Developer Mode Toggle ─────────────────────────────────────────────────────
 window.toggleDevMode = function() {
   document.body.classList.toggle('dev-mode-active');
   const isActive = document.body.classList.contains('dev-mode-active');
   showToast(isActive ? "Developer Workspace Unlocked" : "Developer Mode Hidden", "success");
 };
 
-// Global Creative Studio Wrapper for canvas triggers
+// ── Global Creative Studio Wrapper ────────────────────────────────────────────
 window.generateStudioContent = function() {
   const promptInput = document.getElementById('studio-prompt-input')?.value;
   if (!promptInput) {
@@ -186,7 +295,7 @@ window.generateStudioContent = function() {
   generateStudioContent(promptInput);
 };
 
-// Select Active Application & Refresh views
+// ── Select Active Application & Refresh views ────────────────────────────────
 export function selectActiveApp(appId) {
   if (!appId || !state.appsData[appId]) {
     state.setActiveApp(null);
