@@ -34,10 +34,9 @@ export function renderDashboard() {
   const app = state.appsData[state.currentActiveApp];
   
   // Update Dashboard main title based on context
-  if (app) {
-     document.getElementById('dashboard-main-title').textContent = `${app.name} Performance`;
-  } else {
-     document.getElementById('dashboard-main-title').textContent = `Global Portfolio Performance`;
+  const titleEl = document.getElementById('dashboard-main-title');
+  if (titleEl) {
+    titleEl.textContent = app ? `${app.name} Performance` : `Global Portfolio Performance`;
   }
   
   const template = getTemplateForBusiness(app ? app.businessType : 'generic');
@@ -72,28 +71,42 @@ export function renderDashboard() {
   });
   
   if (!app) {
-    document.getElementById('selected-detail-title').textContent = `No Business Selected`;
-    document.getElementById('app-detail-rating').textContent = `-`;
-    document.getElementById('app-detail-conversion').textContent = `-`;
-    document.getElementById('app-detail-growth').textContent = `-`;
-    document.getElementById('health-gauge-text').textContent = `--`;
+    const detailTitle = document.getElementById('selected-detail-title');
+    if (detailTitle) detailTitle.textContent = `No Business Selected`;
+    const rating = document.getElementById('app-detail-rating');
+    if (rating) rating.textContent = `-`;
+    const conversion = document.getElementById('app-detail-conversion');
+    if (conversion) conversion.textContent = `-`;
+    const growth = document.getElementById('app-detail-growth');
+    if (growth) growth.textContent = `-`;
+    const gauge = document.getElementById('health-gauge-text');
+    if (gauge) gauge.textContent = `--`;
     
     // Clear recommendations
-    document.getElementById('brief-users').textContent = "Select a business to view recommendations.";
-    document.getElementById('brief-engagement').textContent = "-";
-    document.getElementById('brief-competitor').textContent = "-";
-    document.getElementById('brief-priority').textContent = "-";
+    const briefUsers = document.getElementById('brief-users');
+    if (briefUsers) briefUsers.textContent = "Select a business to view recommendations.";
+    const briefEng = document.getElementById('brief-engagement');
+    if (briefEng) briefEng.textContent = "-";
+    const briefComp = document.getElementById('brief-competitor');
+    if (briefComp) briefComp.textContent = "-";
+    const briefPri = document.getElementById('brief-priority');
+    if (briefPri) briefPri.textContent = "-";
     return;
   }
   
-  document.getElementById('selected-detail-title').textContent = `${app.name} Overview`;
-  document.getElementById('app-detail-rating').textContent = `${app.rating} ★`;
-  document.getElementById('app-detail-conversion').textContent = app.conversionRate;
-  document.getElementById('app-detail-growth').textContent = app.socialGrowth;
+  const detailTitle = document.getElementById('selected-detail-title');
+  if (detailTitle) detailTitle.textContent = `${app.name} Overview`;
+  const ratingEl = document.getElementById('app-detail-rating');
+  if (ratingEl) ratingEl.textContent = `${app.rating} ★`;
+  const convEl = document.getElementById('app-detail-conversion');
+  if (convEl) convEl.textContent = app.conversionRate;
+  const growthEl = document.getElementById('app-detail-growth');
+  if (growthEl) growthEl.textContent = app.socialGrowth;
   
   // Fake health score for MVP
   const healthScore = Math.floor(Math.random() * 20) + 75; // 75-95
-  document.getElementById('health-gauge-text').textContent = healthScore;
+  const gaugeText = document.getElementById('health-gauge-text');
+  if (gaugeText) gaugeText.textContent = healthScore;
   const healthPath = document.getElementById('health-gauge-path');
   if (healthPath) healthPath.setAttribute('stroke-dasharray', `${healthScore}, 100`);
   
@@ -110,6 +123,7 @@ export function renderDashboard() {
   
   // Render portfolio comparisons lists
   const portfolioList = document.getElementById('portfolio-growth-list');
+  if (!portfolioList) return;
   portfolioList.innerHTML = '';
   
   Object.keys(state.appsData).forEach(key => {

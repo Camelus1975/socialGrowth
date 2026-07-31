@@ -800,12 +800,14 @@ window.previewAvatarUpload = function(event) {
 
 export async function saveUserProfile() {
   const saveBtn = document.getElementById('save-profile-btn');
+  if (!saveBtn) return;
   const originalText = saveBtn.textContent;
   saveBtn.textContent = 'Saving...';
   saveBtn.disabled = true;
   
-  const newName = document.getElementById('profile-modal-name').value;
-  let newAvatarUrl = document.getElementById('profile-modal-avatar-preview').src;
+  const newName = document.getElementById('profile-modal-name')?.value || '';
+  const avatarPreview = document.getElementById('profile-modal-avatar-preview');
+  let newAvatarUrl = avatarPreview ? avatarPreview.src : '';
   
   try {
     // If we have a selected file and supabase client is available
