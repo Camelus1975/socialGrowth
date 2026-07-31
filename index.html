@@ -438,7 +438,7 @@
         <!-- Bento Grid Main Dashboard -->
         <div class="bento-grid">
           
-          <!-- Bento Item 1: Hero Welcome & Personalized AI Briefing (Span 8) -->
+          <!-- Bento Item 1: Hero Welcome & Outcome Goal Selector (Span 8) -->
           <div class="bento-card bento-hero-card bento-col-8">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
               <div>
@@ -447,11 +447,31 @@
                   AI Growth Operating System Active
                 </span>
                 <h1 style="font-size: 2rem; font-weight: 800; color: white; margin-bottom: 6px;">Good Evening, Shadi 👋</h1>
-                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Here is your live business intelligence briefing for <strong id="bento-active-biz-name" style="color: #c7d2fe;">FitPulse AI</strong>.</p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">What do you want to achieve today for <strong id="bento-active-biz-name" style="color: #c7d2fe;">FitPulse AI</strong>?</p>
               </div>
               <div style="text-align: right; background: rgba(255,255,255,0.05); padding: 12px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1);">
                 <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Opportunity Score</div>
                 <div style="font-size: 1.8rem; font-weight: 800; color: #10b981;">88 <span style="font-size: 1rem; color: var(--text-muted);">/100</span></div>
+              </div>
+            </div>
+
+            <!-- Goal-Based Outcome Selector Cards -->
+            <div class="goal-outcome-grid">
+              <div class="goal-outcome-card" data-action="switchView" data-args="growth-command-center">
+                <div class="goal-outcome-title">🚀 Launch Product</div>
+                <div class="goal-outcome-desc">Auto-run market research, copy & campaign launch</div>
+              </div>
+              <div class="goal-outcome-card" data-action="switchView" data-args="content-studio">
+                <div class="goal-outcome-title">📈 Grow Followers</div>
+                <div class="goal-outcome-desc">Generate Reels, viral copy & hashtags</div>
+              </div>
+              <div class="goal-outcome-card" data-action="switchView" data-args="revenue-intelligence">
+                <div class="goal-outcome-title">💵 Drive Sales & MRR</div>
+                <div class="goal-outcome-desc">Launch promo offer & conversion copy</div>
+              </div>
+              <div class="goal-outcome-card" data-action="switchView" data-args="competitor-intelligence">
+                <div class="goal-outcome-title">🎯 Beat Competitors</div>
+                <div class="goal-outcome-desc">Scan rival pricing & launch counter-campaign</div>
               </div>
             </div>
 
@@ -461,16 +481,6 @@
               <span class="briefing-chip">⚡ <strong>7</strong> Active Campaigns</span>
               <span class="briefing-chip">🤖 <strong>21</strong> AI Agent Tasks Done</span>
               <span class="briefing-chip">🎯 <strong>3</strong> Competitor Movements</span>
-            </div>
-
-            <!-- Prompt Action Chips -->
-            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08);">
-              <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Suggested Quick Actions</div>
-              <div class="prompt-chip-group">
-                <span class="prompt-chip" data-action="switchView" data-args="content-studio">✨ Generate 3 Instagram Reels</span>
-                <span class="prompt-chip" data-action="switchView" data-args="competitor-intelligence">🎯 Analyze Competitor Pricing</span>
-                <span class="prompt-chip" data-action="switchView" data-args="weekly-report">📝 Export Weekly Report</span>
-              </div>
             </div>
           </div>
 
@@ -491,46 +501,78 @@
             </div>
           </div>
 
-          <!-- Bento Item 3: Business Health & KPI Grid (Span 6) -->
+          <!-- Bento Item 3: Today's Focus Panel (Action-First Cards - Span 6) -->
           <div class="bento-card bento-col-6">
-            <h3 class="card-title" style="margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
-              <span>Business Health Overview</span>
-              <span style="font-size: 0.75rem; color: var(--primary); cursor: pointer;" data-action="switchView" data-args="health-score">View Details →</span>
+            <h3 class="card-title" style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+              <span>Today's Focus & Action-First Opportunities</span>
+              <span class="ai-live-pulse" style="font-size: 0.7rem;">3 Actions Pending</span>
             </h3>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-              <div style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Active Opportunities</div>
-                <div class="metric-value" id="dash-metric-opportunities" style="font-size: 1.4rem; margin-top: 4px;">... Loading</div>
-                <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;" id="dash-metric-opp-desc">Scanning market data</p>
+            <div class="focus-card-list">
+              <div class="focus-action-card">
+                <div class="focus-card-main">
+                  <div class="focus-what">Instagram Reel engagement spiked +18%</div>
+                  <div class="focus-why">Short-form video tutorial format outperforming static posts.</div>
+                </div>
+                <button class="btn btn-primary" style="font-size: 0.75rem; padding: 6px 12px; white-space: nowrap;" data-action="switchView" data-args="content-studio">⚡ Create Similar Reel</button>
               </div>
 
-              <div style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.2);">
-                <div style="font-size: 0.75rem; color: #f87171;">Competitor Threats</div>
-                <div class="metric-value" id="dash-metric-threats" style="font-size: 1.4rem; color: #f87171; margin-top: 4px;">... Loading</div>
-                <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;" id="dash-metric-threats-desc">Scanning competitors</p>
+              <div class="focus-action-card" style="border-left-color: #ef4444;">
+                <div class="focus-card-main">
+                  <div class="focus-what">Rival competitor lowered monthly pricing by 15%</div>
+                  <div class="focus-why">Detected pricing update on competitor landing page.</div>
+                </div>
+                <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 12px; white-space: nowrap; border-color: rgba(239,68,68,0.4); color: #f87171;" data-action="switchView" data-args="competitor-intelligence">🎯 Launch Counter Campaign</button>
               </div>
 
-              <div style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Agent Network Status</div>
-                <div class="metric-value" id="dash-metric-agents" style="font-size: 1.4rem; color: var(--primary); margin-top: 4px;">... Loading</div>
-                <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;" id="dash-metric-agents-desc">Checking agent states</p>
-              </div>
-
-              <div style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Growth Memory Insights</div>
-                <div class="metric-value" style="font-size: 1.4rem; color: #8b5cf6; margin-top: 4px;">1,245</div>
-                <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">Data points connected</p>
+              <div class="focus-action-card" style="border-left-color: #06b6d4;">
+                <div class="focus-card-main">
+                  <div class="focus-what">2 new 5-star customer reviews pending response</div>
+                  <div class="focus-why">Replying within 2 hours boosts local SEO reputation rank.</div>
+                </div>
+                <button class="btn btn-glass" style="font-size: 0.75rem; padding: 6px 12px; white-space: nowrap;" data-action="switchView" data-args="review-engine">✨ Send AI Replies</button>
               </div>
             </div>
           </div>
 
-          <!-- Bento Item 4: Priority Actions & Agent Recommendations (Span 6) -->
+          <!-- Bento Item 4: AI Agent Network Visualizer (Span 6) -->
           <div class="bento-card bento-col-6">
-            <h3 class="card-title" style="margin-bottom: 16px;">Priority Actions & Agent Recommendations</h3>
-            <div id="agent-priority-actions-list" style="display:flex; flex-direction:column; gap:10px;">
-              <div style="text-align: center; color: var(--text-muted); padding: 30px;">
-                Scanning for active agent recommendations...
+            <h3 class="card-title" style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+              <span>AI Agent Network (12 Autonomous Agents Active)</span>
+              <span style="font-size: 0.75rem; color: var(--primary); cursor: pointer;" data-action="switchView" data-args="agent-orchestration">View Live Flow →</span>
+            </h3>
+
+            <div class="agent-network-grid">
+              <div class="agent-node-card">
+                <div class="agent-node-header">
+                  <span class="agent-node-title">🧠 CMO Strategy</span>
+                  <span class="agent-status-badge">Active</span>
+                </div>
+                <div class="agent-task-text">Running weekly growth strategy audit and task routing.</div>
+              </div>
+
+              <div class="agent-node-card">
+                <div class="agent-node-header">
+                  <span class="agent-node-title">✍️ Content Writer</span>
+                  <span class="agent-status-badge">Working</span>
+                </div>
+                <div class="agent-task-text">Generating 4 LinkedIn posts & 2 Instagram reel captions.</div>
+              </div>
+
+              <div class="agent-node-card">
+                <div class="agent-node-header">
+                  <span class="agent-node-title">🎯 Competitor Radar</span>
+                  <span class="agent-status-badge">Monitoring</span>
+                </div>
+                <div class="agent-task-text">Scanning 3 rival websites for pricing and feature updates.</div>
+              </div>
+
+              <div class="agent-node-card">
+                <div class="agent-node-header">
+                  <span class="agent-node-title">📢 Social Publisher</span>
+                  <span class="agent-status-badge">Ready</span>
+                </div>
+                <div class="agent-task-text">3 posts queued in calendar for auto-publishing today.</div>
               </div>
             </div>
           </div>

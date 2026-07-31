@@ -2864,20 +2864,167 @@ body::after {
   margin-top: 12px;
 }
 
-.prompt-chip {
-  display: inline-flex;
+.prompt-chip:hover {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   PHASE 3: AI GROWTH OPERATING SYSTEM & AGENT NETWORK VISUALIZER
+   ========================================================================== */
+
+/* Goal-Based Outcome Selector Cards */
+.goal-outcome-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.goal-outcome-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.goal-outcome-card:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.08));
+  border-color: rgba(99, 102, 241, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.goal-outcome-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: white;
+  display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  border-radius: 16px;
-  background: rgba(99, 102, 241, 0.08);
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  color: #c7d2fe;
-  font-size: 0.78rem;
-  font-weight: 500;
-  cursor: pointer;
+}
+
+.goal-outcome-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Today's Focus Action-First Cards */
+.focus-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.focus-action-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 14px 14px 0;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   transition: all 0.2s ease;
 }
+
+.focus-action-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.focus-card-main {
+  flex: 1;
+}
+
+.focus-what {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 2px;
+}
+
+.focus-why {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* AI Agent Network Visualizer Grid */
+.agent-network-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.agent-node-card {
+  background: rgba(17, 24, 39, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  padding: 16px;
+  position: relative;
+  transition: all 0.25s ease;
+}
+
+.agent-node-card:hover {
+  background: rgba(31, 41, 55, 0.8);
+  border-color: rgba(6, 182, 212, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.agent-node-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.agent-node-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.agent-status-badge {
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(6, 182, 212, 0.1);
+  color: #06b6d4;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  font-weight: 600;
+}
+
+.agent-task-text {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-bottom: 10px;
+  min-height: 36px;
+}
+
+/* Developer Mode Hidden Elements */
+.dev-mode-only {
+  display: none !important;
+}
+
+body.dev-mode-active .dev-mode-only {
+  display: block !important;
+}
+
 
 .prompt-chip:hover {
   background: rgba(99, 102, 241, 0.2);
