@@ -8,7 +8,8 @@ import {
   toggleNotificationDrawer, 
   toggleMobileSidebar,
   requestApi,
-  createSafeElement
+  createSafeElement,
+  toggleThemeMode
 } from './common.js';
 
 import { initDashboard, renderDashboard } from './dashboardModule.js';
@@ -941,11 +942,7 @@ export function triggerQuickAction() {
   else if (num === '2') switchView('store-integrations');
 }
 
-export function toggleThemeMode() {
-  const isLight = document.body.classList.toggle('light-mode');
-  localStorage.setItem('theme_mode', isLight ? 'light' : 'dark');
-  showToast(`${isLight ? 'Light' : 'Dark'} mode active!`, "success");
-}
+// toggleThemeMode is imported from common.js
 
 // ------------------------------------------
 // EVENT DELEGATION ROUTER (XSS RESISTANT)

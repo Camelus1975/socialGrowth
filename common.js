@@ -129,3 +129,10 @@ export function createSafeElement(tag, classes = [], text = '') {
   if (text) el.textContent = text;
   return el;
 }
+
+// Theme Toggle
+export function toggleThemeMode() {
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('theme_mode', isLight ? 'light' : 'dark');
+  showToast(`${isLight ? 'Light' : 'Dark'} mode active!`, "success");
+}
