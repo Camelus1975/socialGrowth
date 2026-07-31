@@ -432,53 +432,109 @@
            GROWTH INTELLIGENCE MODULES
            ============================================== -->
            
-      <!-- 1. Unified Intelligence Dashboard -->
+      <!-- 1. Unified Intelligence Dashboard (Bento Mission Control) -->
       <section id="view-unified-intelligence-dash" class="view-panel active">
-        <!-- Top KPIs -->
-        <div class="metrics-grid">
-          <div class="metric-card">
-            <h3 class="metric-title">Predicted Revenue (90 Days)</h3>
-            <div class="metric-value" style="color: var(--accent-green)">$124,500 <span class="metric-trend positive">↑ 18%</span></div>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">Confidence Score: 92%</p>
-          </div>
-          <div class="metric-card">
-            <h3 class="metric-title">Active Opportunities</h3>
-            <div class="metric-value" id="dash-metric-opportunities">... Loading</div>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;" id="dash-metric-opp-desc">Scanning market data</p>
-          </div>
-          <div class="metric-card" style="border-color: rgba(239, 68, 68, 0.3);">
-            <h3 class="metric-title">Competitor Threats</h3>
-            <div class="metric-value" style="color: #f87171;" id="dash-metric-threats">... Loading</div>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;" id="dash-metric-threats-desc">Scanning competitors</p>
-          </div>
-          <div class="metric-card">
-            <h3 class="metric-title">Agent Network Status</h3>
-            <div class="metric-value" style="color: var(--primary)" id="dash-metric-agents">... Loading</div>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;" id="dash-metric-agents-desc">Checking agent states</p>
-          </div>
-        </div>
+        
+        <!-- Bento Grid Main Dashboard -->
+        <div class="bento-grid">
+          
+          <!-- Bento Item 1: Hero Welcome & Personalized AI Briefing (Span 8) -->
+          <div class="bento-card bento-hero-card bento-col-8">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <span class="ai-live-pulse" style="margin-bottom: 12px;">
+                  <span class="ai-live-pulse-dot"></span>
+                  AI Growth Operating System Active
+                </span>
+                <h1 style="font-size: 2rem; font-weight: 800; color: white; margin-bottom: 6px;">Good Evening, Shadi 👋</h1>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Here is your live business intelligence briefing for <strong id="bento-active-biz-name" style="color: #c7d2fe;">FitPulse AI</strong>.</p>
+              </div>
+              <div style="text-align: right; background: rgba(255,255,255,0.05); padding: 12px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1);">
+                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Opportunity Score</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: #10b981;">88 <span style="font-size: 1rem; color: var(--text-muted);">/100</span></div>
+              </div>
+            </div>
 
-        <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr; margin-top: 24px;">
-          <div class="card">
-            <h3 class="card-title">Priority Actions & Agent Recommendations</h3>
-            <div id="agent-priority-actions-list" style="display:flex; flex-direction:column; gap:12px; margin-top:16px;">
-              <div style="text-align: center; color: var(--text-muted); padding: 20px;">
+            <!-- Daily AI Briefing Metric Chips -->
+            <div class="briefing-chip-group">
+              <span class="briefing-chip">📈 <strong>+1,245</strong> Followers</span>
+              <span class="briefing-chip">⚡ <strong>7</strong> Active Campaigns</span>
+              <span class="briefing-chip">🤖 <strong>21</strong> AI Agent Tasks Done</span>
+              <span class="briefing-chip">🎯 <strong>3</strong> Competitor Movements</span>
+            </div>
+
+            <!-- Prompt Action Chips -->
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08);">
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Suggested Quick Actions</div>
+              <div class="prompt-chip-group">
+                <span class="prompt-chip" data-action="switchView" data-args="content-studio">✨ Generate 3 Instagram Reels</span>
+                <span class="prompt-chip" data-action="switchView" data-args="competitor-intelligence">🎯 Analyze Competitor Pricing</span>
+                <span class="prompt-chip" data-action="switchView" data-args="weekly-report">📝 Export Weekly Report</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bento Item 2: Revenue Snapshot & Forecast (Span 4) -->
+          <div class="bento-card bento-col-4" style="background: linear-gradient(135deg, rgba(6, 78, 59, 0.4), rgba(17, 24, 39, 0.8)); border-color: rgba(34, 197, 94, 0.3);">
+            <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6ee7b7; font-weight: 700; margin-bottom: 8px;">Revenue Forecast (90 Days)</div>
+            <div style="font-size: 2.2rem; font-weight: 800; color: white; font-family: var(--font-heading);">$124,500 <span style="font-size: 0.9rem; color: #34d399; vertical-align: middle;">↑ 18%</span></div>
+            <p style="font-size: 0.8rem; color: #a7f3d0; margin-top: 6px;">AI Confidence Score: 92%</p>
+            
+            <div style="margin-top: auto; padding-top: 16px;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #d1fae5; margin-bottom: 6px;">
+                <span>Target ARR Progress</span>
+                <span>$500K / $1M</span>
+              </div>
+              <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; overflow: hidden;">
+                <div style="width: 50%; height: 100%; background: linear-gradient(90deg, #10b981, #34d399); border-radius: 4px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bento Item 3: Business Health & KPI Grid (Span 6) -->
+          <div class="bento-card bento-col-6">
+            <h3 class="card-title" style="margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+              <span>Business Health Overview</span>
+              <span style="font-size: 0.75rem; color: var(--primary); cursor: pointer;" data-action="switchView" data-args="health-score">View Details →</span>
+            </h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+              <div style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Active Opportunities</div>
+                <div class="metric-value" id="dash-metric-opportunities" style="font-size: 1.4rem; margin-top: 4px;">... Loading</div>
+                <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;" id="dash-metric-opp-desc">Scanning market data</p>
+              </div>
+
+              <div style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                <div style="font-size: 0.75rem; color: #f87171;">Competitor Threats</div>
+                <div class="metric-value" id="dash-metric-threats" style="font-size: 1.4rem; color: #f87171; margin-top: 4px;">... Loading</div>
+                <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;" id="dash-metric-threats-desc">Scanning competitors</p>
+              </div>
+
+              <div style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Agent Network Status</div>
+                <div class="metric-value" id="dash-metric-agents" style="font-size: 1.4rem; color: var(--primary); margin-top: 4px;">... Loading</div>
+                <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;" id="dash-metric-agents-desc">Checking agent states</p>
+              </div>
+
+              <div style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Growth Memory Insights</div>
+                <div class="metric-value" style="font-size: 1.4rem; color: #8b5cf6; margin-top: 4px;">1,245</div>
+                <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">Data points connected</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bento Item 4: Priority Actions & Agent Recommendations (Span 6) -->
+          <div class="bento-card bento-col-6">
+            <h3 class="card-title" style="margin-bottom: 16px;">Priority Actions & Agent Recommendations</h3>
+            <div id="agent-priority-actions-list" style="display:flex; flex-direction:column; gap:10px;">
+              <div style="text-align: center; color: var(--text-muted); padding: 30px;">
                 Scanning for active agent recommendations...
               </div>
             </div>
           </div>
-          
-          <div class="card">
-            <h3 class="card-title">Business Health Graph</h3>
-            <div style="height:300px; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.2); border-radius:8px; margin-top:16px;">
-              <!-- Placeholder for Knowledge Graph Visualization -->
-              <div style="text-align:center; color:var(--text-muted);">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:12px; opacity:0.5;"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                <p>Knowledge Graph Active</p>
-                <p style="font-size:0.75rem;">Connecting 1,245 Data Points</p>
-              </div>
-            </div>
-          </div>
+
         </div>
       </section>
 
