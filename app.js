@@ -110,6 +110,7 @@ import { initCopilot } from './copilotModule.js';
 import { initBrandKit } from './brandKitModule.js';
 import { initOnboarding } from './onboardingModule.js';
 import { initWeeklyReport } from './weeklyReportModule.js';
+import { initCommandPalette } from './commandPaletteModule.js';
 
 import {
   initAuth,
@@ -208,6 +209,7 @@ export async function bootApp() {
   initBrandKit();
   initOnboarding();
   initWeeklyReport();
+  initCommandPalette();
   
   // Render initial page views
   renderAppSelectorDropdown();
