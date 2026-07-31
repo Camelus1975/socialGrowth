@@ -1365,45 +1365,99 @@ app.post('/api/copilot/chat', async (req, res) => {
     const { OpenAI } = require('openai');
     const openai = new OpenAI({ apiKey: config.OPENAI_API_KEY });
 
-    // Get business context if available
+    // Fetch comprehensive live business intelligence context
     let businessContext = '';
     if (appId) {
+      // 1. Fetch business profile
       const { data: biz } = await supabase
         .from('businesses')
-        .select('name, category, business_type, discovery_profile')
-        .eq('business_id', appId)
-        .single();
+        .select('*')
+        .or(`business_id.eq.${appId},id.eq.${appId}`)
+        .limit(1)
+        .maybeSingle();
 
       if (biz) {
-        businessContext = `\nActive Business: ${biz.name || 'Unknown'}
-Category: ${biz.category || biz.business_type || 'Unknown'}`;
+        businessContext += `\n=== LIVE BUSINESS INTELLIGENCE ===
+Business Name: ${biz.name || 'Unknown'}
+Category/Type: ${biz.category || biz.business_type || 'General'}
+Social Growth Score: ${biz.social_growth || 0}%
+Conversion Rate: ${biz.conversion_rate || 0}%`;
+
         if (biz.discovery_profile?.businessProfile) {
           const bp = biz.discovery_profile.businessProfile;
-          businessContext += `\nIndustry: ${bp.industry || 'N/A'}
+          businessContext += `
+Industry: ${bp.industry || 'N/A'}
 Summary: ${bp.summary || 'N/A'}
+Value Proposition: ${bp.valueProposition || 'N/A'}
 Target Audience: ${bp.targetAudience || 'N/A'}`;
         }
       }
+
+      // 2. Fetch scheduled/published post stats
+      const { data: posts } = await supabase
+        .from('scheduled_posts')
+        .select('status, platform, content, publish_at')
+        .eq('app_id', appId)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (posts && posts.length > 0) {
+        const publishedCount = posts.filter(p => p.status === 'published').length;
+        const scheduledCount = posts.filter(p => p.status === 'scheduled').length;
+        const draftCount = posts.filter(p => p.status === 'draft').length;
+
+        businessContext += `\n\n=== CONTENT & CALENDAR STATUS ===
+Total Tracked Posts: ${posts.length}
+Published Posts: ${publishedCount}
+Scheduled Posts: ${scheduledCount}
+Draft Posts: ${draftCount}
+Recent Post Snippets:
+${posts.slice(0, 3).map(p => `- [${p.platform.toUpperCase()}] (${p.status}): "${(p.content || '').substring(0, 80)}..."`).join('\n')}`;
+      } else {
+        businessContext += `\n\n=== CONTENT & CALENDAR STATUS ===\nNo posts recorded yet for this business.`;
+      }
+
+      // 3. Fetch recent AI Agent Operations
+      const { data: agentOps } = await supabase
+        .from('agent_operations')
+        .select('agent_name, task_goal, status, recommendation')
+        .eq('app_id', appId)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (agentOps && agentOps.length > 0) {
+        businessContext += `\n\n=== RECENT AI AGENT OPERATIONS ===
+${agentOps.map(op => `- ${op.agent_name} (${op.status}): "${op.task_goal}" -> Recommendation: ${op.recommendation || 'N/A'}`).join('\n')}`;
+      }
+
+      // 4. Fetch social metrics
+      const { data: metrics } = await supabase
+        .from('social_metrics')
+        .select('platform, metric_type, metric_value, fetched_at')
+        .eq('app_id', appId)
+        .order('fetched_at', { ascending: false })
+        .limit(10);
+
+      if (metrics && metrics.length > 0) {
+        businessContext += `\n\n=== SOCIAL ANALYTICS METRICS ===
+${metrics.map(m => `- [${m.platform}] ${m.metric_type}: ${JSON.stringify(m.metric_value).substring(0, 100)}`).join('\n')}`;
+      }
     }
 
-    const systemPrompt = `You are the AI Copilot for a Social Media Growth Operating System. You are a helpful, concise, and actionable assistant embedded in the app.
+    const systemPrompt = `You are the AI Copilot for the Social Media Growth Operating System. You are a helpful, knowledgeable, and actionable growth copilot embedded directly into the user's dashboard.
 
-Your capabilities:
-- Write social media posts for any platform (Twitter/X, Instagram, LinkedIn, TikTok, Facebook)
-- Analyze marketing strategies and suggest improvements
-- Answer questions about the app's features
-- Help users understand their analytics and metrics
-- Suggest content ideas and campaigns
+CRITICAL INSTRUCTION:
+- You DO HAVE direct real-time access to the user's business context, recent post counts, published/scheduled content status, and AI agent operations provided below.
+- NEVER claim you don't have access to their metrics or performance data. Use the real-time context provided below to directly answer questions like "how is my business doing?", "how many posts have I scheduled?", or "what are my agents working on?".
+- If post count or metrics are 0 or empty, explain that clearly and give specific actionable advice on how to start (e.g. "You haven't scheduled any posts yet. Let's create your first campaign in the Content Studio!").
 
-Current context:
-- User is currently viewing: "${currentView || 'unknown'}"${businessContext}
+Current Context:
+- User is currently viewing: "${currentView || 'unknown'}"${businessContext || '\nNo specific business selected.'}
 
 Rules:
-- Be concise. Keep responses under 200 words unless the user asks for details.
-- Use markdown formatting for readability.
-- When writing social media posts, always specify the platform and format appropriately.
-- If the user asks to schedule or publish, tell them to use the Social Calendar or Content Studio.
-- Be enthusiastic but professional.`;
+- Be concise and punchy. Keep responses under 200 words unless detailed advice is requested.
+- Use clean Markdown formatting with bullet points or bold text.
+- Be enthusiastic, strategic, and hyper-actionable.`;
 
     // Build message history
     const messages = [{ role: 'system', content: systemPrompt }];
