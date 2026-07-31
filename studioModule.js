@@ -318,15 +318,26 @@ export async function generateStudioContent() {
       pA.style.color = 'white';
       pA.style.lineHeight = '1.4';
       
+      const btnGroupA = createSafeElement('div');
+      btnGroupA.style.display = 'flex';
+      btnGroupA.style.gap = '8px';
+      btnGroupA.style.marginTop = '10px';
+
       const btnA = createSafeElement('button', ['btn', 'btn-primary'], 'Schedule this Variant');
-      btnA.style.marginTop = '10px';
       btnA.style.fontSize = '0.75rem';
       btnA.style.padding = '6px 12px';
       btnA.onclick = () => window.openSchedulePostModal(new Date().toISOString().split('T')[0], resultCopy.variant_a, platform, document.getElementById('studio-generated-image-url')?.value);
       
+      const pubA = createSafeElement('button', ['btn'], '⚡ Publish Now');
+      pubA.style.cssText = 'font-size: 0.75rem; padding: 6px 12px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer;';
+      pubA.onclick = () => publishNowDirectly(platform, resultCopy.variant_a, pubA);
+
+      btnGroupA.appendChild(btnA);
+      btnGroupA.appendChild(pubA);
+      
       cardA.appendChild(headA);
       cardA.appendChild(pA);
-      cardA.appendChild(btnA);
+      cardA.appendChild(btnGroupA);
       
       const cardB = createSafeElement('div');
       cardB.style.background = 'rgba(255,255,255,0.02)';
@@ -345,15 +356,26 @@ export async function generateStudioContent() {
       pB.style.color = 'white';
       pB.style.lineHeight = '1.4';
 
+      const btnGroupB = createSafeElement('div');
+      btnGroupB.style.display = 'flex';
+      btnGroupB.style.gap = '8px';
+      btnGroupB.style.marginTop = '10px';
+
       const btnB = createSafeElement('button', ['btn', 'btn-primary'], 'Schedule this Variant');
-      btnB.style.marginTop = '10px';
       btnB.style.fontSize = '0.75rem';
       btnB.style.padding = '6px 12px';
       btnB.onclick = () => window.openSchedulePostModal(new Date().toISOString().split('T')[0], resultCopy.variant_b, platform, document.getElementById('studio-generated-image-url')?.value);
       
+      const pubB = createSafeElement('button', ['btn'], '⚡ Publish Now');
+      pubB.style.cssText = 'font-size: 0.75rem; padding: 6px 12px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer;';
+      pubB.onclick = () => publishNowDirectly(platform, resultCopy.variant_b, pubB);
+
+      btnGroupB.appendChild(btnB);
+      btnGroupB.appendChild(pubB);
+
       cardB.appendChild(headB);
       cardB.appendChild(pB);
-      cardB.appendChild(btnB);
+      cardB.appendChild(btnGroupB);
       
       block.appendChild(cardA);
       block.appendChild(cardB);
@@ -374,19 +396,63 @@ export async function generateStudioContent() {
       p.style.color = 'white';
       p.style.lineHeight = '1.4';
       
+      const btnGroup = createSafeElement('div');
+      btnGroup.style.display = 'flex';
+      btnGroup.style.gap = '8px';
+      btnGroup.style.marginTop = '10px';
+
       const btn = createSafeElement('button', ['btn', 'btn-primary'], 'Schedule this Variant');
-      btn.style.marginTop = '10px';
       btn.style.fontSize = '0.75rem';
       btn.style.padding = '6px 12px';
       btn.onclick = () => window.openSchedulePostModal(new Date().toISOString().split('T')[0], resultCopy.variant_a, platform, document.getElementById('studio-generated-image-url')?.value);
 
+      const pub = createSafeElement('button', ['btn'], '⚡ Publish Now');
+      pub.style.cssText = 'font-size: 0.75rem; padding: 6px 12px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer;';
+      pub.onclick = () => publishNowDirectly(platform, resultCopy.variant_a, pub);
+
+      btnGroup.appendChild(btn);
+      btnGroup.appendChild(pub);
+
       card.appendChild(head);
       card.appendChild(p);
-      card.appendChild(btn);
+      card.appendChild(btnGroup);
       block.appendChild(card);
     }
   }
   showToast("Copy variations successfully created!", "success");
+}
+
+async function publishNowDirectly(platform, content, btnElement) {
+  if (!state.currentActiveApp) {
+    showToast("Please select a business first", "error");
+    return;
+  }
+  const originalText = btnElement.textContent;
+  btnElement.disabled = true;
+  btnElement.textContent = "Publishing...";
+  try {
+    const mediaUrl = document.getElementById('studio-generated-image-url')?.value;
+    const res = await requestApi('/api/social/publish', {
+      method: 'POST',
+      body: JSON.stringify({
+        appId: state.currentActiveApp,
+        platform: platform,
+        content: content,
+        mediaUrl: mediaUrl || null
+      })
+    });
+    if (res && res.success) {
+      btnElement.textContent = "✓ Published!";
+      btnElement.style.background = "#059669";
+      showToast(`Successfully published to ${platform}!`, "success");
+    } else {
+      throw new Error(res?.error || "Publish failed");
+    }
+  } catch (err) {
+    btnElement.disabled = false;
+    btnElement.textContent = originalText;
+    showToast(`Publishing failed: ${err.message}`, "error");
+  }
 }
 
 export async function recycleStudioContent() {

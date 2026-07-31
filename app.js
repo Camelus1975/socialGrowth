@@ -105,6 +105,8 @@ import {
 
 import { initMemoryEngine, searchGrowthMemoryUI } from './memoryModule.js';
 import { initCompetitorIntelligence } from './competitorIntelligenceModule.js';
+import { initAnalytics } from './analyticsModule.js';
+import { initCopilot } from './copilotModule.js';
 
 import {
   initAuth,
@@ -198,6 +200,8 @@ export async function bootApp() {
   initContentIntelligence();
   initHealthScore();
   initIndustryBenchmarks();
+  initAnalytics();
+  initCopilot();
   
   // Render initial page views
   renderAppSelectorDropdown();
@@ -441,7 +445,8 @@ export function switchView(viewId, element) {
     'customer-intelligence': { title: 'Customer Intelligence', desc: 'Analyze reviews, feedback, sentiment, churn risks, and opportunities.' },
     'reputation-center': { title: 'Reputation Management', desc: 'Monitor reviews, sentiment, and reputation score.' },
     'industry-benchmarks': { title: 'Industry Benchmarks', desc: 'Compare performance against industry averages.' },
-    'health-score': { title: 'Business Health Score', desc: 'Universal business health measurement across all categories.' }
+    'health-score': { title: 'Business Health Score', desc: 'Universal business health measurement across all categories.' },
+    'social-analytics': { title: 'Social Analytics Dashboard', desc: 'Real-time performance metrics, follower growth, and engagement insights.' }
   };
   
   if (viewTitles[viewId]) {

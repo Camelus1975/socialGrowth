@@ -1197,6 +1197,239 @@ app.post('/api/advertising/approve', async (req, res) => {
     res.json({ status: 'success', message: `Campaign ${campaignId} approved. (Offline mode)` });
   }
 });
+// ==========================================
+// SOCIAL ANALYTICS API ROUTES
+// ==========================================
+
+// Get cached social metrics for an app
+app.get('/api/analytics/social/:appId', async (req, res) => {
+  const { appId } = req.params;
+  if (!appId) return res.status(400).json({ error: 'appId required' });
+
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    let userSupabase = supabase;
+    if (token && token !== 'mock-supabase-jwt-token') {
+      userSupabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
+        global: { headers: { Authorization: `Bearer ${token}` } }
+      });
+    }
+
+    // Get metrics
+    const { data: metrics, error: metricsErr } = await userSupabase
+      .from('social_metrics')
+      .select('*')
+      .eq('app_id', appId)
+      .order('fetched_at', { ascending: false })
+      .limit(100);
+
+    // Get connected accounts
+    const { data: accounts, error: accountsErr } = await userSupabase
+      .from('social_accounts')
+      .select('id, platform, account_name, handle, health_status, created_at')
+      .eq('app_id', appId);
+
+    // Get recent published posts
+    const { data: posts, error: postsErr } = await userSupabase
+      .from('scheduled_posts')
+      .select('*')
+      .eq('app_id', appId)
+      .eq('status', 'published')
+      .order('publish_at', { ascending: false })
+      .limit(20);
+
+    res.json({
+      metrics: metrics || [],
+      accounts: accounts || [],
+      recentPosts: posts || [],
+      lastSync: metrics?.[0]?.fetched_at || null
+    });
+  } catch (err) {
+    console.error('[Analytics] Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Trigger immediate metrics refresh from Meta Graph API
+app.post('/api/analytics/social/:appId/refresh', async (req, res) => {
+  const { appId } = req.params;
+  if (!appId) return res.status(400).json({ error: 'appId required' });
+
+  try {
+    // Get Facebook account credentials
+    const { data: fbAccount } = await supabase
+      .from('social_accounts')
+      .select('handle, access_token_encrypted')
+      .eq('app_id', appId)
+      .eq('platform', 'facebook')
+      .eq('health_status', 'healthy')
+      .single();
+
+    if (!fbAccount || !fbAccount.access_token_encrypted) {
+      return res.json({ success: false, message: 'No connected Facebook account found. Connect via Integrations.' });
+    }
+
+    const accessToken = decryptToken(fbAccount.access_token_encrypted);
+    const pageId = fbAccount.handle;
+
+    // Fetch page insights
+    const insightsUrl = `https://graph.facebook.com/v19.0/${pageId}/insights?metric=page_impressions,page_engaged_users,page_fans&period=day&date_preset=last_30d&access_token=${accessToken}`;
+    const insightsRes = await fetch(insightsUrl);
+    const insightsData = await insightsRes.json();
+
+    if (insightsData.data) {
+      for (const metric of insightsData.data) {
+        await supabase.from('social_metrics').insert({
+          app_id: appId,
+          platform: 'facebook',
+          metric_type: metric.name,
+          metric_value: { values: metric.values, title: metric.title, description: metric.description },
+          period_start: metric.values?.[0]?.end_time,
+          period_end: metric.values?.[metric.values.length - 1]?.end_time,
+          fetched_at: new Date().toISOString()
+        });
+      }
+    }
+
+    // Fetch recent posts with engagement
+    const postsUrl = `https://graph.facebook.com/v19.0/${pageId}/posts?fields=id,message,created_time,shares,likes.summary(true),comments.summary(true)&limit=10&access_token=${accessToken}`;
+    const postsRes = await fetch(postsUrl);
+    const postsData = await postsRes.json();
+
+    if (postsData.data) {
+      await supabase.from('social_metrics').insert({
+        app_id: appId,
+        platform: 'facebook',
+        metric_type: 'post_performance',
+        metric_value: { posts: postsData.data },
+        fetched_at: new Date().toISOString()
+      });
+    }
+
+    res.json({ success: true, message: 'Metrics refreshed', metricsCount: insightsData.data?.length || 0 });
+  } catch (err) {
+    console.error('[Analytics] Refresh error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Direct publish endpoint (Publish Now)
+app.post('/api/social/publish', async (req, res) => {
+  const { appId, platform, content, mediaUrl } = req.body;
+  if (!appId || !content) return res.status(400).json({ error: 'appId and content required' });
+
+  try {
+    const { executeMetaPost, executeInstagramPost } = require('./apiExecutors');
+    let result;
+
+    if (platform === 'instagram') {
+      result = await executeInstagramPost(appId, content, mediaUrl);
+    } else {
+      result = await executeMetaPost(appId, content, mediaUrl);
+    }
+
+    // Also save to scheduled_posts with 'published' status for tracking
+    const token = req.headers.authorization?.split(' ')[1];
+    let userSupabase = supabase;
+    if (token && token !== 'mock-supabase-jwt-token') {
+      userSupabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
+        global: { headers: { Authorization: `Bearer ${token}` } }
+      });
+    }
+
+    await userSupabase.from('scheduled_posts').insert({
+      app_id: appId,
+      platform: platform || 'facebook',
+      content: content,
+      media_url: mediaUrl || null,
+      publish_at: new Date().toISOString(),
+      status: 'published',
+      external_id: result.external_id
+    });
+
+    res.json(result);
+  } catch (err) {
+    console.error('[Publish] Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ==========================================
+// AI COPILOT CHAT ENDPOINT
+// ==========================================
+app.post('/api/copilot/chat', async (req, res) => {
+  const { message, appId, currentView, history } = req.body;
+  if (!message) return res.status(400).json({ error: 'message required' });
+
+  try {
+    const { OpenAI } = require('openai');
+    const openai = new OpenAI({ apiKey: config.OPENAI_API_KEY });
+
+    // Get business context if available
+    let businessContext = '';
+    if (appId) {
+      const { data: biz } = await supabase
+        .from('businesses')
+        .select('name, category, business_type, discovery_profile')
+        .eq('business_id', appId)
+        .single();
+
+      if (biz) {
+        businessContext = `\nActive Business: ${biz.name || 'Unknown'}
+Category: ${biz.category || biz.business_type || 'Unknown'}`;
+        if (biz.discovery_profile?.businessProfile) {
+          const bp = biz.discovery_profile.businessProfile;
+          businessContext += `\nIndustry: ${bp.industry || 'N/A'}
+Summary: ${bp.summary || 'N/A'}
+Target Audience: ${bp.targetAudience || 'N/A'}`;
+        }
+      }
+    }
+
+    const systemPrompt = `You are the AI Copilot for a Social Media Growth Operating System. You are a helpful, concise, and actionable assistant embedded in the app.
+
+Your capabilities:
+- Write social media posts for any platform (Twitter/X, Instagram, LinkedIn, TikTok, Facebook)
+- Analyze marketing strategies and suggest improvements
+- Answer questions about the app's features
+- Help users understand their analytics and metrics
+- Suggest content ideas and campaigns
+
+Current context:
+- User is currently viewing: "${currentView || 'unknown'}"${businessContext}
+
+Rules:
+- Be concise. Keep responses under 200 words unless the user asks for details.
+- Use markdown formatting for readability.
+- When writing social media posts, always specify the platform and format appropriately.
+- If the user asks to schedule or publish, tell them to use the Social Calendar or Content Studio.
+- Be enthusiastic but professional.`;
+
+    // Build message history
+    const messages = [{ role: 'system', content: systemPrompt }];
+    if (history && Array.isArray(history)) {
+      history.slice(-10).forEach(msg => {
+        messages.push({ role: msg.role, content: msg.content });
+      });
+    }
+    messages.push({ role: 'user', content: message });
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: messages,
+      max_tokens: 500,
+      temperature: 0.7
+    });
+
+    const reply = completion.choices[0].message.content;
+    res.json({ reply, usage: completion.usage });
+
+  } catch (err) {
+    console.error('[Copilot] Error:', err);
+    res.status(500).json({ error: `Copilot error: ${err.message}` });
+  }
+});
+
 // Health check — actually verifies DB connection
 app.get('/health', async (req, res) => {
   let dbStatus = 'disconnected';
