@@ -1484,6 +1484,145 @@ Rules:
   }
 });
 
+// ==========================================
+// BRAND KIT API ENDPOINTS
+// ==========================================
+app.get('/api/brand-kit/:appId', async (req, res) => {
+  const { appId } = req.params;
+  if (!appId) return res.status(400).json({ error: 'appId required' });
+
+  try {
+    const { data, error } = await supabase
+      .from('brand_kits')
+      .select('*')
+      .eq('app_id', appId)
+      .maybeSingle();
+
+    if (error) throw error;
+    res.json({ brandKit: data || null });
+  } catch (err) {
+    console.error('[BrandKit GET] Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/brand-kit/:appId', async (req, res) => {
+  const { appId } = req.params;
+  const brandData = req.body;
+  if (!appId) return res.status(400).json({ error: 'appId required' });
+
+  try {
+    const { data, error } = await supabase
+      .from('brand_kits')
+      .upsert({
+        app_id: appId,
+        primary_color: brandData.primary_color || '#6366f1',
+        secondary_color: brandData.secondary_color || '#8b5cf6',
+        accent_color: brandData.accent_color || '#ec4899',
+        font_family: brandData.font_family || 'Inter',
+        logo_url: brandData.logo_url || null,
+        tone_of_voice: brandData.tone_of_voice || 'Professional',
+        target_persona: brandData.target_persona || '',
+        key_phrases: Array.isArray(brandData.key_phrases) ? brandData.key_phrases : (brandData.key_phrases ? brandData.key_phrases.split(',').map(s => s.trim()) : []),
+        forbidden_words: Array.isArray(brandData.forbidden_words) ? brandData.forbidden_words : (brandData.forbidden_words ? brandData.forbidden_words.split(',').map(s => s.trim()) : []),
+        visual_style: brandData.visual_style || 'Modern Minimalist',
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'app_id' })
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json({ success: true, brandKit: data });
+  } catch (err) {
+    console.error('[BrandKit POST] Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ==========================================
+// WEEKLY REPORT API ENDPOINT
+// ==========================================
+app.get('/api/reports/weekly/:appId', async (req, res) => {
+  const { appId } = req.params;
+  if (!appId) return res.status(400).json({ error: 'appId required' });
+
+  try {
+    // 1. Fetch business info
+    const { data: biz } = await supabase
+      .from('businesses')
+      .select('name, category, business_type, social_growth, conversion_rate')
+      .or(`business_id.eq.${appId},id.eq.${appId}`)
+      .limit(1)
+      .maybeSingle();
+
+    // 2. Fetch posts published in the last 7 days
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: posts } = await supabase
+      .from('scheduled_posts')
+      .select('*')
+      .eq('app_id', appId)
+      .gte('created_at', sevenDaysAgo);
+
+    const published = (posts || []).filter(p => p.status === 'published');
+    const scheduled = (posts || []).filter(p => p.status === 'scheduled');
+    const totalPosts = (posts || []).length;
+
+    // 3. Fetch agent operations from the past week
+    const { data: agentOps } = await supabase
+      .from('agent_operations')
+      .select('*')
+      .eq('app_id', appId)
+      .gte('created_at', sevenDaysAgo);
+
+    // 4. Compute growth health score
+    let growthScore = 75;
+    if (published.length > 5) growthScore += 10;
+    if (scheduled.length > 3) growthScore += 5;
+    if (agentOps && agentOps.length > 5) growthScore += 5;
+    growthScore = Math.min(98, growthScore);
+
+    // 5. Generate AI CMO executive commentary
+    let aiSummary = "Great activity this week! Your content output remains consistent across channels.";
+    try {
+      const { OpenAI } = require('openai');
+      const openai = new OpenAI({ apiKey: config.OPENAI_API_KEY });
+      const promptRes = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: 'You are the CMO Agent generating a weekly growth executive summary for a startup founder. Keep it to 3 bullet points, punchy, professional, and actionable.' },
+          { role: 'user', content: `Business: ${biz?.name || appId}\nPublished Posts: ${published.length}\nScheduled Posts: ${scheduled.length}\nAgent Tasks Completed: ${agentOps?.length || 0}` }
+        ],
+        max_tokens: 250
+      });
+      aiSummary = promptRes.choices[0].message.content;
+    } catch (aiErr) {
+      console.warn('[WeeklyReport] OpenAI summary fallback:', aiErr.message);
+    }
+
+    res.json({
+      success: true,
+      businessName: biz?.name || appId,
+      weekRange: `Week of ${new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toLocaleDateString()} - ${new Date().toLocaleDateString()}`,
+      growthScore,
+      publishedCount: published.length,
+      scheduledCount: scheduled.length,
+      totalTracked: totalPosts,
+      agentOpsCount: agentOps?.length || 0,
+      topPost: published[0] || posts?.[0] || null,
+      aiSummary,
+      recommendations: [
+        "Increase Instagram Reel frequency from 2x to 4x weekly",
+        "Run Content Recycler on top-performing LinkedIn post",
+        "Launch A/B copy test in Content Studio for next week's campaign"
+      ]
+    });
+
+  } catch (err) {
+    console.error('[WeeklyReport] Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Health check — actually verifies DB connection
 app.get('/health', async (req, res) => {
   let dbStatus = 'disconnected';

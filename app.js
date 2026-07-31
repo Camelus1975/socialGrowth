@@ -107,6 +107,9 @@ import { initMemoryEngine, searchGrowthMemoryUI } from './memoryModule.js';
 import { initCompetitorIntelligence } from './competitorIntelligenceModule.js';
 import { initAnalytics } from './analyticsModule.js';
 import { initCopilot } from './copilotModule.js';
+import { initBrandKit } from './brandKitModule.js';
+import { initOnboarding } from './onboardingModule.js';
+import { initWeeklyReport } from './weeklyReportModule.js';
 
 import {
   initAuth,
@@ -202,6 +205,9 @@ export async function bootApp() {
   initIndustryBenchmarks();
   initAnalytics();
   initCopilot();
+  initBrandKit();
+  initOnboarding();
+  initWeeklyReport();
   
   // Render initial page views
   renderAppSelectorDropdown();
@@ -446,7 +452,9 @@ export function switchView(viewId, element) {
     'reputation-center': { title: 'Reputation Management', desc: 'Monitor reviews, sentiment, and reputation score.' },
     'industry-benchmarks': { title: 'Industry Benchmarks', desc: 'Compare performance against industry averages.' },
     'health-score': { title: 'Business Health Score', desc: 'Universal business health measurement across all categories.' },
-    'social-analytics': { title: 'Social Analytics Dashboard', desc: 'Real-time performance metrics, follower growth, and engagement insights.' }
+    'social-analytics': { title: 'Social Analytics Dashboard', desc: 'Real-time performance metrics, follower growth, and engagement insights.' },
+    'brand-kit': { title: 'Brand Kit & Identity', desc: 'Manage visual identity, colors, fonts, tone of voice, and prompt rules for AI agents.' },
+    'weekly-report': { title: 'Weekly AI Executive Summary', desc: 'Automated weekly performance score, content velocity, and CMO recommendations.' }
   };
   
   if (viewTitles[viewId]) {

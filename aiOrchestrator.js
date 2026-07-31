@@ -167,6 +167,30 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
         businessContext = `Business Name: ${bizData?.name || appId}\nCategory: ${bizData?.category || businessType}\n`;
         await pushLog("System", "No discovery profile found. Run Business Discovery first for better results.");
       }
+      // Fetch Brand Kit rules if configured
+      try {
+        const { data: brandKit } = await supabase
+          .from('brand_kits')
+          .select('*')
+          .eq('app_id', appId)
+          .maybeSingle();
+
+        if (brandKit) {
+          businessContext += `
+=== BRAND KIT & VOICE DIRECTIVES ===
+Tone of Voice: ${brandKit.tone_of_voice || 'Professional'}
+Visual Image Style: ${brandKit.visual_style || 'Modern Minimalist'}
+Target Persona: ${brandKit.target_persona || 'N/A'}
+Primary Brand Color: ${brandKit.primary_color || '#6366f1'}
+Key Phrases to Include: ${(brandKit.key_phrases || []).join('; ') || 'N/A'}
+Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
+===
+`;
+          await pushLog("System", `Enforcing Brand Kit directives (${brandKit.tone_of_voice} tone, ${brandKit.visual_style} style).`);
+        }
+      } catch (bkErr) {
+        /* ignore brand kit fetch error */
+      }
     } catch (e) {
       await pushLog("System", "Could not fetch business profile. Using basic context.");
     }
