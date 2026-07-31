@@ -125,7 +125,8 @@ import {
 import { 
   initAppManager, 
   fetchUserApps, 
-  renderAppSelectorDropdown 
+  renderAppSelectorDropdown,
+  setSelectActiveAppCallback
 } from './appManager.js';
 import { initBusinessDiscovery } from './businessDiscoveryModule.js';
 import { initHealthScore } from './healthScoreModule.js';
@@ -180,6 +181,7 @@ export async function bootApp() {
   initAdvertisingModule();
 
   // Initialize all view modules
+  setSelectActiveAppCallback(selectActiveApp);
   initAppManager();
   initBusinessDiscovery();
   initDashboard();

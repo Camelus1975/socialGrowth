@@ -28,7 +28,7 @@ import { initCopilot } from './copilotModule.js';
 import { initBrandKit } from './brandKitModule.js';
 import { initOnboarding } from './onboardingModule.js';
 import { initWeeklyReport } from './weeklyReportModule.js';
-import { initAppManager, selectActiveApp } from './appManager.js';
+import { initAppManager, setSelectActiveAppCallback } from './appManager.js';
 import { initHealthScore } from './healthScoreModule.js';
 import { initIndustryBenchmarks } from './industryBenchmarkModule.js';
 
@@ -37,6 +37,9 @@ import { initCommandPaletteV2 } from './commandPalette_v2.js';
 // Boot application shell V2
 window.addEventListener('DOMContentLoaded', async () => {
   console.log("OS V2 Booting...");
+  
+  // Set the application selection callback
+  setSelectActiveAppCallback(selectActiveApp);
   
   // Bind UI interactive events
   setupUIEventListeners();
@@ -182,3 +185,43 @@ window.generateStudioContent = function() {
   }
   generateStudioContent(promptInput);
 };
+
+// Select Active Application & Refresh views
+export function selectActiveApp(appId) {
+  if (!appId || !state.appsData[appId]) {
+    state.setActiveApp(null);
+    const activeName = document.getElementById('active-app-name');
+    const activeDot = document.getElementById('active-app-dot');
+    if (activeName) activeName.textContent = "No App Selected";
+    if (activeDot) activeDot.style.background = "#666";
+    
+    const sidebarName = document.getElementById('sidebar-app-name');
+    if (sidebarName) sidebarName.textContent = "No App Selected";
+    return;
+  }
+  
+  state.setActiveApp(appId);
+  const app = state.appsData[appId];
+  
+  // Update Selector Button
+  const activeName = document.getElementById('active-app-name');
+  const activeDot = document.getElementById('active-app-dot');
+  if (activeName) activeName.textContent = app.name;
+  if (activeDot) activeDot.style.background = app.logoColor;
+  
+  // Update Sidebar Footer Active App Name
+  const sidebarName = document.getElementById('sidebar-app-name');
+  if (sidebarName) sidebarName.textContent = app.name;
+  
+  // Close Dropdown
+  const dropdown = document.getElementById('app-selector-dropdown');
+  if (dropdown) dropdown.classList.remove('active');
+  
+  // Refresh layout data
+  refreshViewData();
+}
+
+export function refreshViewData() {
+  renderDashboard();
+  renderCalendarView();
+}

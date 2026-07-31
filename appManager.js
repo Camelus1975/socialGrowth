@@ -1,8 +1,12 @@
 // App Manager Module - Handles dynamic App creation and rendering
 import { state } from './state.js';
 import { API_URL, showToast, closeModal, requestApi } from './common.js';
-import { selectActiveApp } from './app.js';
 import { getTemplateForBusiness } from './industryTemplates.js';
+
+let selectActiveAppCallback = null;
+export function setSelectActiveAppCallback(cb) {
+  selectActiveAppCallback = cb;
+}
 
 import { getSupabaseClient } from './auth.js';
 
@@ -45,7 +49,9 @@ export function renderAppSelectorDropdown() {
     selectDiv.style.flex = '1';
     selectDiv.style.display = 'flex';
     selectDiv.style.alignItems = 'center';
-    selectDiv.onclick = () => selectActiveApp(app.id);
+    selectDiv.onclick = () => {
+      if (selectActiveAppCallback) selectActiveAppCallback(app.id);
+    };
     
     selectDiv.innerHTML = `
       <span class="app-dot" style="background: ${app.logoColor || '#666'}; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px;"></span>
@@ -154,7 +160,7 @@ export function initAppManager() {
       renderAppSelectorDropdown();
       
       // Select the new app
-      selectActiveApp(appId);
+      if (selectActiveAppCallback) selectActiveAppCallback(appId);
       
       // Reset form and close modal
       nameInput.value = '';
@@ -239,9 +245,9 @@ export async function deleteBusiness(appId) {
       const keys = Object.keys(state.appsData);
       if (state.currentActiveApp === appId) {
         if (keys.length > 0) {
-          selectActiveApp(keys[0]);
+          if (selectActiveAppCallback) selectActiveAppCallback(keys[0]);
         } else {
-          selectActiveApp(null);
+          if (selectActiveAppCallback) selectActiveAppCallback(null);
         }
       }
       
