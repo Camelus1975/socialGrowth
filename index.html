@@ -150,5 +150,46 @@
   </div>
 
   <script type="module" src="/app_v3.js"></script>
+
+  <!-- Profile Modal -->
+  <div id="user-profile-modal" class="custom-modal-overlay">
+    <div class="custom-modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 style="color:white; margin:0;">Profile Settings</h3>
+        <button class="btn btn-secondary" style="padding:6px; border-radius:50%;" data-action="closeModal" data-args="user-profile-modal">✕</button>
+      </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:20px; align-items:center;">
+        <input type="text" id="profile-modal-name" class="input-field" placeholder="Enter your name">
+      </div>
+      <div class="modal-footer" style="justify-content: flex-end;">
+        <button class="btn btn-secondary" data-action="closeModal" data-args="user-profile-modal">Cancel</button>
+        <button class="btn btn-primary" id="save-profile-btn" data-action="saveUserProfile">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="custom-modal-overlay">
+    <div class="custom-modal-content">
+      <div class="modal-header">
+        <h3 style="color:white; margin:0;">Global Settings</h3>
+        <button class="btn btn-secondary" style="padding:6px; border-radius:50%;" data-action="closeModal" data-args="settings-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+          <span>Theme Mode</span>
+          <button class="btn btn-secondary" data-action="toggleThemeMode">Toggle Dark/Light</button>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span>Session</span>
+          <button class="btn btn-secondary" data-action="simulateSbAuthSignout" style="color: #f87171;">Sign Out</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-action="closeModal" data-args="settings-modal">Done</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

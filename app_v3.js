@@ -1,5 +1,5 @@
-import { initAuth, onAuthStateChange } from './auth.js';
-import { showToast } from './common.js';
+import { initAuth, onAuthStateChange, logout, saveUserProfile } from './auth.js';
+import { showToast, openModal, closeModal, toggleThemeMode } from './common.js';
 
 // Social Growth AI - V3 Architecture Entry Point
 
@@ -28,6 +28,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     document.getElementById('user-header-name').textContent = userName;
     document.getElementById('user-header-avatar').src = avatarUrl;
+    
+    // Auto-fill profile modal if available
+    const profileNameInput = document.getElementById('profile-modal-name');
+    if (profileNameInput) profileNameInput.value = userName;
     
     populateHomeFeed();
   };
@@ -93,8 +97,19 @@ function setupUIEventListeners() {
         }
         break;
       case 'openModal':
-        // Legacy interop or custom modal logic
-        console.log('Open modal:', args[0]);
+        openModal(args[0]);
+        break;
+      case 'closeModal':
+        closeModal(args[0]);
+        break;
+      case 'toggleThemeMode':
+        toggleThemeMode();
+        break;
+      case 'simulateSbAuthSignout':
+        logout();
+        break;
+      case 'saveUserProfile':
+        saveUserProfile();
         break;
     }
   });
