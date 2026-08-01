@@ -1,4 +1,6 @@
 // Social Growth AI — Rebuilt V2 Application Core Router (ES6 Module)
+window.__V2_OS__ = true;
+
 import { state } from './state.js';
 import { 
   showToast, 
@@ -201,18 +203,6 @@ function setupUIEventListeners() {
     switch (action) {
       case 'switchView':
         switchWorkspace(args[0], target);
-        break;
-      case 'openModal':
-        openModal(args[0]);
-        break;
-      case 'closeModal':
-        closeModal(args[0]);
-        break;
-      case 'toggleAppSelectorDropdown':
-        document.getElementById('app-selector-dropdown')?.classList.toggle('active');
-        break;
-      case 'toggleThemeMode':
-        toggleThemeMode();
         break;
     }
   });

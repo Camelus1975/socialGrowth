@@ -1097,6 +1097,11 @@ function callFunction(name, args, element, event) {
   };
   
   const fn = functionMap[name];
+  
+  if (window.__V2_OS__ && name === 'switchView') {
+    return; // V2 OS handles this natively with switchWorkspace
+  }
+  
   if (typeof fn === 'function') {
     fn.apply(null, args);
   } else {

@@ -38,6 +38,10 @@ export function renderChecklistWidget() {
         widget.style.display = 'none';
         return;
     }
+    if (localStorage.getItem('hideOnboardingWidget') === 'true') {
+        widget.style.display = 'none';
+        return;
+    }
     
     widget.style.display = 'block';
 
@@ -101,9 +105,68 @@ export function renderChecklistWidget() {
         renderChecklistWidget();
     };
     
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕';
+    Object.assign(closeBtn.style, { background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '14px', opacity: '0.6' });
+    closeBtn.onclick = () => {
+        widget.style.display = 'none';
+        // Optional: save state to localStorage so it stays closed on reload
+        localStorage.setItem('hideOnboardingWidget', 'true');
+    };
+    
+    const controlsContainer = document.createElement('div');
+    Object.assign(controlsContainer.style, { display: 'flex', gap: '8px', alignItems: 'center' });
+    controlsContainer.appendChild(toggleBtn);
+    controlsContainer.appendChild(closeBtn);
+    
     header.appendChild(titleContainer);
-    header.appendChild(toggleBtn);
+    header.appendChild(controlsContainer);
     container.appendChild(header);
+    
+    // Make widget draggable
+    let isDragging = false;
+    let currentX;
+    let currentY;
+    let initialX;
+    let initialY;
+    let xOffset = 0;
+    let yOffset = 0;
+
+    header.style.cursor = 'grab';
+
+    header.addEventListener('mousedown', dragStart);
+    document.addEventListener('mouseup', dragEnd);
+    document.addEventListener('mousemove', drag);
+
+    function dragStart(e) {
+      if (e.target === toggleBtn || e.target === closeBtn) return;
+      initialX = e.clientX - xOffset;
+      initialY = e.clientY - yOffset;
+      isDragging = true;
+      header.style.cursor = 'grabbing';
+    }
+
+    function dragEnd(e) {
+      initialX = currentX;
+      initialY = currentY;
+      isDragging = false;
+      header.style.cursor = 'grab';
+    }
+
+    function drag(e) {
+      if (isDragging) {
+        e.preventDefault();
+        currentX = e.clientX - initialX;
+        currentY = e.clientY - initialY;
+        xOffset = currentX;
+        yOffset = currentY;
+        setTranslate(currentX, currentY, container);
+      }
+    }
+
+    function setTranslate(xPos, yPos, el) {
+      el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+    }
     
     if (!isChecklistMinimized) {
         const progressBarContainer = document.createElement('div');

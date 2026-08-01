@@ -1,5 +1,5 @@
 // App Founder Growth Suite - Supabase Authentication Module
-import { API_URL, showToast } from './common.js';
+import { API_URL, showToast, closeModal } from './common.js';
 
 // Initialize Supabase client from CDN (loaded in index.html)
 const SUPABASE_URL = window.__SUPABASE_URL__ || '';
@@ -227,5 +227,59 @@ export function toggleAuthMode() {
       loginForm.style.display = 'none';
       signupForm.style.display = 'block';
     }
+  }
+}
+
+export async function saveUserProfile() {
+  const saveBtn = document.getElementById('save-profile-btn');
+  if (!saveBtn) return;
+  const originalText = saveBtn.textContent;
+  saveBtn.textContent = 'Saving...';
+  saveBtn.disabled = true;
+  
+  const newName = document.getElementById('profile-modal-name')?.value || '';
+  const avatarPreview = document.getElementById('profile-modal-avatar-preview');
+  let newAvatarUrl = avatarPreview ? avatarPreview.src : '';
+  
+  try {
+    if (window.selectedAvatarFile && window.supabaseClient) {
+      const file = window.selectedAvatarFile;
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}_avatar.${fileExt}`;
+      const filePath = `${fileName}`;
+      
+      const { data, error } = await window.supabaseClient.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+        
+      if (error) throw error;
+      
+      const { data: { publicUrl } } = window.supabaseClient.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+        
+      newAvatarUrl = publicUrl;
+    }
+    
+    if (window.supabaseClient) {
+      const { error } = await window.supabaseClient.auth.updateUser({
+        data: { full_name: newName, avatar_url: newAvatarUrl }
+      });
+      if (error) throw error;
+    }
+    
+    const headerName = document.getElementById('user-header-name');
+    const avatar = document.getElementById('user-header-avatar');
+    if (headerName) headerName.textContent = newName;
+    if (avatar) avatar.src = newAvatarUrl;
+    
+    showToast('Profile updated successfully!', 'success');
+    closeModal('user-profile-modal');
+  } catch (err) {
+    console.error('Error saving profile:', err);
+    showToast('Error saving profile.', 'error');
+  } finally {
+    saveBtn.textContent = originalText;
+    saveBtn.disabled = false;
   }
 }
