@@ -107,7 +107,7 @@ function switchWorkspace(workspaceId) {
 // Data Population Helpers
 function populateHomeFeed() {
   const feed = document.getElementById('action-feed-container');
-  feed.innerHTML = \
+  feed.innerHTML = `
     <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; margin-bottom: 16px;">
       <h3 style="margin-top:0; color: #f87171;">[Urgent] Approve your content for this week</h3>
       <p style="color: #9ca3af;">The AI has generated 5 posts based on your brand guidelines.</p>
@@ -118,5 +118,5 @@ function populateHomeFeed() {
       <p style="color: #9ca3af;">3 high-value leads asked for pricing.</p>
       <button class="btn btn-primary">Reply to Leads</button>
     </div>
-  \;
+  `;
 }
