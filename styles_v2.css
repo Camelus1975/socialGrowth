@@ -44,6 +44,14 @@
   --transition-cubic: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+body.light-mode {
+  --bg-deep: #f3f4f6;
+  --bg-sidebar: rgba(255, 255, 255, 0.7);
+  --border-glass: rgba(0, 0, 0, 0.08);
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

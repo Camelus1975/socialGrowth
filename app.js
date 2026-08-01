@@ -833,8 +833,11 @@ export async function saveUserProfile() {
     
     // Update user_metadata via Supabase Auth if available
     if (window.supabaseClient) {
+      const updateData = { full_name: newName };
+      if (newAvatarUrl) updateData.avatar_url = newAvatarUrl;
+      
       const { error } = await window.supabaseClient.auth.updateUser({
-        data: { full_name: newName, avatar_url: newAvatarUrl }
+        data: updateData
       });
       if (error) throw error;
     }
@@ -843,7 +846,7 @@ export async function saveUserProfile() {
     const headerName = document.getElementById('user-header-name');
     const avatar = document.getElementById('user-header-avatar');
     if (headerName) headerName.textContent = newName;
-    if (avatar) avatar.src = newAvatarUrl;
+    if (avatar && newAvatarUrl) avatar.src = newAvatarUrl;
     
     showToast('Profile updated successfully!', 'success');
     closeModal('user-profile-modal');
