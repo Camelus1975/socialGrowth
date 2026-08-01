@@ -10,11 +10,11 @@ export async function initGrowthV3() {
   setTimeout(() => {
     kpiAudience.textContent = '142,000';
     kpiEngagement.textContent = '4.2%';
-    kpiRevenue.textContent = ',450';
+    kpiRevenue.textContent = '$12,450';
     
-    analysisText.innerHTML = \
+    analysisText.innerHTML = `
       Your revenue is up because your LinkedIn posts are converting at 2x the normal rate. We should double down on LinkedIn.<br><br>
       <button class="btn btn-secondary" style="margin-top:12px;">Generate 5 more LinkedIn posts</button>
-    \;
+    `;
   }, 1200);
 }

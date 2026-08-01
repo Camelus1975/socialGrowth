@@ -19,15 +19,15 @@ export function initInboxV3() {
       el.style.cursor = 'pointer';
       el.style.background = t.unread ? 'rgba(255,255,255,0.02)' : 'transparent';
       
-      el.innerHTML = \
+      el.innerHTML = `
         <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-          <strong style="color:var(--text-main);">\</strong>
-          <span style="font-size:0.8rem; color:var(--text-muted);">\</span>
+          <strong style="color:var(--text-main);">${t.user}</strong>
+          <span style="font-size:0.8rem; color:var(--text-muted);">${t.platform}</span>
         </div>
         <div style="font-size:0.9rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-          \
+          ${t.preview}
         </div>
-      \;
+      `;
       
       el.addEventListener('click', () => {
         t.unread = false;
@@ -40,14 +40,14 @@ export function initInboxV3() {
   }
 
   function renderActiveThread(thread) {
-    activeThread.innerHTML = \
+    activeThread.innerHTML = `
       <div style="padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between;">
-        <h2>\ <span style="font-size:1rem; color:var(--text-muted); font-weight:normal;">on \</span></h2>
+        <h2>${thread.user} <span style="font-size:1rem; color:var(--text-muted); font-weight:normal;">on ${thread.platform}</span></h2>
         <button class="btn btn-secondary">Mark Resolved</button>
       </div>
       <div style="padding: 24px; flex: 1; overflow-y:auto; display:flex; flex-direction:column; gap:16px;">
         <div style="align-self:flex-start; background:rgba(255,255,255,0.05); padding:16px; border-radius:12px; max-width:80%;">
-          \
+          ${thread.preview}
         </div>
         
         <div style="margin-top: 24px;">
@@ -62,16 +62,16 @@ export function initInboxV3() {
           </div>
         </div>
       </div>
-    \;
+    `;
   }
 
   // Initial render
   renderList();
   
   // Empty state for active thread
-  activeThread.innerHTML = \
+  activeThread.innerHTML = `
     <div style="display:flex; align-items:center; justify-content:center; height:100%; color:var(--text-muted);">
       Select a thread to view
     </div>
-  \;
+  `;
 }

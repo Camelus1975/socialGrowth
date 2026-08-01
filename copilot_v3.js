@@ -76,7 +76,7 @@ function appendMessage(role, text) {
   
   // Basic markdown to HTML
   let formattedText = text.replace(/\n/g, '<br>');
-  formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>\</strong>');
+  formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   msgDiv.innerHTML = formattedText;
   
   history.appendChild(msgDiv);
