@@ -11,6 +11,7 @@ const { Queue } = require('bullmq');
 const Redis = require('ioredis');
 const config = require('./config');
 const aiGatewayRouter = require('./aiGatewayRouter');
+const agentRouter = require('./agentRouter');
 const { processDiscoveryJob } = require('./discoveryEngine');
 
 
@@ -173,6 +174,7 @@ app.use('/api', authenticate);
 const billingRouter = require('./billingRouter');
 app.use('/api/billing', billingRouter);
 app.use('/api/ai-gateway', aiGatewayRouter);
+app.use('/api/agent', agentRouter);
 
 // Public endpoint: expose Supabase config for frontend auth (anon key is public by design)
 app.get('/api/auth/config', (req, res) => {
