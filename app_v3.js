@@ -4,6 +4,7 @@ import { initCopilotV3 } from './copilot_v3.js';
 import { initGrowthV3 } from './growth_v3.js';
 import { initInboxV3 } from './inbox_v3.js';
 import { initCalendarV3 } from './calendar_v3.js';
+import { initWorkspaceV3, initiateAddBusiness } from './workspace_v3.js';
 
 // Social Growth AI - V3 Architecture Entry Point
 
@@ -24,6 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initGrowthV3();
   initInboxV3();
   initCalendarV3();
+  initWorkspaceV3();
   
   const loginScreen = document.getElementById('auth-login-screen');
   const appContainer = document.getElementById('app-container');
@@ -103,7 +105,7 @@ function setupUIEventListeners() {
           target.classList.add('active');
         } else {
           // If FAB triggered it, highlight copilot nav item
-          document.querySelector('.nav-item[data-args=\"copilot\"]').classList.add('active');
+          document.querySelector('.nav-item[data-args="copilot"]').classList.add('active');
         }
         break;
       case 'openModal':
@@ -120,6 +122,9 @@ function setupUIEventListeners() {
         break;
       case 'saveUserProfile':
         saveUserProfile();
+        break;
+      case 'initiateAddBusiness':
+        initiateAddBusiness();
         break;
     }
   });

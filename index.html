@@ -32,6 +32,16 @@
     <nav class="sidebar">
       <div class="sidebar-header">
         <div class="logo">▲</div>
+        <div class="workspace-selector" id="workspace-selector-btn">
+          <span style="flex:1" id="active-workspace-name">My Brand</span>
+          <span style="font-size:0.7rem; color:var(--text-muted);">▼</span>
+          <div class="workspace-dropdown-menu" id="workspace-dropdown-menu">
+            <!-- Businesses injected here -->
+            <div class="workspace-dropdown-item" data-action="initiateAddBusiness">
+              <span style="color:#2dd4bf;">+ Add New Business</span>
+            </div>
+          </div>
+        </div>
       </div>
       
       <ul class="nav-links">
