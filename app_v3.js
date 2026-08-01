@@ -16,27 +16,40 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupUIEventListeners();
   
   const loginScreen = document.getElementById('auth-login-screen');
-  const appLayout = document.getElementById('app-layout');
+  const appContainer = document.getElementById('app-container');
   
+  const handleUserLogin = (user) => {
+    state.user = user;
+    loginScreen.style.display = 'none';
+    appContainer.style.display = 'flex';
+    
+    const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Founder';
+    const avatarUrl = user.user_metadata?.avatar_url || 'https://i.pravatar.cc/150?u=' + user.id;
+    
+    document.getElementById('user-header-name').textContent = userName;
+    document.getElementById('user-header-avatar').src = avatarUrl;
+    
+    populateHomeFeed();
+  };
+
+  const handleUserLogout = () => {
+    loginScreen.style.display = 'flex';
+    appContainer.style.display = 'none';
+  };
+
   // Initialize Supabase
-  await initAuth();
+  const session = await initAuth();
+  if (session && session.user) {
+    handleUserLogin(session.user);
+  } else {
+    handleUserLogout();
+  }
   
-  onAuthStateChange((user) => {
-    if (user) {
-      state.user = user;
-      loginScreen.style.display = 'none';
-      appLayout.style.display = 'flex';
-      
-      const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Founder';
-      const avatarUrl = user.user_metadata?.avatar_url || 'https://i.pravatar.cc/150?u=' + user.id;
-      
-      document.getElementById('user-header-name').textContent = userName;
-      document.getElementById('user-header-avatar').src = avatarUrl;
-      
-      populateHomeFeed();
+  onAuthStateChange((session) => {
+    if (session && session.user) {
+      handleUserLogin(session.user);
     } else {
-      loginScreen.style.display = 'flex';
-      appLayout.style.display = 'none';
+      handleUserLogout();
     }
   });
 
