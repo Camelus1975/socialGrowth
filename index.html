@@ -3,424 +3,152 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Social Growth AI — Growth Operating System</title>
-  <link rel="stylesheet" href="/styles_v2.css">
+  <title>Social Growth AI — Action Feed & Copilot</title>
+  <link rel="stylesheet" href="/styles_v3.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
-  <!-- Premium Auth Layer -->
-  <div id="auth-login-screen" style="display:flex; position:fixed; inset:0; z-index:9999; background:#040711; align-items:center; justify-content:center; font-family:'Inter',sans-serif;">
-    <div style="background:rgba(15,23,42,0.85); backdrop-filter:blur(30px); border:1px solid rgba(255,255,255,0.08); border-radius:24px; padding:48px; width:440px; max-width:92vw; box-shadow:0 25px 60px rgba(0,0,0,0.6);">
-      <div style="text-align:center; margin-bottom:32px;">
-        <div style="width:60px; height:60px; background:linear-gradient(135deg, #6366f1, #8b5cf6); border-radius:16px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:26px; color:white; font-weight:800; box-shadow:0 0 30px rgba(99,102,241,0.4);">▲</div>
-        <h1 style="color:white; font-size:1.6rem; font-weight:800; font-family:'Outfit'; margin:0;">Social Growth AI</h1>
-        <p style="color:rgba(148,163,184,0.6); font-size:0.85rem; margin-top:4px;">Growth Operating System</p>
+  <!-- Premium Auth Layer (Reused from previous V2 but simplified) -->
+  <div id="auth-login-screen" class="auth-overlay" style="display:flex;">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">▲</div>
+        <h1>Social Growth AI</h1>
+        <p>Log in to access your Copilot</p>
       </div>
-
-      <div id="auth-error-message" style="color:#f87171; font-size:0.8rem; text-align:center; min-height:20px; margin-bottom:8px;"></div>
-
-      <div id="auth-login-form">
-        <div style="margin-bottom:18px;">
-          <label style="display:block; color:rgba(148,163,184,0.8); font-size:0.75rem; font-weight:600; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Email Address</label>
-          <input type="email" id="auth-email" placeholder="founder@company.com" style="width:100%; padding:14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; color:white; font-size:0.9rem; outline:none;">
-        </div>
-        <div style="margin-bottom:24px;">
-          <label style="display:block; color:rgba(148,163,184,0.8); font-size:0.75rem; font-weight:600; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Password</label>
-          <input type="password" id="auth-password" placeholder="••••••••" style="width:100%; padding:14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; color:white; font-size:0.9rem; outline:none;">
-        </div>
-        <button id="auth-login-btn" class="btn btn-primary" style="width:100%; padding:14px; border-radius:10px;">Sign In</button>
-        <p style="text-align:center; color:var(--text-muted); font-size:0.8rem; margin-top:20px;">
-          Don't have an account? <a href="#" id="auth-show-signup" style="color:#818cf8; font-weight:600;">Create one</a>
-        </p>
+      <div class="auth-methods">
+        <button class="btn btn-github" onclick="window.simulateSbAuthVerify('github')">Continue with GitHub</button>
+        <button class="btn btn-google" onclick="window.simulateSbAuthVerify('google')">Continue with Google</button>
       </div>
-
-      <div id="auth-signup-form" style="display:none;">
-        <div style="margin-bottom:18px;">
-          <label style="display:block; color:rgba(148,163,184,0.8); font-size:0.75rem; font-weight:600; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Email Address</label>
-          <input type="email" id="auth-signup-email" placeholder="founder@company.com" style="width:100%; padding:14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; color:white; font-size:0.9rem; outline:none;">
-        </div>
-        <div style="margin-bottom:24px;">
-          <label style="display:block; color:rgba(148,163,184,0.8); font-size:0.75rem; font-weight:600; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Password</label>
-          <input type="password" id="auth-signup-password" placeholder="Min 6 characters" style="width:100%; padding:14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; color:white; font-size:0.9rem; outline:none;">
-        </div>
-        <button id="auth-signup-btn" class="btn btn-primary" style="width:100%; padding:14px; border-radius:10px;">Create Account</button>
-        <p style="text-align:center; color:var(--text-muted); font-size:0.8rem; margin-top:20px;">
-          Already have an account? <a href="#" id="auth-show-login" style="color:#818cf8; font-weight:600;">Sign in</a>
-        </p>
-      </div>
-
-      <!-- OAuth -->
-      <div style="display:flex; align-items:center; gap:12px; margin:24px 0;">
-        <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
-        <span style="color:rgba(148,163,184,0.4); font-size:0.75rem;">OR</span>
-        <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
-      </div>
-      <button id="auth-google-btn" class="btn btn-glass" style="width:100%; margin-bottom:10px; border-radius:10px;">Continue with Google</button>
-      <button id="auth-github-btn" class="btn btn-glass" style="width:100%; border-radius:10px;">Continue with GitHub</button>
     </div>
   </div>
 
-  <!-- Rebuilt App Layout -->
-  <div id="app-container">
+  <!-- V3 App Layout -->
+  <div id="app-layout" style="display:none;" class="app-layout">
     
-    <!-- Sidebar Redesign -->
-    <aside id="app-sidebar" class="premium-sidebar">
+    <!-- Left Navigation Sidebar -->
+    <nav class="sidebar">
       <div class="sidebar-header">
-        <div class="logo-container">
-          <div class="logo-icon">▲</div>
-          <div>
-            <div class="logo-text">Social Growth AI</div>
-            <div class="logo-tag">Operating System</div>
-          </div>
-        </div>
-
-        <!-- Workspace Switcher / App Selector -->
-        <div class="app-selector-container">
-          <button class="app-select-btn" id="active-app-selector" data-action="toggleAppSelectorDropdown">
-            <span><span class="app-dot" id="active-app-dot"></span><span id="active-app-name">Select Business</span></span>
-            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-          </button>
-          <div class="app-select-options" id="app-selector-dropdown">
-            <div id="dynamic-app-list"></div>
-            <div style="height: 1px; background: rgba(255,255,255,0.08); margin: 8px 0;"></div>
-            <div class="app-option" data-action="openModal" data-args="discovery-wizard-modal" style="justify-content: center; color: var(--color-revenue);">
-              Add New Business
-            </div>
-          </div>
-        </div>
+        <div class="logo">▲</div>
       </div>
+      
+      <ul class="nav-links">
+        <li class="nav-item active" data-action="switchWorkspace" data-args="home">
+          <span class="icon">🏠</span> Home
+        </li>
+        <li class="nav-item" data-action="switchWorkspace" data-args="copilot">
+          <span class="icon">✨</span> Copilot
+        </li>
+        <li class="nav-item" data-action="switchWorkspace" data-args="calendar">
+          <span class="icon">📅</span> Calendar
+        </li>
+        <li class="nav-item" data-action="switchWorkspace" data-args="inbox">
+          <span class="icon">📥</span> Inbox
+        </li>
+        <li class="nav-item" data-action="switchWorkspace" data-args="growth">
+          <span class="icon">📈</span> Growth
+        </li>
+      </ul>
 
-      <!-- Sitemap Groupings -->
-      <nav class="sidebar-nav">
-        <div class="nav-section-title">Operating System</div>
-        <ul class="nav-list">
-          <li class="nav-item">
-            <div class="nav-link active" data-color="dashboard" data-action="switchView" data-args="unified-intelligence-dash|this">
-              <span>🏠</span> <span>Home Mission Control</span>
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-color="strategy" data-action="switchView" data-args="growth-command-center|this">
-              <span>🎯</span> <span>Goal Center</span>
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-color="agents" data-action="switchView" data-args="agent-orchestration|this">
-              <span>🤖</span> <span>AI Agent Network</span>
-            </div>
-          </li>
-        </ul>
-
-        <div class="nav-section-title">Growth Workspaces</div>
-        <ul class="nav-list">
-          <li class="nav-item">
-            <div class="nav-link" data-color="campaigns" data-action="switchView" data-args="launch-center|this">
-              <span>🚀</span> <span>Campaign Hub</span>
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-color="content" data-action="switchView" data-args="content-studio|this">
-              <span>✍</span> <span>Creative Studio</span>
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-color="publishing" data-action="switchView" data-args="social-calendar|this">
-              <span>📅</span> <span>Publish Scheduler</span>
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-color="competitors" data-action="switchView" data-args="competitor-intelligence|this">
-              <span>🕵</span> <span>Market Intelligence</span>
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-color="analytics" data-action="switchView" data-args="social-analytics|this">
-              <span>📊</span> <span>Business Intelligence</span>
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-color="revenue" data-action="switchView" data-args="revenue-intelligence|this">
-              <span>💰</span> <span>Revenue Intelligence</span>
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-color="knowledge" data-action="switchView" data-args="brand-kit|this">
-              <span>📚</span> <span>Brand Kit & Memory</span>
-            </div>
-          </li>
-        </ul>
-
-        <!-- Dev Mode Pinned Option (Hidden by default) -->
-        <div class="nav-section-title dev-mode-only">Infrastructure</div>
-        <ul class="nav-list dev-mode-only">
-          <li class="nav-item">
-            <div class="nav-link" data-color="developer" data-action="switchView" data-args="db-console|this">
-              <span>🛠</span> <span>Developer Console</span>
-            </div>
-          </li>
-        </ul>
-      </nav>
-
-      <!-- Sidebar User Card Profile -->
       <div class="sidebar-footer">
-        <div class="user-profile-widget" data-action="openModal" data-args="user-profile-modal">
-          <img id="user-header-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80">
-          <div>
-            <div id="user-header-name" class="notranslate" style="color: white; font-weight: 700;">Shadi</div>
-            <div id="sidebar-app-name" style="color: var(--text-muted); font-size: 0.75rem;">FitPulse AI</div>
+        <div class="nav-item" data-action="openModal" data-args="settings-modal">
+          <span class="icon">⚙️</span> Settings
+        </div>
+        <div class="user-profile" data-action="openModal" data-args="user-profile-modal">
+          <img src="" id="user-header-avatar" alt="Avatar" class="avatar-img">
+          <div class="user-info">
+            <span id="user-header-name" class="user-name">User</span>
+            <span class="user-role">Founder</span>
           </div>
         </div>
       </div>
-    </aside>
+    </nav>
 
-    <!-- Main Workspace Frame -->
-    <main class="main-content">
+    <!-- Main Workspace Area -->
+    <main class="workspace-container">
       
-      <!-- Sticky Header -->
-      <header class="workspace-header">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <h2 id="current-view-title" style="color: white; font-family: 'Outfit'; font-size: 1.5rem;">Home Mission Control</h2>
-        </div>
-
-        <div class="header-actions">
-          <button class="command-palette-trigger">
-            <span>Search OS...</span>
-            <kbd>Ctrl K</kbd>
-          </button>
-          
-          <button class="btn btn-secondary" data-action="toggleThemeMode" id="theme-toggle-btn" style="padding: 10px; border-radius: 50%;">
-            🌓
-          </button>
-
-          <!-- Developer Mode Toggle -->
-          <button class="btn btn-glass" onclick="window.toggleDevMode()" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 8px;">
-            🛠 Dev Mode
-          </button>
-        </div>
-      </header>
-
-      <!-- Core Workspaces View Panels -->
-      
-      <!-- Workspace 1: Home Bento Mission Control -->
-      <section id="view-unified-intelligence-dash" class="view-panel active">
-        <div class="bento-grid">
-          
-          <!-- Bento Welcome Hero -->
-          <div class="bento-card bento-hero-card bento-col-8">
-            <div>
-              <span class="ai-live-pulse">
-                <span class="ai-live-pulse-dot"></span>
-                AI Operating System Active
-              </span>
-              <h1 style="font-size: 2.2rem; font-weight: 800; color: white; margin-top: 12px; font-family: 'Outfit';">Good Evening, Shadi 👋</h1>
-              <p style="color: var(--text-muted); margin-top: 6px;">Select your objective today. Your AI team is ready to execute.</p>
-            </div>
-
-            <!-- Goal outcome selector -->
-            <div class="goal-outcome-grid">
-              <div class="goal-outcome-card" data-action="switchView" data-args="growth-command-center">
-                <div class="goal-outcome-title">🚀 Launch Product</div>
-                <div class="goal-outcome-desc">Auto-run research, drafts, and schedule campaigns</div>
-              </div>
-              <div class="goal-outcome-card" data-action="switchView" data-args="content-studio">
-                <div class="goal-outcome-title">📈 Grow Followers</div>
-                <div class="goal-outcome-desc">Generate Instagram Reels, LinkedIn posts & copy variants</div>
-              </div>
-              <div class="goal-outcome-card" data-action="switchView" data-args="revenue-intelligence">
-                <div class="goal-outcome-title">💵 Drive Revenue & MRR</div>
-                <div class="goal-outcome-desc">Optimize offer conversions & draft promo sequences</div>
-              </div>
-              <div class="goal-outcome-card" data-action="switchView" data-args="competitor-intelligence">
-                <div class="goal-outcome-title">🎯 Beat Competitors</div>
-                <div class="goal-outcome-desc">Scan rival pricing pages & generate counter-campaigns</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bento Item 2: Revenue Snapshot -->
-          <div class="bento-card bento-col-4" style="background: linear-gradient(135deg, rgba(6, 78, 59, 0.4), rgba(17, 24, 39, 0.85)); border-color: rgba(34, 197, 94, 0.3);">
-            <div style="font-size: 0.75rem; text-transform: uppercase; color: #34d399; font-weight: 700; margin-bottom: 8px;">Revenue Forecast</div>
-            <div style="font-size: 2.4rem; font-weight: 800; color: white; font-family: 'Outfit';">$124,500 <span style="font-size: 0.9rem; color: #10b981; vertical-align: middle;">↑ 18%</span></div>
-            <p style="color: #a7f3d0; font-size: 0.8rem; margin-top: 6px;">AI Confidence: 92%</p>
-            <div style="margin-top: auto; padding-top: 20px;">
-              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #d1fae5; margin-bottom: 6px;">
-                <span>MRR Goal Target</span>
-                <span>50% Completed</span>
-              </div>
-              <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; overflow: hidden;">
-                <div style="width: 50%; height: 100%; background: linear-gradient(90deg, #10b981, #34d399); border-radius: 4px;"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bento Item 3: Today's Focus Action-First Cards -->
-          <div class="bento-card bento-col-6">
-            <h3 class="card-title">Today's Focus & Action-First Decisions</h3>
-            <div class="focus-card-list">
-              <div class="focus-action-card">
-                <div class="focus-card-main">
-                  <div class="focus-what">Instagram Reel engagement spiked +18%</div>
-                  <div class="focus-why">Short video tutorials performing extremely well this week.</div>
-                </div>
-                <button class="btn btn-primary" style="font-size: 0.75rem; padding: 6px 12px;" data-action="switchView" data-args="content-studio">⚡ Create Similar Reel</button>
-              </div>
-
-              <div class="focus-action-card" style="border-left-color: #ef4444;">
-                <div class="focus-card-main">
-                  <div class="focus-what">Rival competitor lowered monthly pricing by 15%</div>
-                  <div class="focus-why">Pricing audit scanned change on competitor homepage.</div>
-                </div>
-                <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 12px; color: #f87171; border-color: rgba(239,68,68,0.3);" data-action="switchView" data-args="competitor-intelligence">🎯 Launch Counter Campaign</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bento Item 4: AI Agent Command Center visual network -->
-          <div class="bento-card bento-col-6">
-            <h3 class="card-title">AI Team Operations</h3>
-            <div class="agent-network-grid">
-              <div class="agent-node-card">
-                <div class="agent-node-header">
-                  <span class="agent-node-title">🧠 Strategy Agent</span>
-                  <span class="agent-status-badge">Active</span>
-                </div>
-                <div class="agent-task-text">Running daily audit, routing tasks.</div>
-              </div>
-              <div class="agent-node-card">
-                <div class="agent-node-header">
-                  <span class="agent-node-title">✍️ Content Agent</span>
-                  <span class="agent-status-badge">Working</span>
-                </div>
-                <div class="agent-task-text">Drafting 3 Instagram Reels.</div>
-              </div>
-              <div class="agent-node-card">
-                <div class="agent-node-header">
-                  <span class="agent-node-title">🕵 Competitor Agent</span>
-                  <span class="agent-status-badge">Monitoring</span>
-                </div>
-                <div class="agent-task-text">Monitoring 3 rival apps.</div>
-              </div>
-            </div>
-          </div>
-
+      <!-- View 1: Home (Action Feed) -->
+      <section id="view-home" class="view-panel active">
+        <header class="view-header">
+          <h2>Good morning. Here is what you need to do today:</h2>
+        </header>
+        <div class="feed-container" id="action-feed-container">
+          <!-- Feed items dynamically injected -->
         </div>
       </section>
 
-      <!-- Workspace 2: Goals Center -->
-      <section id="view-growth-command-center" class="view-panel">
-        <div class="bento-card">
-          <h2 style="font-family:'Outfit'; color:white; font-size:1.8rem; margin-bottom:12px;">What would you like to achieve today?</h2>
-          <p style="color:var(--text-muted); margin-bottom:24px;">The AI Strategy planner will auto-orchestrate workflows to complete your goals.</p>
-
-          <div id="command-center-feed" style="max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; padding: 12px; background: rgba(0,0,0,0.15); border-radius: 12px;">
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 16px; border-radius: 12px;">
-              <strong style="color: white; display:block; margin-bottom:4px;">🤖 AI Strategy Orchestrator</strong>
-              Hello! Tell me what you want to achieve today and I'll route the tasks to the specialist agents.
-            </div>
+      <!-- View 2: Copilot -->
+      <section id="view-copilot" class="view-panel" style="display:none;">
+        <div class="copilot-container">
+          <div class="chat-history" id="copilot-chat-history">
+            <!-- Chat history injected here -->
           </div>
-
-          <div style="display: flex; gap: 12px; background: rgba(0,0,0,0.25); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
-            <input id="command-center-input" type="text" placeholder="e.g. Generate LinkedIn leads, grow app downloads..." style="flex:1; background:transparent; border:none; outline:none; color:white; font-size:1rem; padding: 10px;">
-            <button id="command-center-submit" class="btn btn-primary">⚡ Execute</button>
+          <div class="chat-input-wrapper">
+            <input type="text" id="copilot-input" class="chat-input" placeholder="Type a command, drag an asset, or paste a link...">
+            <button class="btn btn-primary" id="copilot-send-btn">↑</button>
           </div>
         </div>
       </section>
 
-      <!-- Workspace 3: Creative Studio -->
-      <section id="view-content-studio" class="view-panel">
-        <div class="bento-grid">
-          
-          <div class="bento-card bento-col-8">
-            <h3 class="card-title">Generate Platform Copy Variants</h3>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">Leverage pre-filled prompt templates using your brand guidelines.</p>
-
-            <div class="prompt-chip-group" style="margin-bottom: 20px;">
-              <span class="prompt-chip" onclick="prefillLaunchPrompt('instagram')">✨ Instagram Tutorial Reel</span>
-              <span class="prompt-chip" onclick="prefillLaunchPrompt('linkedin')">📝 LinkedIn Value Thread</span>
-              <span class="prompt-chip" onclick="prefillLaunchPrompt('x')">🐦 Twitter Hype Thread</span>
-            </div>
-
-            <textarea id="studio-prompt-input" rows="5" class="input-field" style="width: 100%; border-radius: 10px; background: rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.08); padding: 14px; color:white;" placeholder="Type your creative concept..."></textarea>
-            <button id="studio-generate-btn" class="btn btn-primary" style="margin-top: 14px;" onclick="window.generateStudioContent()">⚡ Generate Copy Variants</button>
-          </div>
-
-          <!-- Canvas Preview -->
-          <div class="bento-card bento-col-4">
-            <h3 class="card-title">Creative Preview Canvas</h3>
-            <div id="studio-canvas-container" style="background: rgba(0,0,0,0.2); border: 1px dashed rgba(255,255,255,0.15); border-radius: 12px; height: 300px; display:flex; align-items:center; justify-content:center;">
-              <span style="color: var(--text-muted); font-size: 0.85rem;">Generated variant mockups render here.</span>
-            </div>
-          </div>
-
+      <!-- View 3: Calendar -->
+      <section id="view-calendar" class="view-panel" style="display:none;">
+        <header class="view-header calendar-header">
+          <button class="btn btn-secondary">&lt;</button>
+          <h2>This Week</h2>
+          <button class="btn btn-secondary">&gt;</button>
+          <div style="flex:1"></div>
+          <button class="btn btn-primary">+ New Post</button>
+        </header>
+        <div class="calendar-grid" id="calendar-grid-container">
+          <!-- Calendar injected here -->
         </div>
       </section>
 
-      <!-- Placeholder Views for remaining workspaces to allow client routing to function without error -->
-      <section id="view-launch-center" class="view-panel"><div class="bento-card"><h2 style="color:white;">Campaign Hub</h2><p style="color:var(--text-muted);">Launch center and campaign planner options.</p></div></section>
-      <section id="view-social-calendar" class="view-panel"><div class="bento-card"><h2 style="color:white;">Publish Scheduler</h2><p style="color:var(--text-muted);">Scheduled calendar timeline and post queue.</p></div></section>
-      <section id="view-competitor-intelligence" class="view-panel"><div class="bento-card"><h2 style="color:white;">Market Intelligence</h2><p style="color:var(--text-muted);">Competitor threats, website scans, and pricing audit logs.</p></div></section>
-      <section id="view-social-analytics" class="view-panel"><div class="bento-card"><h2 style="color:white;">Business Intelligence</h2><p style="color:var(--text-muted);">Follower growth, daily engagement charts, and metric trends.</p></div></section>
-      <section id="view-revenue-intelligence" class="view-panel"><div class="bento-card"><h2 style="color:white;">Revenue Intelligence</h2><p style="color:var(--text-muted);">Track MRR, LTV, CAC, and attribution analytics.</p></div></section>
-      <section id="view-brand-kit" class="view-panel"><div class="bento-card"><h2 style="color:white;">Brand Kit & Memory</h2><p style="color:var(--text-muted);">Tone of voice visual identifiers and agent directives.</p></div></section>
-      <section id="view-db-console" class="view-panel"><div class="bento-card"><h2 style="color:white;">Developer Console</h2><p style="color:var(--text-muted);">SQL logs, database schemas, and background job queue checkers.</p></div></section>
-      <section id="view-agent-orchestration" class="view-panel"><div class="bento-card"><h2 style="color:white;">AI Agent Network</h2><p style="color:var(--text-muted);">Live visual node connections of your autonomous team.</p></div></section>
+      <!-- View 4: Inbox -->
+      <section id="view-inbox" class="view-panel" style="display:none;">
+        <div class="inbox-layout">
+          <div class="inbox-sidebar" id="inbox-thread-list">
+            <!-- Threads injected here -->
+          </div>
+          <div class="inbox-main" id="inbox-active-thread">
+            <!-- Active thread injected here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- View 5: Growth -->
+      <section id="view-growth" class="view-panel" style="display:none;">
+        <header class="view-header">
+          <h2>Growth Analytics</h2>
+        </header>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Audience</div>
+            <div class="kpi-value" id="kpi-audience">0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Engagement</div>
+            <div class="kpi-value" id="kpi-engagement">0%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Revenue</div>
+            <div class="kpi-value" id="kpi-revenue"></div>
+          </div>
+        </div>
+        <div class="analysis-box">
+          <h3>AI Growth Analysis</h3>
+          <p id="growth-analysis-text">Loading insights...</p>
+        </div>
+      </section>
 
     </main>
 
+    <!-- Global AI Floating Action Button -->
+    <button class="fab-ai" data-action="switchWorkspace" data-args="copilot">⚡</button>
   </div>
 
-  <!-- PERSISTENT FLOATING QUICK DOCK -->
-  <div id="quick-actions-bar" class="floating-quick-actions">
-    <button class="quick-action-btn" data-action="switchView" data-args="growth-command-center">
-      <span>🎯</span> <span>AI Goal</span>
-    </button>
-    <button class="quick-action-btn" data-action="switchView" data-args="content-studio">
-      <span>⚡</span> <span>Creative</span>
-    </button>
-    <button class="quick-action-btn" data-action="switchView" data-args="competitor-intelligence">
-      <span>🕵</span> <span>Intelligence</span>
-    </button>
-    <button class="quick-action-btn" data-action="switchView" data-args="social-calendar">
-      <span>📅</span> <span>Timeline</span>
-    </button>
-    <button class="quick-action-btn" data-action="switchView" data-args="social-analytics">
-      <span>📊</span> <span>Metrics</span>
-    </button>
-  </div>
-
-  <!-- Command Palette Modal -->
-  <div id="command-palette-modal" class="modal-overlay" style="display: none; align-items: flex-start; padding-top: 15vh;">
-    <div class="command-palette-card">
-      <div class="command-palette-header">
-        <input type="text" id="command-palette-input" placeholder="Search workspaces, goals, or execute actions (Ctrl + K)...">
-        <span style="font-size: 0.7rem; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; color: #9ca3af;">ESC</span>
-      </div>
-      <div id="command-palette-results" class="command-palette-body"></div>
-    </div>
-  </div>
-
-  <!-- Profile Modal -->
-  <div id="user-profile-modal" class="custom-modal-overlay">
-    <div class="custom-modal-content" style="max-width: 400px;">
-      <div class="modal-header">
-        <h3 style="color:white; margin:0;">Profile Settings</h3>
-        <button class="btn btn-secondary" style="padding:6px; border-radius:50%;" data-action="closeModal" data-args="user-profile-modal">✕</button>
-      </div>
-      <div class="modal-body" style="display:flex; flex-direction:column; gap:20px; align-items:center;">
-        <input type="text" id="profile-modal-name" class="input-field" placeholder="Enter your name">
-      </div>
-      <div class="modal-footer" style="justify-content: flex-end;">
-        <button class="btn btn-secondary" data-action="closeModal" data-args="user-profile-modal">Cancel</button>
-        <button class="btn btn-primary" id="save-profile-btn" data-action="saveUserProfile">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Suppress missing auth scripts error -->
-  <script type="module" src="/app_v2.js"></script>
-
+  <script type="module" src="/app_v3.js"></script>
 </body>
 </html>
