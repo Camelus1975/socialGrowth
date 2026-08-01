@@ -1,5 +1,7 @@
 import { initAuth, onAuthStateChange, logout, saveUserProfile } from './auth.js';
 import { showToast, openModal, closeModal, toggleThemeMode } from './common.js';
+import { initCopilotV3 } from './copilot_v3.js';
+import { initGrowthV3 } from './growth_v3.js';
 
 // Social Growth AI - V3 Architecture Entry Point
 
@@ -14,6 +16,10 @@ const state = {
 // Initialize Application
 document.addEventListener('DOMContentLoaded', async () => {
   setupUIEventListeners();
+  
+  // Initialize specific V3 modules
+  initCopilotV3(state);
+  initGrowthV3();
   
   const loginScreen = document.getElementById('auth-login-screen');
   const appContainer = document.getElementById('app-container');
