@@ -163,10 +163,11 @@ router.post('/', async (req, res) => {
       if (toolCall.function.name === "create_business") {
         let dbError = null;
         if (userId) {
+          const businessSlug = args.name.toLowerCase().replace(/[^a-z0-9]/g, '') + '_' + Math.random().toString(36).substring(2, 6);
           const { error } = await userSupabase.from('businesses').insert({
+            business_id: businessSlug,
             user_id: userId,
             name: args.name,
-            website: args.url || null,
             business_type: 'custom',
             category: 'brand'
           });
