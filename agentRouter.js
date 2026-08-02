@@ -179,9 +179,9 @@ router.post('/', async (req, res) => {
             return res.json({ message: `I tried to add **${args.name}**, but I encountered a database error: \`${dbError.message || JSON.stringify(dbError)}\`` });
           }
           
-          return res.json({ message: `Awesome! I've successfully set up the workspace for **${args.name}**${args.url ? ` (${args.url})` : ''}. (DEBUG: inserted ${JSON.stringify(resInsert.data)})`, refreshWorkspaces: true });
+          return res.json({ message: `Awesome! I've successfully set up the workspace for **${args.name}**${args.url ? ` (${args.url})` : ''}. You can now select it from the workspace dropdown in the top left!`, refreshWorkspaces: true });
         } else {
-          return res.json({ message: `I could not create the workspace because I couldn't authenticate you. (DEBUG: token=${token ? token.substring(0, 15) + '...' : 'none'})` });
+          return res.json({ message: `I could not create the workspace because I couldn't authenticate you.` });
         }
       }
 

@@ -45,6 +45,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const profileNameInput = document.getElementById('profile-modal-name');
     if (profileNameInput) profileNameInput.value = userName;
     
+    // Tell workspace selector to fetch businesses now that we're logged in
+    window.dispatchEvent(new CustomEvent('refreshWorkspaces'));
+    
     populateHomeFeed();
   };
 

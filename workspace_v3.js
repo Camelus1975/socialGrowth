@@ -1,3 +1,5 @@
+import { getSupabaseClient } from './auth.js';
+
 export async function initWorkspaceV3() {
   const dropdownBtn = document.getElementById('workspace-selector-btn');
   const dropdownMenu = document.getElementById('workspace-dropdown-menu');
@@ -24,9 +26,10 @@ export async function initWorkspaceV3() {
   
   // Fetch from Supabase
   async function fetchWorkspaces() {
-    if (window.supabaseClient) {
+    const supabaseClient = getSupabaseClient();
+    if (supabaseClient) {
       try {
-        const { data, error } = await window.supabaseClient.from('businesses').select('*');
+        const { data, error } = await supabaseClient.from('businesses').select('*');
         if (data && data.length > 0) {
           businesses = data;
           renderBusinesses(data);
