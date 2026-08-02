@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initGrowthV3();
   initInboxV3();
   initCalendarV3();
-  initWorkspaceV3();
+  initWorkspaceV3(state);
   
   const loginScreen = document.getElementById('auth-login-screen');
   const appContainer = document.getElementById('app-container');

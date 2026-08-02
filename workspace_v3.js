@@ -1,6 +1,6 @@
 import { getSupabaseClient } from './auth.js';
 
-export async function initWorkspaceV3() {
+export async function initWorkspaceV3(state) {
   const dropdownBtn = document.getElementById('workspace-selector-btn');
   const dropdownMenu = document.getElementById('workspace-dropdown-menu');
   const activeName = document.getElementById('active-workspace-name');
@@ -37,6 +37,10 @@ export async function initWorkspaceV3() {
           // Only auto-select the first one if we don't have an active one yet
           if (activeName.textContent === 'My Brand' || !activeName.textContent) {
             activeName.textContent = data[0].name || 'My Brand';
+            if (state) {
+              state.activeWorkspace = data[0].name;
+              state.activeWorkspaceId = data[0].business_id;
+            }
           }
         }
       } catch (err) {
@@ -64,7 +68,10 @@ export async function initWorkspaceV3() {
       el.addEventListener('click', () => {
         activeName.textContent = biz.name;
         dropdownMenu.classList.remove('active');
-        // Trigger a global state update or re-render if necessary
+        if (state) {
+          state.activeWorkspace = biz.name;
+          state.activeWorkspaceId = biz.business_id;
+        }
       });
       // Insert before the 'Add Business' button
       dropdownMenu.insertBefore(el, dropdownMenu.lastElementChild);
