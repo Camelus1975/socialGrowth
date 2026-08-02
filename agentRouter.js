@@ -163,7 +163,7 @@ router.post('/', async (req, res) => {
       if (toolCall.function.name === "create_business") {
         let dbError = null;
         if (userId) {
-          const { error } = await supabase.from('businesses').insert({
+          const { error } = await userSupabase.from('businesses').insert({
             user_id: userId,
             name: args.name,
             website: args.url || null,
