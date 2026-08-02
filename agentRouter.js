@@ -164,22 +164,25 @@ router.post('/', async (req, res) => {
         let dbError = null;
         if (userId) {
           const businessSlug = args.name.toLowerCase().replace(/[^a-z0-9]/g, '') + '_' + Math.random().toString(36).substring(2, 6);
-          const { error } = await userSupabase.from('businesses').insert({
+          const resInsert = await userSupabase.from('businesses').insert({
             business_id: businessSlug,
             user_id: userId,
             name: args.name,
             business_type: 'custom',
             category: 'brand'
-          });
-          dbError = error;
+          }).select();
+          
+          dbError = resInsert.error;
+          
+          if (dbError) {
+            console.error("DB Error creating business:", dbError);
+            return res.json({ message: `I tried to add **${args.name}**, but I encountered a database error: \`${dbError.message || JSON.stringify(dbError)}\`` });
+          }
+          
+          return res.json({ message: `Awesome! I've successfully set up the workspace for **${args.name}**${args.url ? ` (${args.url})` : ''}. (DEBUG: inserted ${JSON.stringify(resInsert.data)})`, refreshWorkspaces: true });
+        } else {
+          return res.json({ message: `I could not create the workspace because I couldn't authenticate you. (DEBUG: token=${token ? token.substring(0, 15) + '...' : 'none'})` });
         }
-        
-        if (dbError) {
-          console.error("DB Error creating business:", dbError);
-          return res.json({ message: `I tried to add **${args.name}**, but I encountered a database error: \`${dbError.message || JSON.stringify(dbError)}\`` });
-        }
-        
-        return res.json({ message: `Awesome! I've successfully set up the workspace for **${args.name}**${args.url ? ` (${args.url})` : ''}. You can now select it from the workspace dropdown in the top left!`, refreshWorkspaces: true });
       }
 
       if (toolCall.function.name === "run_business_discovery") {
