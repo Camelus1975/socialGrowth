@@ -222,7 +222,7 @@ router.post('/', async (req, res) => {
         const completion = await openai.chat.completions.create({
           model: 'gpt-4o-mini',
           messages: [
-            { role: 'system', content: 'You are a content recycling expert. Take the given post and repurpose it into 4 formats. Return JSON with keys: email (newsletter version), thread (Twitter thread), linkedin (LinkedIn post), shortForm (TikTok/Reels caption). Keep the core message but optimize each for its platform.' },
+            { role: 'system', content: 'You are a content recycling expert. Take the given post and repurpose it into 6 formats. Return JSON with keys: email (newsletter version), thread (Twitter thread), linkedin (LinkedIn post), shortForm (TikTok/Reels script), facebook (Facebook post), instagram (Instagram caption). Keep the core message but optimize each for its platform.' },
             { role: 'user', content: `Original ${args.platform || 'social'} post: ${args.content}` }
           ],
           response_format: { type: 'json_object' }
@@ -240,6 +240,12 @@ ${recycled.thread}
 
 **💼 LinkedIn Post:**
 ${recycled.linkedin}
+
+**📘 Facebook Post:**
+${recycled.facebook}
+
+**📸 Instagram Caption:**
+${recycled.instagram}
 
 **📱 Short-Form Video Script (TikTok/Reels):**
 ${recycled.shortForm}
