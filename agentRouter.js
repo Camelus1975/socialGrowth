@@ -76,6 +76,21 @@ const tools = [
         required: ["appId", "competitorName"]
       }
     }
+  },
+  {
+    type: "function",
+    function: {
+      name: "recycle_content",
+      description: "Recycles or repurposes a piece of content (like a blog post, caption, or script) into multiple formats (email, Twitter thread, LinkedIn post, short-form video script).",
+      parameters: {
+        type: "object",
+        properties: {
+          content: { type: "string", description: "The original content to be recycled" },
+          platform: { type: "string", description: "The original platform (e.g., blog, social)" }
+        },
+        required: ["content"]
+      }
+    }
   }
 ];
 
@@ -118,6 +133,7 @@ router.post('/', async (req, res) => {
         - If the user asks for a marketing plan or content generation, immediately call trigger_orchestration.
         - If the user asks you to read or scrape a website, immediately call run_business_discovery.
         - If the user mentions a competitor, immediately call track_competitor.
+        - If the user provides content and asks to recycle or repurpose it, immediately call recycle_content.
         Speak conversationally and concisely.` 
       }
     ];
@@ -200,6 +216,35 @@ router.post('/', async (req, res) => {
         
         if (error) return res.json({ message: "Failed to add competitor to the database." });
         return res.json({ message: `I have successfully logged **${args.competitorName}** into the Competitor Intelligence Center. We will now monitor them for any feature or pricing changes!` });
+      }
+
+      if (toolCall.function.name === "recycle_content") {
+        const completion = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: 'You are a content recycling expert. Take the given post and repurpose it into 4 formats. Return JSON with keys: email (newsletter version), thread (Twitter thread), linkedin (LinkedIn post), shortForm (TikTok/Reels caption). Keep the core message but optimize each for its platform.' },
+            { role: 'user', content: `Original ${args.platform || 'social'} post: ${args.content}` }
+          ],
+          response_format: { type: 'json_object' }
+        });
+        
+        const recycled = JSON.parse(completion.choices[0].message.content);
+        const formattedResponse = `
+Here is your recycled content! ♻️
+
+**📧 Newsletter (Email):**
+${recycled.email}
+
+**🧵 Twitter Thread:**
+${recycled.thread}
+
+**💼 LinkedIn Post:**
+${recycled.linkedin}
+
+**📱 Short-Form Video Script (TikTok/Reels):**
+${recycled.shortForm}
+`;
+        return res.json({ message: formattedResponse });
       }
     }
 
