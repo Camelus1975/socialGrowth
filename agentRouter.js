@@ -79,6 +79,18 @@ const tools = [
   {
     type: "function",
     function: {
+      name: "find_and_track_competitors",
+      description: "Use this tool to automatically search, brainstorm, and identify competitors for the user's business based on their niche, and then track them in the background.",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: []
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
       name: "analyze_competitor",
       description: "Use this tool to read the latest intelligence report for a tracked competitor from the database. Use this when the user asks questions about a competitor's pricing, market position, or weaknesses.",
       parameters: {
@@ -145,7 +157,8 @@ router.post('/', async (req, res) => {
         - If the user provides a business name/URL, immediately call create_business. Do not ask for confirmation.
         - If the user asks for a marketing plan or content generation, immediately call trigger_orchestration.
         - If the user asks you to read or scrape a website, immediately call run_business_discovery.
-        - If the user mentions a competitor, immediately call track_competitor.
+        - If the user specifically asks you to search for, brainstorm, or find competitors for them, immediately call find_and_track_competitors.
+        - If the user explicitly mentions a competitor name to track, call track_competitor.
         - If the user provides content and asks to recycle or repurpose it, immediately call recycle_content.
         Speak conversationally and concisely.` 
       }
@@ -248,6 +261,67 @@ router.post('/', async (req, res) => {
         processCompetitorJob(data.id, args.competitorUrl, args.appId, userSupabase).catch(console.error);
         
         return res.json({ message: `I have successfully logged **${args.competitorName}** into the Competitor Intelligence Center. I am dispatching a background job to scrape their website and analyze their strategy right now!` });
+      }
+      
+      if (toolCall.function.name === "find_and_track_competitors") {
+        if (!args.appId) return res.json({ message: "Please select a workspace before I can find competitors for it." });
+        
+        // Fetch user's business profile
+        const { data: businessData, error: bizError } = await userSupabase.from('businesses')
+          .select('name, tagline, category, discovery_profile')
+          .eq('business_id', args.appId)
+          .single();
+          
+        if (bizError || !businessData) {
+          return res.json({ message: "I couldn't load your business profile to find competitors." });
+        }
+        
+        const bizContext = `Name: ${businessData.name}\nTagline: ${businessData.tagline || ''}\nCategory: ${businessData.category || ''}\nProfile: ${JSON.stringify(businessData.discovery_profile || {})}`;
+        
+        // Brainstorm competitors using OpenAI
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: "You are a competitive intelligence expert. Identify 3 real-world direct competitors for the provided business based on their niche. Return strictly a JSON object matching this schema: { \"competitors\": [ { \"name\": \"...\", \"website_url\": \"https://...\" } ] }" },
+            { role: "user", content: `Find 3 competitors for this business:\n\n${bizContext}` }
+          ],
+          response_format: { type: "json_object" }
+        });
+        
+        try {
+          const parsed = JSON.parse(completion.choices[0].message.content);
+          const competitors = parsed.competitors || [];
+          
+          if (competitors.length === 0) {
+            return res.json({ message: "I couldn't identify any clear competitors for your niche right now." });
+          }
+          
+          let responseMessage = `I've analyzed your business profile and identified these competitors:\n`;
+          
+          // Insert each into DB and dispatch jobs
+          for (const comp of competitors) {
+            responseMessage += `- **${comp.name}** (${comp.website_url})\n`;
+            
+            const { data, error } = await userSupabase.from('competitors').insert({
+              app_id: args.appId,
+              name: comp.name,
+              website_url: comp.website_url || null,
+              current_pricing: {}
+            }).select().single();
+            
+            if (!error && data) {
+              // Dispatch background job for each
+              processCompetitorJob(data.id, comp.website_url, args.appId, userSupabase).catch(console.error);
+            }
+          }
+          
+          responseMessage += `\nI have dispatched the background scraping bots to analyze all of their websites! I will notify your Inbox when their intelligence profiles are ready.`;
+          return res.json({ message: responseMessage });
+          
+        } catch (err) {
+          console.error("Failed to parse auto-competitors:", err);
+          return res.json({ message: "I encountered an error while trying to brainstorm competitors." });
+        }
       }
 
       if (toolCall.function.name === "analyze_competitor") {
