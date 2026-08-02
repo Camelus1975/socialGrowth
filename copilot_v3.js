@@ -1,6 +1,7 @@
 import { requestApi } from './common.js';
 
 let isGenerating = false;
+let conversationHistory = []; // Add local state for history
 
 export function initCopilotV3(state) {
   const sendBtn = document.getElementById('copilot-send-btn');
@@ -14,6 +15,8 @@ export function initCopilotV3(state) {
     
     inputEl.value = '';
     appendMessage('user', text);
+    conversationHistory.push({ role: 'user', content: text }); // Track user msg
+    
     isGenerating = true;
     
     const loadingId = appendLoading();
@@ -24,6 +27,7 @@ export function initCopilotV3(state) {
         body: JSON.stringify({
           agentType: 'copilot',
           message: text,
+          history: conversationHistory, // Send full history
           context: state
         })
       });
@@ -32,6 +36,7 @@ export function initCopilotV3(state) {
       
       if (response && response.message) {
         appendMessage('ai', response.message);
+        conversationHistory.push({ role: 'assistant', content: response.message }); // Track AI msg
       } else {
         appendMessage('ai', 'Sorry, I encountered an error processing that.');
       }
