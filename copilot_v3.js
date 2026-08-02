@@ -37,6 +37,10 @@ export function initCopilotV3(state) {
       if (response && response.message) {
         appendMessage('ai', response.message);
         conversationHistory.push({ role: 'assistant', content: response.message }); // Track AI msg
+        
+        if (response.refreshWorkspaces) {
+          window.dispatchEvent(new CustomEvent('refreshWorkspaces'));
+        }
       } else {
         appendMessage('ai', 'Sorry, I encountered an error processing that.');
       }

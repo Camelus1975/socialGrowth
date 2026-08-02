@@ -179,7 +179,7 @@ router.post('/', async (req, res) => {
           return res.json({ message: `I tried to add **${args.name}**, but I encountered a database error: \`${dbError.message || JSON.stringify(dbError)}\`` });
         }
         
-        return res.json({ message: `Awesome! I've successfully set up the workspace for **${args.name}**${args.url ? ` (${args.url})` : ''}. You can now select it from the workspace dropdown in the top left!` });
+        return res.json({ message: `Awesome! I've successfully set up the workspace for **${args.name}**${args.url ? ` (${args.url})` : ''}. You can now select it from the workspace dropdown in the top left!`, refreshWorkspaces: true });
       }
 
       if (toolCall.function.name === "run_business_discovery") {

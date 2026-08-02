@@ -23,18 +23,31 @@ export async function initWorkspaceV3() {
   });
   
   // Fetch from Supabase
-  if (window.supabaseClient) {
-    try {
-      const { data, error } = await window.supabaseClient.from('businesses').select('*');
-      if (data && data.length > 0) {
-        businesses = data;
-        renderBusinesses(data);
-        activeName.textContent = data[0].name || 'My Brand';
+  async function fetchWorkspaces() {
+    if (window.supabaseClient) {
+      try {
+        const { data, error } = await window.supabaseClient.from('businesses').select('*');
+        if (data && data.length > 0) {
+          businesses = data;
+          renderBusinesses(data);
+          
+          // Only auto-select the first one if we don't have an active one yet
+          if (activeName.textContent === 'My Brand' || !activeName.textContent) {
+            activeName.textContent = data[0].name || 'My Brand';
+          }
+        }
+      } catch (err) {
+        console.error('Could not fetch businesses:', err);
       }
-    } catch (err) {
-      console.error('Could not fetch businesses:', err);
     }
   }
+
+  fetchWorkspaces();
+  
+  // Listen for agent-triggered workspace refreshes
+  window.addEventListener('refreshWorkspaces', () => {
+    fetchWorkspaces();
+  });
   
   function renderBusinesses(data) {
     // Remove old business items (keep the 'Add New' button at the bottom)
