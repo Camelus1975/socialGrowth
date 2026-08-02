@@ -4,7 +4,7 @@ const { OpenAI } = require('openai');
 const { createClient } = require('@supabase/supabase-js');
 const config = require('./config');
 
-const { processDiscoveryJob } = require('./discoveryEngine');
+const { processDiscoveryJob, processCompetitorJob } = require('./discoveryEngine');
 const { runMarketingOrchestration } = require('./aiOrchestrator');
 const { searchGrowthMemory } = require('./memoryEngine');
 
@@ -65,15 +65,28 @@ const tools = [
     type: "function",
     function: {
       name: "track_competitor",
-      description: "Logs a competitor into the Competitor Intelligence Center for continuous tracking.",
+      description: "Add a competitor to the intelligence tracking system. It will immediately trigger a background job to scrape their website and generate an analysis profile. Do not use this tool if the user is just asking a question about a competitor.",
       parameters: {
         type: "object",
         properties: {
-          appId: { type: "string", description: "The UUID of the user's business" },
-          competitorName: { type: "string", description: "Name of the competitor" },
-          competitorUrl: { type: "string", description: "Website URL of the competitor" }
+          competitorName: { type: "string", description: "The name of the competitor" },
+          competitorUrl: { type: "string", description: "The URL of the competitor's website" }
         },
-        required: ["appId", "competitorName"]
+        required: ["competitorName"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "analyze_competitor",
+      description: "Use this tool to read the latest intelligence report for a tracked competitor from the database. Use this when the user asks questions about a competitor's pricing, market position, or weaknesses.",
+      parameters: {
+        type: "object",
+        properties: {
+          competitorName: { type: "string", description: "The name of the competitor to analyze" }
+        },
+        required: ["competitorName"]
       }
     }
   },
@@ -157,8 +170,11 @@ router.post('/', async (req, res) => {
 
     // Check if the model wanted to call a function
     if (responseMessage.tool_calls) {
-      const toolCall = responseMessage.tool_calls[0];
+      const toolCall = response.choices[0].message.tool_calls[0];
       const args = JSON.parse(toolCall.function.arguments);
+      args.appId = activeWorkspaceId; // Automatically inject current workspace
+      
+      console.log(`[Copilot] Executing tool: ${toolCall.function.name}`, args);
       
       if (toolCall.function.name === "create_business") {
         let dbError = null;
@@ -216,15 +232,53 @@ router.post('/', async (req, res) => {
       if (toolCall.function.name === "track_competitor") {
         if (!args.appId) return res.json({ message: "Please select a workspace before adding competitors." });
         
-        const { error } = await userSupabase.from('competitors').insert({
+        const { data, error } = await userSupabase.from('competitors').insert({
           app_id: args.appId,
           name: args.competitorName,
-          url: args.competitorUrl || null,
-          monitoring_status: 'active'
+          website_url: args.competitorUrl || null,
+          current_pricing: {}
+        }).select().single();
+        
+        if (error) {
+          console.error("Failed to add competitor:", error);
+          return res.json({ message: "Failed to add competitor to the database." });
+        }
+        
+        // Dispatch background job to discoveryEngine
+        processCompetitorJob(data.id, args.competitorUrl, args.appId, userSupabase).catch(console.error);
+        
+        return res.json({ message: `I have successfully logged **${args.competitorName}** into the Competitor Intelligence Center. I am dispatching a background job to scrape their website and analyze their strategy right now!` });
+      }
+
+      if (toolCall.function.name === "analyze_competitor") {
+        if (!args.appId) return res.json({ message: "Please select a workspace first." });
+        
+        const { data, error } = await userSupabase.from('competitors')
+          .select('*')
+          .eq('app_id', args.appId)
+          .ilike('name', `%${args.competitorName}%`)
+          .limit(1)
+          .single();
+          
+        if (error || !data) {
+          return res.json({ message: `I couldn't find any intelligence reports for **${args.competitorName}**. Have you tracked them using the Competitor Intelligence Center?` });
+        }
+        
+        if (!data.current_pricing || Object.keys(data.current_pricing).length === 0) {
+          return res.json({ message: `I am tracking **${data.name}**, but the background discovery engine hasn't finished analyzing their website yet. Please check back in a minute!` });
+        }
+        
+        // Pass the raw data back to the LLM to format a response
+        // We will call OpenAI again to format the answer nicely based on the DB JSON
+        const aiResponse = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: "You are a competitive intelligence strategist. Summarize the provided competitor data to answer the user's implicit question. Use markdown, keep it concise and punchy." },
+            { role: "user", content: `Here is the intelligence data for ${data.name}:\n\n${JSON.stringify(data.current_pricing, null, 2)}` }
+          ]
         });
         
-        if (error) return res.json({ message: "Failed to add competitor to the database." });
-        return res.json({ message: `I have successfully logged **${args.competitorName}** into the Competitor Intelligence Center. We will now monitor them for any feature or pricing changes!` });
+        return res.json({ message: aiResponse.choices[0].message.content });
       }
 
       if (toolCall.function.name === "recycle_content") {

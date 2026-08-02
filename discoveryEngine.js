@@ -271,6 +271,105 @@ ${googleBusinessContent || 'No Google Business Profile content available'}
   }
 }
 
+/**
+ * Process a competitor discovery job.
+ * Scrapes competitor website and generates an analysis profile.
+ */
+async function processCompetitorJob(competitorId, websiteUrl, appId, providedSupabase = null) {
+  let supabase = providedSupabase;
+  try {
+    if (!supabase) {
+      supabase = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_KEY || config.SUPABASE_ANON_KEY);
+    }
+    
+    if (!websiteUrl) {
+      console.log(`[Competitor Engine] No URL provided for competitor ${competitorId}. Skipping scrape.`);
+      return;
+    }
+    
+    console.log(`[Competitor Engine] Scraping competitor URL: ${websiteUrl}`);
+    const websiteContent = await scrapeWebContent(websiteUrl);
+    
+    if (!websiteContent || websiteContent.length < 50) {
+      console.log(`[Competitor Engine] Failed to scrape meaningful content from ${websiteUrl}`);
+      return;
+    }
+
+    const systemPrompt = `You are a world-class Competitor Intelligence Analyst.
+Analyze the following scraped website content for a competitor.
+Extract their market position, pricing model, key features, strengths, and weaknesses.
+Return the result strictly as a JSON object matching this schema:
+{
+  "market_position": "Summary of how they position themselves (e.g. premium, budget, enterprise)",
+  "pricing": {
+    "model": "Subscription, Freemium, One-time, etc.",
+    "starting_price": "$X/mo",
+    "details": "..."
+  },
+  "analysis_profile": {
+    "target_audience": "Who they are targeting",
+    "key_features": ["feature 1", "feature 2"],
+    "strengths": ["strength 1", "strength 2"],
+    "weaknesses": ["weakness 1", "weakness 2"]
+  }
+}`;
+
+    console.log(`[Competitor Engine] Analyzing scraped data for ${competitorId}...`);
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `Website Content:\n${websiteContent.substring(0, 8000)}` }
+      ],
+      response_format: { type: "json_object" }
+    });
+
+    const analysisData = JSON.parse(completion.choices[0].message.content);
+    
+    // Save to database
+    // We store the whole analysis inside current_pricing for now as a workaround for not altering schema dynamically
+    await supabase
+      .from('competitors')
+      .update({ 
+        market_position: analysisData.market_position,
+        current_pricing: analysisData, // Store the entire JSON block here
+        last_scanned_at: new Date().toISOString()
+      })
+      .eq('id', competitorId);
+      
+    console.log(`[Competitor Engine] Analysis saved for competitor ${competitorId}.`);
+    
+    // Send a message to the user's Inbox
+    const threadId = `sys_competitor_${appId}`;
+    
+    // Upsert thread
+    await supabase.from('inbox_threads').upsert({
+      id: threadId,
+      app_id: appId,
+      sender: 'Competitor Intelligence Agent',
+      platform: 'system',
+      last_text: 'New competitor intelligence report available.',
+      last_date: new Date().toISOString(),
+      read: false
+    });
+    
+    // Insert message
+    const msgText = `I have finished analyzing your competitor at ${websiteUrl}.\n\n**Market Position:** ${analysisData.market_position}\n**Pricing:** ${analysisData.pricing.starting_price} (${analysisData.pricing.model})\n\n**Strengths:**\n- ${analysisData.analysis_profile.strengths.join('\n- ')}\n\n**Weaknesses (Opportunities for you):**\n- ${analysisData.analysis_profile.weaknesses.join('\n- ')}`;
+    
+    await supabase.from('inbox_messages').insert({
+      thread_id: threadId,
+      sender_role: 'bot',
+      text: msgText
+    });
+    
+    console.log(`[Competitor Engine] Inbox notification sent to user.`);
+    
+  } catch (err) {
+    console.error(`[Competitor Engine] Competitor ${competitorId} failed:`, err);
+  }
+}
+
 module.exports = {
-  processDiscoveryJob
+  processDiscoveryJob,
+  processCompetitorJob
 };
