@@ -41,6 +41,7 @@ export async function initWorkspaceV3(state) {
               state.activeWorkspace = data[0].name;
               state.activeWorkspaceId = data[0].business_id;
             }
+            window.dispatchEvent(new CustomEvent('workspaceChanged'));
           }
         }
       } catch (err) {
@@ -72,6 +73,7 @@ export async function initWorkspaceV3(state) {
           state.activeWorkspace = biz.name;
           state.activeWorkspaceId = biz.business_id;
         }
+        window.dispatchEvent(new CustomEvent('workspaceChanged'));
       });
       // Insert before the 'Add Business' button
       dropdownMenu.insertBefore(el, dropdownMenu.lastElementChild);
