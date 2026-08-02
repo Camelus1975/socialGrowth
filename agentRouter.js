@@ -280,7 +280,7 @@ router.post('/', async (req, res) => {
         
         // Brainstorm competitors using OpenAI
         const completion = await openai.chat.completions.create({
-          model: "gpt-4o",
+          model: "gpt-4o-mini",
           messages: [
             { role: "system", content: "You are a competitive intelligence expert. Identify 3 real-world direct competitors for the provided business based on their niche. Return strictly a JSON object matching this schema: { \"competitors\": [ { \"name\": \"...\", \"website_url\": \"https://...\" } ] }" },
             { role: "user", content: `Find 3 competitors for this business:\n\n${bizContext}` }
