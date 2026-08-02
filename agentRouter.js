@@ -172,7 +172,12 @@ router.post('/', async (req, res) => {
           });
           dbError = error;
         }
-        if (dbError) return res.json({ message: `I tried to add **${args.name}**, but I encountered a database error.` });
+        
+        if (dbError) {
+          console.error("DB Error creating business:", dbError);
+          return res.json({ message: `I tried to add **${args.name}**, but I encountered a database error: \`${dbError.message || JSON.stringify(dbError)}\`` });
+        }
+        
         return res.json({ message: `Awesome! I've successfully set up the workspace for **${args.name}**${args.url ? ` (${args.url})` : ''}. You can now select it from the workspace dropdown in the top left!` });
       }
 
