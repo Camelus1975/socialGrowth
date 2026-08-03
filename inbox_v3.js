@@ -60,7 +60,8 @@ export function initInboxV3() {
         
         el.addEventListener('click', () => {
           t.read = true;
-          supabase.from('inbox_threads').update({ read: true }).eq('id', t.id).catch(console.error);
+          supabase.from('inbox_threads').update({ read: true }).eq('id', t.id)
+            .then(({ error }) => { if (error) console.error(error); });
           renderList();
           loadActiveThread(t, supabase);
         });
