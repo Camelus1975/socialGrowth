@@ -417,17 +417,16 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
               }
             }
             
-            // Fallback: DALL-E (if Replicate failed and DALL-E is available)
             if (!imageUrl) {
               try {
-                console.log(`[Orchestrator] Trying OpenAI gpt-image-2 fallback for image ${i+1}...`);
+                console.log(`[Orchestrator] Trying OpenAI dall-e-3 fallback for image ${i+1}...`);
                 const response = await openai.images.generate({
-                  model: "gpt-image-2",
+                  model: "dall-e-3",
                   prompt: enhancedPrompt,
                   n: 1,
                   size: "1024x1024",
                 });
-                // gpt-image-2 returns base64 by default
+                // dall-e-3 returns base64 by default when specifying response_format, but here it's url by default
                 if (response.data[0].url) {
                   imageUrl = response.data[0].url;
                 } else if (response.data[0].b64_json) {
@@ -534,6 +533,18 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
 
   } catch (error) {
     console.error("[Orchestrator] Error running pipeline:", error);
+    try {
+      if (supabase && appId) {
+        await supabase.from('agent_operations').insert({
+          app_id: appId,
+          agent_name: 'System Error',
+          status: 'failed',
+          recommendation: `Orchestrator Pipeline Crash: ${error.message}`
+        });
+      }
+    } catch (e) {
+      console.error("[Orchestrator] Failed to log error to DB:", e);
+    }
     return { success: false, error: "Multi-Agent Pipeline Failed." };
   }
 }
