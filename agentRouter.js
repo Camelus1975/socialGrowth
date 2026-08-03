@@ -25,7 +25,8 @@ const tools = [
         type: "object",
         properties: {
           name: { type: "string", description: "The name of the business or brand" },
-          url: { type: "string", description: "The website URL of the business" }
+          url: { type: "string", description: "The website URL of the business" },
+          niche: { type: "string", description: "A short description of what the business does (e.g., 'a social media app', 'a coffee shop')" }
         },
         required: ["name"]
       }
@@ -226,6 +227,7 @@ router.post('/', async (req, res) => {
             business_id: businessSlug,
             user_id: userId,
             name: args.name,
+            tagline: args.niche || null,
             business_type: 'custom',
             category: 'brand'
           }).select();
@@ -311,8 +313,8 @@ router.post('/', async (req, res) => {
         const completion = await openai.chat.completions.create({
           model: "gpt-4o-mini",
           messages: [
-            { role: "system", content: "You are a competitive intelligence expert. Identify 3 real-world direct competitors for the provided business based on their niche. Return strictly a JSON object matching this schema: { \"competitors\": [ { \"name\": \"...\", \"website_url\": \"https://...\" } ] }" },
-            { role: "user", content: `Find 3 competitors for this business:\n\n${bizContext}` }
+            { role: "system", content: "You are a competitive intelligence expert. Identify 3 real-world direct competitors for the provided business based on their niche. Use the user's specific request and the business context. Return strictly a JSON object matching this schema: { \"competitors\": [ { \"name\": \"...\", \"website_url\": \"https://...\" } ] }" },
+            { role: "user", content: `User's Request: "${message}"\n\nBusiness Context:\n${bizContext}\n\nFind 3 competitors.` }
           ],
           response_format: { type: "json_object" }
         });
