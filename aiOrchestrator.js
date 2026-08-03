@@ -497,22 +497,25 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
         const postsToInsert = contentWriter.result.copy_variants.map((v, i) => {
           const date = new Date();
           date.setDate(date.getDate() + i + 1); // schedule 1 per day starting tomorrow
-          const dateString = date.toISOString().split('T')[0];
+          date.setHours(12, 0, 0, 0);
           
           return {
             user_id: uid,
             app_id: appId,
             platform: v.platform || 'linkedin',
-            scheduled_date: dateString,
-            scheduled_time: '12:00',
+            publish_at: date.toISOString(),
             content: v.text,
             media_url: generatedImages[i] || null,
-            status: 'draft' // Draft status, awaiting CEO approval
+            status: 'scheduled' 
           };
         });
 
-        await supabase.from('scheduled_posts').insert(postsToInsert);
-        await pushLog("Publishing Agent", `${postsToInsert.length} organic posts successfully queued in Draft mode.`);
+        const { error: insertErr } = await supabase.from('scheduled_posts').insert(postsToInsert);
+        if (insertErr) {
+          console.error('[Orchestrator] Insert error:', insertErr);
+          throw insertErr;
+        }
+        await pushLog("Publishing Agent", `${postsToInsert.length} organic posts successfully scheduled in the Calendar.`);
       } catch (err) {
         console.error("Failed to queue organic posts", err);
       }
