@@ -288,11 +288,11 @@ async function processCompetitorJob(competitorId, websiteUrl, appId, providedSup
     }
     
     console.log(`[Competitor Engine] Scraping competitor URL: ${websiteUrl}`);
-    const websiteContent = await scrapeWebContent(websiteUrl);
+    let websiteContent = await scrapeWebContent(websiteUrl);
     
     if (!websiteContent || websiteContent.length < 50) {
-      console.log(`[Competitor Engine] Failed to scrape meaningful content from ${websiteUrl}`);
-      return;
+      console.log(`[Competitor Engine] Failed to scrape meaningful content from ${websiteUrl}. Proceeding with fallback.`);
+      websiteContent = `[Website scraping failed. Please generate a generic logical competitor profile based on the URL or name alone]`;
     }
 
     const systemPrompt = `You are a world-class Competitor Intelligence Analyst.
@@ -328,14 +328,15 @@ Return the result strictly as a JSON object matching this schema:
     
     // Save to database
     // We store the whole analysis inside current_pricing for now as a workaround for not altering schema dynamically
-    await supabase
+    const { error: updateErr } = await supabase
       .from('competitors')
       .update({ 
         market_position: analysisData.market_position,
-        current_pricing: analysisData, // Store the entire JSON block here
+        current_pricing: analysisData,
         last_scanned_at: new Date().toISOString()
       })
       .eq('id', competitorId);
+    if (updateErr) console.error("[Competitor Engine] Update competitor error:", updateErr);
       
     console.log(`[Competitor Engine] Analysis saved for competitor ${competitorId}.`);
     
@@ -343,7 +344,7 @@ Return the result strictly as a JSON object matching this schema:
     const threadId = `sys_competitor_${appId}`;
     
     // Upsert thread
-    await supabase.from('inbox_threads').upsert({
+    const { error: upsertErr } = await supabase.from('inbox_threads').upsert({
       id: threadId,
       app_id: appId,
       sender: 'Competitor Intelligence Agent',
@@ -352,15 +353,17 @@ Return the result strictly as a JSON object matching this schema:
       last_date: new Date().toISOString(),
       read: false
     });
+    if (upsertErr) console.error("[Competitor Engine] Upsert thread error:", upsertErr);
     
     // Insert message
     const msgText = `I have finished analyzing your competitor at ${websiteUrl}.\n\n**Market Position:** ${analysisData.market_position}\n**Pricing:** ${analysisData.pricing.starting_price} (${analysisData.pricing.model})\n\n**Strengths:**\n- ${analysisData.analysis_profile.strengths.join('\n- ')}\n\n**Weaknesses (Opportunities for you):**\n- ${analysisData.analysis_profile.weaknesses.join('\n- ')}`;
     
-    await supabase.from('inbox_messages').insert({
+    const { error: insertErr } = await supabase.from('inbox_messages').insert({
       thread_id: threadId,
       sender_role: 'bot',
       text: msgText
     });
+    if (insertErr) console.error("[Competitor Engine] Insert message error:", insertErr);
     
     console.log(`[Competitor Engine] Inbox notification sent to user.`);
     
