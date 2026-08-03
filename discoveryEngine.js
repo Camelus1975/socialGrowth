@@ -319,7 +319,7 @@ Return the result strictly as a JSON object matching this schema:
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `Website Content:\n${websiteContent.substring(0, 8000)}` }
+        { role: "user", content: `Competitor URL: ${websiteUrl}\n\nWebsite Content:\n${websiteContent.substring(0, 8000)}` }
       ],
       response_format: { type: "json_object" }
     });
@@ -356,7 +356,13 @@ Return the result strictly as a JSON object matching this schema:
     if (upsertErr) console.error("[Competitor Engine] Upsert thread error:", upsertErr);
     
     // Insert message
-    const msgText = `I have finished analyzing your competitor at ${websiteUrl}.\n\n**Market Position:** ${analysisData.market_position}\n**Pricing:** ${analysisData.pricing.starting_price} (${analysisData.pricing.model})\n\n**Strengths:**\n- ${analysisData.analysis_profile.strengths.join('\n- ')}\n\n**Weaknesses (Opportunities for you):**\n- ${analysisData.analysis_profile.weaknesses.join('\n- ')}`;
+    const marketPos = analysisData.market_position || 'Unknown';
+    const pricingStart = analysisData.pricing?.starting_price || 'Unknown';
+    const pricingModel = analysisData.pricing?.model || 'Unknown';
+    const strengths = analysisData.analysis_profile?.strengths || ['None identified'];
+    const weaknesses = analysisData.analysis_profile?.weaknesses || ['None identified'];
+    
+    const msgText = `I have finished analyzing your competitor at ${websiteUrl}.\n\n**Market Position:** ${marketPos}\n**Pricing:** ${pricingStart} (${pricingModel})\n\n**Strengths:**\n- ${strengths.join('\n- ')}\n\n**Weaknesses (Opportunities for you):**\n- ${weaknesses.join('\n- ')}`;
     
     const { error: insertErr } = await supabase.from('inbox_messages').insert({
       thread_id: threadId,
