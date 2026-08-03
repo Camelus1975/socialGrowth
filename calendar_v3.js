@@ -186,10 +186,10 @@ function openNewPostModal() {
       btn.innerText = 'Scheduling...';
       btn.disabled = true;
 
-      const res = await fetch(\`/api/calendar/\${state.activeWorkspaceId}\`, {
+      const res = await fetch(`/api/calendar/${state.activeWorkspaceId}`, {
         method: 'POST',
         headers: { 
-          'Authorization': \`Bearer \${token}\`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ platform, content, media_url: mediaUrl, publish_at: publishAt })
