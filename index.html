@@ -190,9 +190,16 @@
           <span>Theme Mode</span>
           <button class="btn btn-secondary" data-action="toggleThemeMode">Toggle Dark/Light</button>
         </div>
-        <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
           <span>Session</span>
           <button class="btn btn-secondary" data-action="simulateSbAuthSignout" style="color: #f87171;">Sign Out</button>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+          <div>
+            <span style="display:block; color: #f87171;">Danger Zone</span>
+            <span style="font-size:0.8rem; color:var(--text-muted);">Permanently delete current workspace</span>
+          </div>
+          <button class="btn btn-secondary" data-action="deleteCurrentWorkspace" style="color: #f87171; border-color: #f87171;">Delete</button>
         </div>
       </div>
       <div class="modal-footer">

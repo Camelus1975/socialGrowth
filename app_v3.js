@@ -4,17 +4,13 @@ import { initCopilotV3 } from './copilot_v3.js';
 import { initGrowthV3 } from './growth_v3.js';
 import { initInboxV3 } from './inbox_v3.js';
 import { initCalendarV3 } from './calendar_v3.js';
-import { initWorkspaceV3, initiateAddBusiness } from './workspace_v3.js';
+import { initWorkspaceV3, initiateAddBusiness, deleteWorkspace } from './workspace_v3.js';
 
 // Social Growth AI - V3 Architecture Entry Point
 
 window.__V3_OS__ = true; // Signal we are in V3
 
-// Core state
-const state = {
-  activeWorkspace: 'home',
-  user: null
-};
+import { state } from './state.js';
 
 // Initialize Application
 document.addEventListener('DOMContentLoaded', async () => {
@@ -128,6 +124,9 @@ function setupUIEventListeners() {
         break;
       case 'initiateAddBusiness':
         initiateAddBusiness();
+        break;
+      case 'deleteCurrentWorkspace':
+        deleteWorkspace();
         break;
     }
   });

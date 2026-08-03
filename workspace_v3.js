@@ -35,7 +35,7 @@ export async function initWorkspaceV3(state) {
           renderBusinesses(data);
           
           // Only auto-select the first one if we don't have an active one yet
-          if (activeName.textContent === 'My Brand' || !activeName.textContent) {
+          if (activeName.textContent === 'My Brand' || activeName.textContent === 'Loading...' || !state.activeWorkspaceId) {
             activeName.textContent = data[0].name || 'My Brand';
             if (state) {
               state.activeWorkspace = data[0].name;
@@ -107,4 +107,37 @@ export function initiateAddBusiness() {
     history.appendChild(msgDiv);
     history.scrollTop = history.scrollHeight;
   }
+}
+
+export async function deleteWorkspace() {
+  const { state } = await import('./state.js');
+  const { getSupabaseClient } = await import('./auth.js');
+  const { closeModal, showToast } = await import('./common.js');
+  
+  if (!state.activeWorkspaceId) {
+    showToast('No active workspace to delete!', 'error');
+    return;
+  }
+  
+  if (!confirm(`Are you absolutely sure you want to delete ${state.activeWorkspace}? This will delete all competitors, messages, and configurations.`)) {
+    return;
+  }
+  
+  const supabase = getSupabaseClient();
+  const { error } = await supabase.from('businesses').delete().eq('business_id', state.activeWorkspaceId);
+  
+  if (error) {
+    console.error("Failed to delete workspace:", error);
+    showToast('Failed to delete workspace.', 'error');
+    return;
+  }
+  
+  showToast('Workspace deleted successfully.', 'success');
+  closeModal('settings-modal');
+  
+  // Refresh workspaces
+  state.activeWorkspaceId = null;
+  state.activeWorkspace = null;
+  document.getElementById('active-workspace-name').textContent = 'Loading...';
+  window.dispatchEvent(new CustomEvent('refreshWorkspaces'));
 }

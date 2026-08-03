@@ -119,6 +119,35 @@ const tools = [
   }
 ];
 
+router.post('/debug-competitor', async (req, res) => {
+  const { appId, competitorUrl } = req.body;
+  const authHeader = req.headers.authorization;
+  const userSupabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
+    global: { headers: { Authorization: authHeader } }
+  });
+  
+  try {
+    const { data, error } = await userSupabase.from('competitors').insert({
+      app_id: appId,
+      name: "Debug Test",
+      website_url: competitorUrl || null,
+      current_pricing: {}
+    }).select().single();
+    
+    if (error) {
+      return res.json({ success: false, error: "Insert competitor failed", details: error });
+    }
+    
+    // Run synchronously to catch error
+    await processCompetitorJob(data.id, competitorUrl, appId, userSupabase);
+    
+    return res.json({ success: true, message: "Job finished" });
+  } catch (err) {
+    return res.json({ success: false, error: "Crash", details: err.message });
+  }
+});
+
+// Original intent endpoint starts here
 router.post('/', async (req, res) => {
   const { message, context, agentType, history } = req.body;
   

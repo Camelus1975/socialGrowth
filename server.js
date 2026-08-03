@@ -12,7 +12,16 @@ const Redis = require('ioredis');
 const config = require('./config');
 const aiGatewayRouter = require('./aiGatewayRouter');
 const agentRouter = require('./agentRouter');
-const { processDiscoveryJob } = require('./discoveryEngine');
+const { processDiscoveryJob, initCompetitorCron } = require('./discoveryEngine');
+
+// Create service role client for background tasks
+const supabaseAdmin = createClient(
+  config.SUPABASE_URL, 
+  config.SUPABASE_SERVICE_KEY || config.SUPABASE_ANON_KEY
+);
+
+// Initialize 30-day competitor rescrape cron job
+initCompetitorCron(supabaseAdmin);
 
 
 let agentExecutionQueue;

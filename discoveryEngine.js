@@ -371,5 +371,38 @@ Return the result strictly as a JSON object matching this schema:
 
 module.exports = {
   processDiscoveryJob,
-  processCompetitorJob
+  processCompetitorJob,
+  initCompetitorCron
 };
+
+function initCompetitorCron(supabaseClient) {
+  // Check every 24 hours (86400000 ms)
+  setInterval(async () => {
+    try {
+      console.log("[Cron] Running 30-day competitor rescrape check...");
+      
+      // We look for competitors where last_scanned_at is older than 30 days
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      
+      const { data: competitors, error } = await supabaseClient
+        .from('competitors')
+        .select('*')
+        .lt('last_scanned_at', thirtyDaysAgo);
+        
+      if (error) throw error;
+      
+      if (competitors && competitors.length > 0) {
+        console.log(`[Cron] Found ${competitors.length} competitors needing a rescan.`);
+        for (const comp of competitors) {
+          // Fire and forget background job
+          // Note: Here we pass the service client to bypass RLS, because it's an automated background cron
+          processCompetitorJob(comp.id, comp.website_url, comp.app_id, supabaseClient).catch(console.error);
+        }
+      } else {
+        console.log("[Cron] No competitors need rescanning.");
+      }
+    } catch (err) {
+      console.error("[Cron] Competitor rescrape check failed:", err);
+    }
+  }, 24 * 60 * 60 * 1000);
+}
