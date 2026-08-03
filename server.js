@@ -23,6 +23,48 @@ const supabaseAdmin = createClient(
 // Initialize 30-day competitor rescrape cron job
 initCompetitorCron(supabaseAdmin);
 
+// Initialize Multi-platform Publisher Cron Job
+function initPublisherCron(supabaseClient) {
+  // Check every 60 seconds
+  setInterval(async () => {
+    try {
+      const now = new Date().toISOString();
+      
+      const { data: posts, error } = await supabaseClient
+        .from('scheduled_posts')
+        .select('*')
+        .eq('status', 'scheduled')
+        .lte('publish_at', now);
+        
+      if (error) throw error;
+      
+      if (posts && posts.length > 0) {
+        console.log(`[Publisher Cron] Found ${posts.length} posts to publish.`);
+        for (const post of posts) {
+          console.log(`[Publisher Cron] MOCK PUBLISHING post ${post.id} to ${post.platform}...`);
+          
+          // Here is where we would call Twitter/LinkedIn/Instagram APIs
+          // For now, we mock a successful API call.
+          
+          const { error: updateErr } = await supabaseClient
+            .from('scheduled_posts')
+            .update({ status: 'published', updated_at: new Date().toISOString() })
+            .eq('id', post.id);
+            
+          if (updateErr) {
+            console.error(`[Publisher Cron] Failed to update status for post ${post.id}`, updateErr);
+          } else {
+            console.log(`[Publisher Cron] Post ${post.id} published successfully.`);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("[Publisher Cron] Error:", err);
+    }
+  }, 60 * 1000);
+}
+initPublisherCron(supabaseAdmin);
+
 
 let agentExecutionQueue;
 const useRedis = !!process.env.REDIS_URL;
@@ -181,9 +223,11 @@ app.use('/api', authenticate);
 
 // Register Routers
 const billingRouter = require('./billingRouter');
+const calendarRouter = require('./calendarRouter');
 app.use('/api/billing', billingRouter);
 app.use('/api/ai-gateway', aiGatewayRouter);
 app.use('/api/agent', agentRouter);
+app.use('/api/calendar', calendarRouter);
 
 // Public endpoint: expose Supabase config for frontend auth (anon key is public by design)
 app.get('/api/auth/config', (req, res) => {

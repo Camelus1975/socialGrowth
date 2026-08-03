@@ -61,7 +61,13 @@
           <span class="icon">📈</span> Growth
         </li>
       </ul>
-
+      <div style="flex:1"></div>
+      <ul class="nav-links">
+        <li class="nav-item" data-action="switchWorkspace" data-args="integrations">
+          <span class="icon">⚙️</span> Integrations
+        </li>
+      </ul>
+    </nav>
       <div class="sidebar-footer">
         <div class="nav-item" data-action="openModal" data-args="settings-modal">
           <span class="icon">⚙️</span> Settings
@@ -109,7 +115,7 @@
           <h2>This Week</h2>
           <button class="btn btn-secondary">&gt;</button>
           <div style="flex:1"></div>
-          <button class="btn btn-primary">+ New Post</button>
+          <button class="btn btn-primary" id="btn-new-post">+ New Post</button>
         </header>
         <div class="calendar-grid" id="calendar-grid-container">
           <!-- Calendar injected here -->
@@ -150,6 +156,39 @@
         <div class="analysis-box">
           <h3>AI Growth Analysis</h3>
           <p id="growth-analysis-text">Loading insights...</p>
+        </div>
+      </section>
+
+      <!-- View 6: Integrations -->
+      <section id="view-integrations" class="view-panel" style="display:none;">
+        <header class="view-header">
+          <h2>Platform Integrations</h2>
+        </header>
+        <div style="padding:24px; max-width:600px;">
+          <p style="color:var(--text-muted); margin-bottom:24px;">Connect your social media accounts to enable multi-platform publishing.</p>
+          
+          <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:12px; padding:16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:40px; height:40px; background:#38bdf8; border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">X</div>
+              <div>
+                <div style="font-weight:bold; color:var(--text-main);">Twitter / X</div>
+                <div style="font-size:0.85rem; color:var(--text-muted);">Not connected</div>
+              </div>
+            </div>
+            <button class="btn btn-secondary" onclick="alert('OAuth Mock: Twitter Connected!')">Connect</button>
+          </div>
+
+          <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:12px; padding:16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:40px; height:40px; background:#60a5fa; border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">in</div>
+              <div>
+                <div style="font-weight:bold; color:var(--text-main);">LinkedIn</div>
+                <div style="font-size:0.85rem; color:var(--text-muted);">Not connected</div>
+              </div>
+            </div>
+            <button class="btn btn-secondary" onclick="alert('OAuth Mock: LinkedIn Connected!')">Connect</button>
+          </div>
+
         </div>
       </section>
 

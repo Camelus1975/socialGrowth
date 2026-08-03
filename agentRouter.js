@@ -420,6 +420,37 @@ ${recycled.shortForm}
 `;
         return res.json({ message: formattedResponse });
       }
+
+      if (toolCall.function.name === "schedule_social_post") {
+        if (!args.appId) return res.json({ message: "Please select a workspace before scheduling posts." });
+        
+        // Ensure date is valid or use default
+        let publishAt = args.publish_at;
+        if (!publishAt || isNaN(Date.parse(publishAt))) {
+          // Default to tomorrow 10am if invalid
+          const tmrw = new Date();
+          tmrw.setDate(tmrw.getDate() + 1);
+          tmrw.setHours(10, 0, 0, 0);
+          publishAt = tmrw.toISOString();
+        }
+
+        const { error } = await userSupabase.from('scheduled_posts').insert({
+          user_id: userId,
+          app_id: args.appId,
+          platform: args.platform.toLowerCase(),
+          content: args.content,
+          media_url: args.media_url || null,
+          publish_at: publishAt,
+          status: 'scheduled'
+        });
+
+        if (error) {
+          console.error("Schedule post error:", error);
+          return res.json({ message: "I encountered an error trying to save your post to the database." });
+        }
+
+        return res.json({ message: `I have successfully scheduled your **${args.platform}** post for ${new Date(publishAt).toLocaleString()}! You can view and manage it in the Calendar tab.` });
+      }
     }
 
     // If no function was called, just return the text response
