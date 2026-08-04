@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { requestApi } from './app_v2.js';
+import { requestApi } from './common.js';
 
 export function initMediaV3() {
   window.addEventListener('workspaceChanged', loadMediaGrid);
