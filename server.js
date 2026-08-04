@@ -224,10 +224,13 @@ app.use('/api', authenticate);
 // Register Routers
 const billingRouter = require('./billingRouter');
 const calendarRouter = require('./calendarRouter');
+const mediaRouter = require('./mediaRouter');
+
 app.use('/api/billing', billingRouter);
 app.use('/api/ai-gateway', aiGatewayRouter);
 app.use('/api/agent', agentRouter);
 app.use('/api/calendar', calendarRouter);
+app.use('/api/media', mediaRouter);
 
 // Public endpoint: expose Supabase config for frontend auth (anon key is public by design)
 app.get('/api/auth/config', (req, res) => {

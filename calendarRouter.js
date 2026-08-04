@@ -70,4 +70,30 @@ router.post('/:appId', async (req, res) => {
   }
 });
 
+// DELETE a scheduled post
+router.delete('/:appId/:postId', async (req, res) => {
+  const { appId, postId } = req.params;
+  const supabase = getSupabase(req);
+
+  try {
+    const { data: userAuth, error: authErr } = await supabase.auth.getUser();
+    if (authErr || !userAuth.user) {
+      return res.status(401).json({ success: false, error: 'Unauthorized' });
+    }
+
+    // RLS will ensure they can only delete their own posts
+    const { error } = await supabase
+      .from('scheduled_posts')
+      .delete()
+      .eq('id', postId)
+      .eq('app_id', appId);
+
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[Calendar] Error deleting post:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;

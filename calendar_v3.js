@@ -89,14 +89,17 @@ function renderCalendar(posts) {
         
         let mediaHtml = '';
         if (post.media_url) {
-          mediaHtml = `<div style="margin-top:8px; border-radius:4px; overflow:hidden; max-height:80px;"><img src="${post.media_url}" style="width:100%; height:auto; object-fit:cover;" /></div>`;
+          mediaHtml = `<div style="margin-top:8px; border-radius:4px; overflow:hidden; max-height:80px; cursor:zoom-in;" onclick="window.openMediaViewer('${post.media_url}', 'image')"><img src="${post.media_url}" style="width:100%; height:auto; object-fit:cover;" /></div>`;
         }
         
         html += `
-          <div style="background:rgba(0,0,0,0.3); opacity:${opacity}; border-left: 3px solid ${color}; border-radius:6px; padding:12px; margin-top:12px; font-size:0.85rem; color:var(--text-muted); cursor:pointer;">
-            <div style="font-weight:bold; margin-bottom:4px; color:var(--text-main); display:flex; justify-content:space-between;">
+          <div style="background:rgba(0,0,0,0.3); opacity:${opacity}; border-left: 3px solid ${color}; border-radius:6px; padding:12px; margin-top:12px; font-size:0.85rem; color:var(--text-muted); position:relative;">
+            <div style="font-weight:bold; margin-bottom:4px; color:var(--text-main); display:flex; justify-content:space-between; align-items:center;">
               <span>${timeStr} - ${post.platform}</span>
-              <span title="${post.status}">${statusIcon}</span>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <span title="${post.status}">${statusIcon}</span>
+                <button onclick="window.deleteCalendarPost('${post.id}')" style="background:none; border:none; color:var(--error); cursor:pointer; padding:0; font-size:1.1rem;" title="Delete Post">🗑️</button>
+              </div>
             </div>
             <div style="display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">${post.content}</div>
             ${mediaHtml}
@@ -210,3 +213,28 @@ function openNewPostModal() {
     }
   };
 }
+
+window.deleteCalendarPost = async function(postId) {
+  if (!state.activeWorkspaceId) return;
+  if (!confirm("Are you sure you want to permanently delete this scheduled post?")) return;
+  
+  try {
+    const res = await requestApi(`/api/calendar/${state.activeWorkspaceId}/${postId}`, {
+      method: 'DELETE'
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      if(data.success) {
+        initCalendar(state);
+      } else {
+        alert("Failed to delete post: " + data.error);
+      }
+    } else {
+      alert("Failed to delete post.");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error deleting post.");
+  }
+};

@@ -252,6 +252,7 @@ export function switchWorkspace(viewId, element) {
     'agent-orchestration': 'AI Agent Network',
     'launch-center': 'Campaign Hub',
     'content-studio': 'Creative Studio',
+    'media-assets': 'Media Assets',
     'social-calendar': 'Publish Scheduler',
     'competitor-intelligence': 'Market Intelligence',
     'social-analytics': 'Business Intelligence',
