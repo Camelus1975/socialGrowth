@@ -1,6 +1,6 @@
 import { getSupabaseClient } from './auth.js';
 import { state } from './state.js';
-import { showToast } from './common.js';
+import { showToast, requestApi } from './common.js';
 
 export function initCalendarV3() {
   const grid = document.getElementById('calendar-grid-container');
