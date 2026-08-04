@@ -86,18 +86,16 @@ window.deleteMediaAsset = async function(mediaId) {
         method: 'DELETE'
       });
       
-      if (res.ok) {
-        const data = await res.json();
-        if(data.success) {
-          loadMediaGrid();
-        } else {
-          alert("Failed to delete media: " + data.error);
-        }
+      if (res.success) {
+        loadMediaGrid();
       } else {
-        alert("Failed to delete media.");
+        alert("Failed to delete media: " + res.error);
       }
     } catch (err) {
       console.error(err);
       alert("Error deleting media.");
     }
   };
+
+// Export loadMediaGrid so app_v2.js or others can trigger a refresh if needed
+export { loadMediaGrid };

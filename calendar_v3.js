@@ -223,15 +223,10 @@ window.deleteCalendarPost = async function(postId) {
       method: 'DELETE'
     });
     
-    if (res.ok) {
-      const data = await res.json();
-      if(data.success) {
-        initCalendar(state);
-      } else {
-        alert("Failed to delete post: " + data.error);
-      }
+    if (res.success) {
+      loadCalendar();
     } else {
-      alert("Failed to delete post.");
+      alert("Failed to delete post: " + res.error);
     }
   } catch (err) {
     console.error(err);
