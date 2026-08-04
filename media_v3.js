@@ -97,5 +97,4 @@ window.deleteMediaAsset = async function(mediaId) {
     }
   };
 
-// Export loadMediaGrid so app_v2.js or others can trigger a refresh if needed
-export { loadMediaGrid };
+
