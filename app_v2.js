@@ -22,34 +22,12 @@ import {
 } from './auth.js';
 
 // ── Modules ───────────────────────────────────────────────────────────────────
-import { initDashboard, renderDashboard } from './dashboardModule.js';
-import { initIntelligenceDashboard } from './intelligenceDashboardModule.js';
-import { initCommandCenter } from './commandCenterModule.js';
-import { initCalendar, renderCalendarView } from './calendarModule.js';
-import { initUniversalCRM } from './crmModule.js';
-import { initRevenueIntelligence } from './revenueIntelligenceModule.js';
-import { initSalesIntelligence } from './salesIntelligenceModule.js';
-import { initCustomerIntelligence } from './customerIntelligenceModule.js';
-import { initReputationCenter } from './reputationModule.js';
-import { initAttributionEngine } from './attributionModule.js';
-import { initInbox } from './inboxModule.js';
-import { initMedia } from './mediaModule.js';
-import { initDatabaseConsole } from './dbModule.js';
-import { initMemoryEngine } from './memoryModule.js';
-import { initCompetitorIntelligence } from './competitorIntelligenceModule.js';
-import { initStudio, generateStudioContent } from './studioModule.js';
-import { initCopilot } from './copilotModule.js';
-import { initBrandKit } from './brandKitModule.js';
-import { initOnboarding } from './onboardingModule.js';
-import { initWeeklyReport } from './weeklyReportModule.js';
 import { 
   initAppManager, 
   fetchUserApps, 
   renderAppSelectorDropdown, 
   setSelectActiveAppCallback 
 } from './appManager.js';
-import { initHealthScore } from './healthScoreModule.js';
-import { initIndustryBenchmarks } from './industryBenchmarkModule.js';
 
 import { initCommandPaletteV2 } from './commandPalette_v2.js';
 
@@ -94,29 +72,8 @@ async function bootApp() {
   await fetchUserApps();
 
   // Initialize all modular dashboard sub-engines
+  // Modular components (V2)
   initAppManager();
-  initDashboard();
-  initIntelligenceDashboard();
-  initCommandCenter();
-  initCalendar();
-  initUniversalCRM();
-  initRevenueIntelligence();
-  initSalesIntelligence();
-  initCustomerIntelligence();
-  initReputationCenter();
-  initAttributionEngine();
-  initInbox();
-  initMedia();
-  initDatabaseConsole();
-  initMemoryEngine();
-  initCompetitorIntelligence();
-  initStudio();
-  initCopilot();
-  initBrandKit();
-  initOnboarding();
-  initWeeklyReport();
-  initHealthScore();
-  initIndustryBenchmarks();
 
   // Initialize V2 fuzzy command search palette
   initCommandPaletteV2();
@@ -133,7 +90,6 @@ async function bootApp() {
   }
 
   selectActiveApp(state.currentActiveApp);
-  renderDashboard();
 }
 
 // ── Auth Button Listeners ─────────────────────────────────────────────────────
