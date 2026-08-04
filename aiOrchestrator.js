@@ -37,12 +37,13 @@ Role: Visual concepts and campaign creative direction.
 Input: A strategy from the CMO and business context.
 CRITICAL: You MUST generate "image_prompts" — a list of detailed DALL-E image generation prompts. Generate one image prompt per content piece (match the number of posts the Content Writer will create, typically 4-6).
 Each image prompt should be a rich visual description (50-150 words) describing colors, composition, style, mood, and elements specific to the business.
-Do NOT use generic stock-photo descriptions. Reference the business's actual products/services.
+CRITICAL RULE: The image MUST be 100% text-free. Instruct the image generator to NOT include any words, typography, letters, watermarks, or text.
 Output JSON format: { "creative_brief": "...", "image_prompts": ["Detailed DALL-E prompt 1...", "Detailed DALL-E prompt 2...", "..."] }`,
   
   ContentWriter: `You are the Content Writer Agent.
 Role: Generate specific social media copy variations based on strategy.
 Input: A strategy from the CMO and business intelligence context.
+CRITICAL: Your content MUST be highly specific to the provided Business Intelligence context. Do not use generic industry fluff. Talk directly about the specific products, services, features, and brand voice of the business.
 IMPORTANT: Follow the CMO's strategy regarding which platforms to target. If the user's goal specifies a platform (e.g. "instagram", "tiktok", "linkedin"), generate posts ONLY for that platform.
 If no specific platform is mentioned, generate for multiple platforms.
 Platform formatting rules:
@@ -360,7 +361,7 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
           for (let i = 0; i < totalImages; i++) {
             const promptText = imagePrompts[i];
             const postText = contentWriter.result.copy_variants[i]?.text || '';
-            const enhancedPrompt = `A photographic, professional social media visual for "${appName || businessType}" business. Theme: "${postText.substring(0, 150)}". Visual direction: ${promptText.substring(0, 400)}. Style: Clean modern photography or illustration, vibrant colors, high quality. CRITICAL RULE: Do NOT include ANY text, letters, words, numbers, logos, watermarks, typography, or written characters anywhere in the image. The image must be purely visual with ZERO text elements.`;
+            const enhancedPrompt = `A high-end, clean photographic visual for "${appName || businessType}" business. Theme: "${postText.substring(0, 150)}". Visual direction: ${promptText.substring(0, 400)}. Style: Clean modern photography, vibrant colors, cinematic lighting, 4k, masterpiece. CRITICAL RULE: This image must be 100% text-free. Do NOT include ANY text, letters, words, numbers, logos, watermarks, typography, captions, signage, or written language anywhere in the image. Pure visual only.`;
             
             let imageUrl = null;
             
@@ -508,6 +509,27 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
             status: 'scheduled' 
           };
         });
+
+        // Push Video concepts to the calendar if present
+        const videoAgent = agentResults.find(a => a.agent === 'Video Marketing Agent');
+        if (videoAgent && videoAgent.result && videoAgent.result.video_concept) {
+          const vDate = new Date();
+          vDate.setDate(vDate.getDate() + postsToInsert.length + 1);
+          vDate.setHours(12, 0, 0, 0);
+          
+          const scriptText = `🎬 VIDEO CONCEPT: ${videoAgent.result.video_concept}\n\nTARGET: ${videoAgent.result.target_audience}\n\nSTORYBOARD:\n` + 
+            (videoAgent.result.storyboard || []).map(s => `Scene ${s.scene_number} (${s.duration}s): ${s.visual_direction}`).join('\n');
+            
+          postsToInsert.push({
+            user_id: uid,
+            app_id: appId,
+            platform: 'tiktok', // default video platform
+            publish_at: vDate.toISOString(),
+            content: scriptText,
+            media_url: null,
+            status: 'scheduled'
+          });
+        }
 
         const { error: insertErr } = await supabase.from('scheduled_posts').insert(postsToInsert);
         if (insertErr) {
