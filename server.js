@@ -197,6 +197,7 @@ const authenticate = async (req, res, next) => {
   
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
+    console.error(`[Auth] 401: Missing token for ${req.originalUrl}`);
     return res.status(401).json({ error: 'Unauthorized: Missing token credentials' });
   }
   
@@ -209,11 +210,13 @@ const authenticate = async (req, res, next) => {
   try {
     const { data, error } = await supabase.auth.getUser(token);
     if (error || !data.user) {
+      console.error(`[Auth] 401: Invalid token session for ${req.originalUrl}. Error:`, error?.message || 'No user data');
       return res.status(401).json({ error: 'Unauthorized: Invalid token session' });
     }
     req.user = data.user;
     next();
   } catch (err) {
+    console.error(`[Auth] 401: Verification error for ${req.originalUrl}. Error:`, err.message);
     return res.status(401).json({ error: 'Unauthorized: Auth service verification error' });
   }
 };

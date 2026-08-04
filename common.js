@@ -44,6 +44,11 @@ export async function requestApi(path, options = {}) {
     const newToken = await refreshToken();
     if (newToken) {
       res = await doFetch(newToken);
+    } else {
+      console.error("Token refresh failed. Forcing logout.");
+      localStorage.removeItem('supabase_jwt_token');
+      window.location.reload();
+      return null;
     }
   }
   
@@ -135,4 +140,29 @@ export function toggleThemeMode() {
   const isLight = document.body.classList.toggle('light-mode');
   localStorage.setItem('theme_mode', isLight ? 'light' : 'dark');
   showToast(`${isLight ? 'Light' : 'Dark'} mode active!`, "success");
-}
+}// --- Media Viewer ---
+window.openMediaViewer = function(url, type) {
+  let modal = document.getElementById('global-media-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'global-media-modal';
+    modal.className = 'custom-modal-overlay';
+    modal.innerHTML = `
+      <div class="custom-modal-content" style="max-width: 800px; padding: 10px; position: relative;">
+        <button class="btn btn-secondary" style="position: absolute; top: -10px; right: -10px; z-index: 1000; border-radius: 50%; padding: 8px 12px; background: var(--bg-surface); border: 1px solid var(--border-glass);" onclick="document.getElementById('global-media-modal').style.display='none'; document.getElementById('global-media-container').innerHTML='';">✕</button>
+        <div id="global-media-container" style="display: flex; justify-content: center; align-items: center; width: 100%; max-height: 80vh; overflow: hidden; border-radius: 8px;">
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+  
+  const container = document.getElementById('global-media-container');
+  if (type === 'video' || url.endsWith('.mp4') || url.endsWith('.webm')) {
+    container.innerHTML = `<video src="${url}" controls autoplay style="max-width: 100%; max-height: 80vh; border-radius: 8px;"></video>`;
+  } else {
+    container.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 80vh; border-radius: 8px; object-fit: contain;" />`;
+  }
+  
+  modal.style.display = 'flex';
+};

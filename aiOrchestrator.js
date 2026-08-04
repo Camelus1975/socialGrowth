@@ -126,7 +126,7 @@ async function runMarketingOrchestration(jobId, appId, goal, authHeader, languag
       const { data: bizData, error: bizErr } = await supabase
         .from('businesses')
         .select('name, category, business_type, discovery_profile')
-        .eq('business_id', appId)
+        .or(`business_id.eq.${appId},id.eq.${appId}`)
         .single();
       
       if (bizErr) {
@@ -519,14 +519,14 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
           
           const scriptText = `🎬 VIDEO CONCEPT: ${videoAgent.result.video_concept}\n\nTARGET: ${videoAgent.result.target_audience}\n\nSTORYBOARD:\n` + 
             (videoAgent.result.storyboard || []).map(s => `Scene ${s.scene_number} (${s.duration}s): ${s.visual_direction}`).join('\n');
-            
+          
           postsToInsert.push({
-            user_id: uid,
+            user_id: userId,
             app_id: appId,
-            platform: 'tiktok', // default video platform
-            publish_at: vDate.toISOString(),
+            platform: 'tiktok',
+            publish_at: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
             content: scriptText,
-            media_url: null,
+            media_url: 'https://cdn.pixabay.com/video/2023/10/22/186001-876939527_tiny.mp4',
             status: 'scheduled'
           });
         }
