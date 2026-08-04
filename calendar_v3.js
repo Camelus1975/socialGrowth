@@ -89,16 +89,29 @@ function renderCalendar(posts) {
         
         let mediaHtml = '';
         if (post.media_url) {
-          mediaHtml = `<div style="margin-top:8px; border-radius:4px; overflow:hidden; max-height:80px; cursor:zoom-in;" onclick="window.openMediaViewer('${post.media_url}', 'image')"><img src="${post.media_url}" style="width:100%; height:auto; object-fit:cover;" /></div>`;
+          const isVideo = post.media_url.endsWith('.mp4') || post.media_url.endsWith('.webm') || post.media_url.includes('video');
+          if (isVideo) {
+            mediaHtml = `<div style="margin-top:8px; border-radius:4px; overflow:hidden; max-height:80px; cursor:pointer;" onclick="event.stopPropagation(); window.openMediaViewer('${post.media_url}', 'video')"><video src="${post.media_url}" style="width:100%; height:auto; object-fit:cover;" muted></video><div style="position:absolute; bottom:4px; right:4px; font-size:1.2rem;">▶️</div></div>`;
+          } else {
+            mediaHtml = `<div style="margin-top:8px; border-radius:4px; overflow:hidden; max-height:80px; cursor:zoom-in;" onclick="event.stopPropagation(); window.openMediaViewer('${post.media_url}', 'image')"><img src="${post.media_url}" style="width:100%; height:auto; object-fit:cover;" /></div>`;
+          }
         }
         
+        // Escape post content for safe use in onclick attribute
+        const escapedContent = encodeURIComponent(post.content || '');
+        const escapedMediaUrl = post.media_url ? encodeURIComponent(post.media_url) : '';
+        const isVideoPost = post.media_url && (post.media_url.endsWith('.mp4') || post.media_url.endsWith('.webm') || post.media_url.includes('video'));
+
         html += `
-          <div style="background:rgba(0,0,0,0.3); opacity:${opacity}; border-left: 3px solid ${color}; border-radius:6px; padding:12px; margin-top:12px; font-size:0.85rem; color:var(--text-muted); position:relative;">
+          <div 
+            style="background:rgba(0,0,0,0.3); opacity:${opacity}; border-left: 3px solid ${color}; border-radius:6px; padding:12px; margin-top:12px; font-size:0.85rem; color:var(--text-muted); position:relative; cursor:pointer;"
+            onclick="window.openPostDetail('${post.id}', '${post.platform}', '${post.status}', '${escapedMediaUrl}', ${isVideoPost}, decodeURIComponent('${escapedContent}'))"
+          >
             <div style="font-weight:bold; margin-bottom:4px; color:var(--text-main); display:flex; justify-content:space-between; align-items:center;">
               <span>${timeStr} - ${post.platform}</span>
               <div style="display:flex; gap:8px; align-items:center;">
                 <span title="${post.status}">${statusIcon}</span>
-                <button onclick="window.deleteCalendarPost('${post.id}')" style="background:none; border:none; color:var(--error); cursor:pointer; padding:0; font-size:1.1rem;" title="Delete Post">🗑️</button>
+                <button onclick="event.stopPropagation(); window.deleteCalendarPost('${post.id}')" style="background:none; border:none; color:var(--error); cursor:pointer; padding:0; font-size:1.1rem;" title="Delete Post">🗑️</button>
               </div>
             </div>
             <div style="display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">${post.content}</div>
@@ -232,4 +245,54 @@ window.deleteCalendarPost = async function(postId) {
     console.error(err);
     alert("Error deleting post.");
   }
+};
+
+// Open a detailed post view modal when a post card is clicked
+window.openPostDetail = function(postId, platform, status, encodedMediaUrl, isVideo, content) {
+  const mediaUrl = encodedMediaUrl ? decodeURIComponent(encodedMediaUrl) : null;
+
+  let existingModal = document.getElementById('post-detail-modal');
+  if (existingModal) existingModal.remove();
+
+  const platformColors = { linkedin: '#60a5fa', instagram: '#f472b6', tiktok: '#2dd4bf', twitter: '#38bdf8', facebook: '#818cf8' };
+  const color = platformColors[platform.toLowerCase()] || '#9ca3af';
+  const statusLabel = status === 'published' ? '✅ Published' : status === 'failed' ? '❌ Failed' : status === 'draft' ? '📝 Draft' : '⏳ Scheduled';
+
+  let mediaSection = '';
+  if (mediaUrl) {
+    if (isVideo) {
+      mediaSection = `<video src="${mediaUrl}" controls style="width:100%; border-radius:10px; margin-bottom:16px; max-height:260px;"></video>`;
+    } else {
+      mediaSection = `<img src="${mediaUrl}" style="width:100%; border-radius:10px; margin-bottom:16px; max-height:320px; object-fit:contain; cursor:zoom-in;" onclick="window.openMediaViewer('${mediaUrl}', 'image')" />`;
+    }
+  }
+
+  const modal = document.createElement('div');
+  modal.id = 'post-detail-modal';
+  modal.style.cssText = 'position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:20px;';
+  modal.innerHTML = `
+    <div style="background:var(--bg-panel); border:1px solid var(--border-glass); border-radius:16px; padding:28px; width:100%; max-width:560px; max-height:85vh; overflow-y:auto; position:relative;">
+      <button onclick="document.getElementById('post-detail-modal').remove()" style="position:absolute; top:16px; right:16px; background:rgba(255,255,255,0.08); border:1px solid var(--border-glass); color:var(--text-main); border-radius:50%; width:32px; height:32px; cursor:pointer; font-size:1rem;">✕</button>
+      
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+        <div style="width:12px; height:12px; border-radius:50%; background:${color};"></div>
+        <span style="font-weight:700; font-size:1.1rem; color:var(--text-main); text-transform:capitalize;">${platform}</span>
+        <span style="font-size:0.85rem; color:var(--text-muted); margin-left:auto;">${statusLabel}</span>
+      </div>
+
+      ${mediaSection}
+
+      <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-glass); border-radius:10px; padding:16px; white-space:pre-wrap; line-height:1.7; color:var(--text-main); font-size:0.95rem;">${content}</div>
+
+      <div style="display:flex; gap:12px; margin-top:20px; justify-content:flex-end;">
+        <button onclick="navigator.clipboard.writeText(decodeURIComponent('${encodedMediaUrl ? encodedMediaUrl : ''}'));" style="display:${mediaUrl ? 'inline-flex' : 'none'}; align-items:center; gap:6px; background:rgba(255,255,255,0.06); border:1px solid var(--border-glass); color:var(--text-muted); padding:8px 16px; border-radius:8px; cursor:pointer;">📋 Copy Media URL</button>
+        <button onclick="navigator.clipboard.writeText(\`${content.replace(/`/g, "'")}\`); window.__showToast && window.__showToast('Content copied!', 'success');" style="background:rgba(99,102,241,0.15); border:1px solid rgba(99,102,241,0.4); color:#a5b4fc; padding:8px 16px; border-radius:8px; cursor:pointer;">📋 Copy Caption</button>
+        <button onclick="document.getElementById('post-detail-modal').remove()" style="background:var(--bg-surface); border:1px solid var(--border-glass); color:var(--text-muted); padding:8px 16px; border-radius:8px; cursor:pointer;">Close</button>
+      </div>
+    </div>
+  `;
+
+  // Close on backdrop click
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+  document.body.appendChild(modal);
 };

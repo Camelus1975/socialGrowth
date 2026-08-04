@@ -175,30 +175,70 @@ router.post('/', async (req, res) => {
     const activeWorkspace = context?.activeWorkspace || 'Unknown Workspace';
     const activeWorkspaceId = context?.activeWorkspaceId || null;
 
+    // ── Fetch live business context for the system prompt ──────────────────
+    let businessContextBlock = '';
+    if (activeWorkspaceId) {
+      try {
+        const { data: bizData } = await userSupabase
+          .from('businesses')
+          .select('name, category, business_type, tagline, discovery_profile')
+          .or(`business_id.eq.${activeWorkspaceId},id.eq.${activeWorkspaceId}`)
+          .single();
+
+        if (bizData) {
+          const dp = bizData.discovery_profile;
+          const profile = dp?.businessProfile || {};
+          const voice   = dp?.brandVoice     || {};
+          const strat   = dp?.contentStrategy || {};
+
+          businessContextBlock = `
+\n=== ACTIVE BUSINESS PROFILE ===
+Business Name   : ${profile.name || bizData.name}
+Tagline         : ${bizData.tagline || profile.summary || '—'}
+Industry        : ${profile.industry || bizData.category || '—'}
+What they do    : ${profile.summary || '—'}
+Value Prop      : ${profile.valueProposition || '—'}
+Target Audience : ${profile.targetAudience || '—'}
+Products/Services: ${(profile.products || []).join(', ') || '—'}
+Brand Tone      : ${voice.tone || '—'} / ${voice.personality || '—'}
+Brand Keywords  : ${(voice.keywords || []).join(', ') || '—'}
+Content Pillars : ${(strat.contentPillars || []).join(', ') || '—'}
+Best Platforms  : ${(strat.bestPlatforms || []).join(', ') || '—'}
+=== END BUSINESS PROFILE ===\n
+IMPORTANT: Every action you take MUST be tailored to this exact business. Do NOT generate generic content.`;
+        }
+      } catch (e) {
+        console.warn('[Copilot] Could not fetch business profile for system prompt:', e.message);
+      }
+    }
+    // ───────────────────────────────────────────────────────────────────────
+
     const messages = [
       { 
         role: "system", 
-        content: `You are the Social Growth Copilot, an AI Chief of Staff. 
-        You manage a team of backend agents and engines.
-        Active Workspace ID: ${activeWorkspaceId}
-        Active Workspace Name: ${activeWorkspace}
-        
-        RULES:
-        - If the user provides a business name/URL, immediately call create_business. Do not ask for confirmation.
-        - If the user asks for a marketing plan or content generation, immediately call trigger_orchestration.
-        - If the user asks you to read or scrape a website, immediately call run_business_discovery.
-        - If the user specifically asks you to search for, brainstorm, or find competitors for them, immediately call find_and_track_competitors.
-        - If the user explicitly mentions a competitor name to track, call track_competitor.
-        - If the user provides content and asks to recycle or repurpose it, immediately call recycle_content.
-        Speak conversationally and concisely.` 
+        content: `You are the Social Growth Copilot, an expert AI Chief of Staff for this business.
+Active Workspace ID   : ${activeWorkspaceId}
+Active Workspace Name : ${activeWorkspace}
+${businessContextBlock}
+
+RULES:
+- If the user provides a business name/URL, immediately call create_business. Do not ask for confirmation.
+- If the user asks for a marketing plan, content, posts, or any content generation, immediately call trigger_orchestration and use their EXACT words as the goal.
+- If the user asks you to read or scrape a website, immediately call run_business_discovery.
+- If the user specifically asks you to search for, brainstorm, or find competitors, immediately call find_and_track_competitors.
+- If the user explicitly mentions a competitor name to track, call track_competitor.
+- If the user provides content and asks to recycle or repurpose it, immediately call recycle_content.
+- ALWAYS ground your responses in the business profile above. Never make up generic advice.
+Speak conversationally and concisely.` 
       }
     ];
 
-    // Append history to give AI context
-    if (history && Array.isArray(history)) {
+    // Append conversation history, then the current user message last
+    if (history && Array.isArray(history) && history.length > 0) {
+      // history already contains the current user message (pushed before fetch in frontend)
       history.forEach(msg => messages.push({ role: msg.role, content: msg.content }));
     } else {
-      messages.push({ role: "user", content: message });
+      messages.push({ role: 'user', content: message });
     }
 
     // Call OpenAI
@@ -266,11 +306,11 @@ router.post('/', async (req, res) => {
       if (toolCall.function.name === "trigger_orchestration") {
         if (!args.appId) return res.json({ message: "Please select a workspace before I can trigger the orchestration team." });
         
-        // Fire and forget orchestration
-        // We pass a dummy jobId because we are skipping the job table for now
-        runMarketingOrchestration("copilot-trigger", args.appId, args.goal, req.headers.authorization, 'en', 'saas', 'both', userId).catch(console.error);
+        // Pass the user's raw message as the orchestration goal so it follows their exact instructions
+        const orchestrationGoal = args.goal || message;
+        runMarketingOrchestration("copilot-trigger", args.appId, orchestrationGoal, req.headers.authorization, 'en', 'saas', 'both', userId).catch(console.error);
         
-        return res.json({ message: `I've triggered the **AI Orchestrator** for your goal: *"${args.goal}"*. The CMO, Content Writer, and Creative Director are spinning up right now to generate your campaign!` });
+        return res.json({ message: `I've triggered the **AI Orchestrator** for your goal: *"${orchestrationGoal}"*. The CMO, Content Writer, and Creative Director are spinning up right now to generate your campaign! Check the Calendar tab in about 60 seconds.` });
       }
 
       if (toolCall.function.name === "track_competitor") {
