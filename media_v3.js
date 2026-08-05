@@ -25,8 +25,7 @@ export async function loadMediaGrid() {
   grid.innerHTML = '<div style="color:var(--text-muted); padding:20px;">Loading media...</div>';
 
   try {
-    const res = await requestApi(`/api/media/${state.activeWorkspaceId}`);
-    const data = await res.json();
+    const data = await requestApi(`/api/media/${state.activeWorkspaceId}`);
 
     if (!data.success) {
       grid.innerHTML = `<div style="color:var(--error); padding:20px;">Failed to load media assets: ${data.error}</div>`;
