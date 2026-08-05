@@ -123,11 +123,21 @@ async function runMarketingOrchestration(jobId, appId, goal, authHeader, languag
     let appName = "";
     try {
       console.log(`[Orchestrator] Looking up business with business_id="${appId}"...`);
-      const { data: bizData, error: bizErr } = await supabase
+      let { data: bizData, error: bizErr } = await supabase
         .from('businesses')
         .select('name, category, business_type, discovery_profile')
-        .or(`business_id.eq.${appId},id.eq.${appId}`)
-        .single();
+        .eq('business_id', appId)
+        .maybeSingle();
+        
+      if (!bizData) {
+        const fallback = await supabase
+          .from('businesses')
+          .select('name, category, business_type, discovery_profile')
+          .eq('id', appId)
+          .maybeSingle();
+        bizData = fallback.data;
+        bizErr = bizErr || fallback.error;
+      }
       
       if (bizErr) {
         console.error(`[Orchestrator] Business lookup FAILED:`, bizErr.message, bizErr.code);
