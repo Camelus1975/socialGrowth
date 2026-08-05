@@ -361,7 +361,7 @@ Speak conversationally and concisely.`
         
         // Pass the user's raw message as the orchestration goal so it follows their exact instructions
         const orchestrationGoal = args.goal || message;
-        runMarketingOrchestration("copilot-trigger", args.appId, orchestrationGoal, req.headers.authorization, 'en', 'saas', 'both', userId).catch(console.error);
+        runMarketingOrchestration("copilot-trigger", args.appId, orchestrationGoal, req.headers.authorization, 'en', 'custom', 'both', userId).catch(console.error);
         
         return res.json({ message: `I've triggered the **AI Orchestrator** for your goal: *"${orchestrationGoal}"*. The CMO, Content Writer, and Creative Director are spinning up right now to generate your campaign! Check the Calendar tab in about 60 seconds.` });
       }

@@ -239,7 +239,7 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: AGENT_PROMPTS.CMO + "\n" + langDirective + "\n" + typeDirective },
-        { role: "user", content: `${businessContext}\nBusiness Name: ${appName || 'Unknown'}\nBusiness Type: ${businessType}\nFounder's Goal: ${goal}\n\n${memoryContext}` }
+        { role: "user", content: `${businessContext}\nBusiness Name: ${appName || 'Unknown'}\nBusiness Type: ${bizData?.discovery_profile?.businessProfile?.industry || bizData?.category || businessType}\nFounder's Goal: ${goal}\n\n${memoryContext}` }
       ],
       response_format: { type: "json_object" }
     });
