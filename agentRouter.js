@@ -289,7 +289,6 @@ Speak conversationally and concisely.`
           user_id: userId,
           name: args.name,
           tagline: args.niche || null,
-          website_url: args.url || null,
           business_type: 'custom',
           category: 'brand'
         }).select().single();
