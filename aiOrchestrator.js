@@ -61,8 +61,9 @@ Output JSON format: { "aso_recommendations": "...", "keywords": ["..."] }`,
 
   VideoMarketingAgent: `You are the Video Marketing Agent.
 Role: Plan and storyboard video marketing assets (TikToks, Reels, Ads).
-Input: A strategy from the CMO.
-Output JSON format: { "video_concept": "...", "target_audience": "...", "storyboard": [ { "scene_number": 1, "visual_direction": "...", "duration": 3 } ] }`,
+Input: A strategy from the CMO and business intelligence context.
+CRITICAL: Base your video concept entirely on the specific business profile provided. Highlight their actual products, target audience, and value proposition.
+Output JSON format: { "video_concept": "...", "target_audience": "...", "video_search_term": "A 2-3 word search query for a relevant stock background video (e.g. 'office workers', 'abstract technology', 'coffee shop')", "storyboard": [ { "scene_number": 1, "visual_direction": "...", "duration": 3 } ] }`,
 
   PublishingAgent: `You are the Publishing Agent.
 Role: Channel selection, format adaptation, and scheduling intelligence.
@@ -528,7 +529,8 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
           vDate.setHours(12, 0, 0, 0);
           
           const scriptText = `🎬 VIDEO CONCEPT: ${videoAgent.result.video_concept}\n\nTARGET: ${videoAgent.result.target_audience}\n\nSTORYBOARD:\n` + 
-            (videoAgent.result.storyboard || []).map(s => `Scene ${s.scene_number} (${s.duration}s): ${s.visual_direction}`).join('\n');
+            (videoAgent.result.storyboard || []).map(s => `Scene ${s.scene_number} (${s.duration}s): ${s.visual_direction}`).join('\n') +
+            `\n\n🎥 Recommended Background Video: Search for "${videoAgent.result.video_search_term || 'relevant business footage'}" on Pexels/Pixabay.`;
           
           postsToInsert.push({
             user_id: userId,
@@ -536,7 +538,7 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
             platform: 'tiktok',
             publish_at: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
             content: scriptText,
-            media_url: 'https://www.w3schools.com/html/mov_bbb.mp4',
+            media_url: generatedImages[0] || null, // Use the first generated AI image as a storyboard thumbnail instead of a random MP4
             status: 'scheduled'
           });
         }
