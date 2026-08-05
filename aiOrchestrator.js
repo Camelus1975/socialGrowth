@@ -526,7 +526,7 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
             platform: 'tiktok',
             publish_at: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
             content: scriptText,
-            media_url: 'https://cdn.pixabay.com/video/2023/10/22/186001-876939527_tiny.mp4',
+            media_url: 'https://www.w3schools.com/html/mov_bbb.mp4',
             status: 'scheduled'
           });
         }

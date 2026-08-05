@@ -179,11 +179,24 @@ router.post('/', async (req, res) => {
     let businessContextBlock = '';
     if (activeWorkspaceId) {
       try {
-        const { data: bizData } = await userSupabase
+        // Step 1: try matching business_id (slug like "mybrand_abc1")
+        let { data: bizData } = await userSupabase
           .from('businesses')
           .select('name, category, business_type, tagline, discovery_profile')
-          .or(`business_id.eq.${activeWorkspaceId},id.eq.${activeWorkspaceId}`)
-          .single();
+          .eq('business_id', activeWorkspaceId)
+          .maybeSingle();
+
+        // Step 2: fall back to UUID id column if not found
+        if (!bizData) {
+          const fallback = await userSupabase
+            .from('businesses')
+            .select('name, category, business_type, tagline, discovery_profile')
+            .eq('id', activeWorkspaceId)
+            .maybeSingle();
+          bizData = fallback.data;
+        }
+
+        console.log(`[Copilot] Business lookup for "${activeWorkspaceId}": found=${!!bizData}, name=${bizData?.name}`);
 
         if (bizData) {
           const dp = bizData.discovery_profile;
@@ -205,13 +218,18 @@ Brand Keywords  : ${(voice.keywords || []).join(', ') || '—'}
 Content Pillars : ${(strat.contentPillars || []).join(', ') || '—'}
 Best Platforms  : ${(strat.bestPlatforms || []).join(', ') || '—'}
 === END BUSINESS PROFILE ===\n
-IMPORTANT: Every action you take MUST be tailored to this exact business. Do NOT generate generic content.`;
+IMPORTANT: Every action you take MUST be tailored specifically to this exact business. Do NOT generate generic content. Reference the business name, industry, and target audience in every response.`;
+        } else {
+          console.warn(`[Copilot] No business found for workspace ID: "${activeWorkspaceId}"`);
+          businessContextBlock = `\nNote: No business profile found. The user may need to run Business Discovery first.`;
         }
       } catch (e) {
         console.warn('[Copilot] Could not fetch business profile for system prompt:', e.message);
       }
     }
     // ───────────────────────────────────────────────────────────────────────
+
+
 
     const messages = [
       { 
