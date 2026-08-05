@@ -6,8 +6,8 @@ export function initMediaV3() {
   
   // Refresh when switching to the Media Assets tab
   window.addEventListener('click', (e) => {
-    const target = e.target.closest('[data-action="switchView"]');
-    if (target && target.getAttribute('data-args').includes('media-assets')) {
+    const target = e.target.closest('[data-action="switchWorkspace"]');
+    if (target && target.getAttribute('data-args') === 'media') {
       loadMediaGrid();
     }
   });

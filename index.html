@@ -60,6 +60,9 @@
         <li class="nav-item" data-action="switchWorkspace" data-args="growth">
           <span class="icon">📈</span> Growth
         </li>
+        <li class="nav-item" data-action="switchWorkspace" data-args="media">
+          <span class="icon">🖼️</span> Media Assets
+        </li>
       </ul>
       <div style="flex:1"></div>
       <ul class="nav-links">
@@ -160,7 +163,17 @@
         </div>
       </section>
 
-      <!-- View 6: Integrations -->
+      <!-- View 6: Media Assets -->
+      <section id="view-media" class="view-panel" style="display:none;">
+        <header class="view-header">
+          <h2>Media Assets</h2>
+        </header>
+        <div id="media-assets-grid" class="media-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; padding: 20px;">
+          <!-- Media injected here -->
+        </div>
+      </section>
+
+      <!-- View: Integrations -->
       <section id="view-integrations" class="view-panel" style="display:none;">
         <header class="view-header">
           <h2>Platform Integrations</h2>
