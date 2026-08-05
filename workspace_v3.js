@@ -102,7 +102,7 @@ export function initiateAddBusiness() {
     msgDiv.style.background = 'rgba(99, 102, 241, 0.1)';
     msgDiv.style.alignSelf = 'flex-start';
     msgDiv.style.border = '1px solid rgba(99, 102, 241, 0.2)';
-    msgDiv.innerHTML = `<strong>Agent:</strong> I can help you set up a new business workspace! To get started, what is the name and website URL of the brand you want to add?`;
+    msgDiv.innerHTML = `<strong>Agent:</strong> I can help you set up a new business workspace! To get started, what is the <strong>name</strong> and <strong>website URL</strong> of the brand you want to add?<br><br><em>(Providing the URL allows me to instantly scan the website, learn about your business, and generate a tailored brand profile!)</em>`;
     
     history.appendChild(msgDiv);
     history.scrollTop = history.scrollHeight;

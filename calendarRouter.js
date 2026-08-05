@@ -96,4 +96,29 @@ router.delete('/:appId/:postId', async (req, res) => {
   }
 });
 
+// DELETE ALL posts for a workspace
+router.delete('/:appId', async (req, res) => {
+  const { appId } = req.params;
+  const supabase = getSupabase(req);
+
+  try {
+    const { data: userAuth, error: authErr } = await supabase.auth.getUser();
+    if (authErr || !userAuth.user) {
+      return res.status(401).json({ success: false, error: 'Unauthorized' });
+    }
+
+    const { error } = await supabase
+      .from('scheduled_posts')
+      .delete()
+      .eq('app_id', appId)
+      .eq('user_id', userAuth.user.id);
+
+    if (error) throw error;
+    res.json({ success: true, message: 'All posts cleared.' });
+  } catch (err) {
+    console.error('[Calendar] Error deleting all posts:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;

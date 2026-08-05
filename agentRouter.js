@@ -20,15 +20,15 @@ const tools = [
     type: "function",
     function: {
       name: "create_business",
-      description: "Creates a new business workspace for the user in the database.",
+      description: "Creates a new business workspace. ALWAYS ask for both the business name AND website URL before calling this. The URL is needed to auto-study the business.",
       parameters: {
         type: "object",
         properties: {
           name: { type: "string", description: "The name of the business or brand" },
-          url: { type: "string", description: "The website URL of the business" },
+          url: { type: "string", description: "The website URL of the business — REQUIRED for auto-discovery" },
           niche: { type: "string", description: "A short description of what the business does (e.g., 'a social media app', 'a coffee shop')" }
         },
-        required: ["name"]
+        required: ["name", "url"]
       }
     }
   },
@@ -240,9 +240,10 @@ Active Workspace Name : ${activeWorkspace}
 ${businessContextBlock}
 
 RULES:
-- If the user provides a business name/URL, immediately call create_business. Do not ask for confirmation.
+- When the user wants to add a business, FIRST ask for both the business name AND its website URL if not provided. The URL is critical for auto-studying the business.
+- Once you have both name and URL, call create_business immediately. The system will auto-scrape and study the website.
 - If the user asks for a marketing plan, content, posts, or any content generation, immediately call trigger_orchestration and use their EXACT words as the goal.
-- If the user asks you to read or scrape a website, immediately call run_business_discovery.
+- If the user asks you to read or scrape a website manually, call run_business_discovery.
 - If the user specifically asks you to search for, brainstorm, or find competitors, immediately call find_and_track_competitors.
 - If the user explicitly mentions a competitor name to track, call track_competitor.
 - If the user provides content and asks to recycle or repurpose it, immediately call recycle_content.
@@ -278,29 +279,64 @@ Speak conversationally and concisely.`
       console.log(`[Copilot] Executing tool: ${toolCall.function.name}`, args);
       
       if (toolCall.function.name === "create_business") {
-        let dbError = null;
-        if (userId) {
-          const businessSlug = args.name.toLowerCase().replace(/[^a-z0-9]/g, '') + '_' + Math.random().toString(36).substring(2, 6);
-          const resInsert = await userSupabase.from('businesses').insert({
-            business_id: businessSlug,
-            user_id: userId,
-            name: args.name,
-            tagline: args.niche || null,
-            business_type: 'custom',
-            category: 'brand'
-          }).select();
-          
-          dbError = resInsert.error;
-          
-          if (dbError) {
-            console.error("DB Error creating business:", dbError);
-            return res.json({ message: `I tried to add **${args.name}**, but I encountered a database error: \`${dbError.message || JSON.stringify(dbError)}\`` });
-          }
-          
-          return res.json({ message: `Awesome! I've successfully set up the workspace for **${args.name}**${args.url ? ` (${args.url})` : ''}. You can now select it from the workspace dropdown in the top left!`, refreshWorkspaces: true });
-        } else {
+        if (!userId) {
           return res.json({ message: `I could not create the workspace because I couldn't authenticate you.` });
         }
+
+        const businessSlug = args.name.toLowerCase().replace(/[^a-z0-9]/g, '') + '_' + Math.random().toString(36).substring(2, 6);
+        const resInsert = await userSupabase.from('businesses').insert({
+          business_id: businessSlug,
+          user_id: userId,
+          name: args.name,
+          tagline: args.niche || null,
+          website_url: args.url || null,
+          business_type: 'custom',
+          category: 'brand'
+        }).select().single();
+
+        if (resInsert.error) {
+          console.error("DB Error creating business:", resInsert.error);
+          return res.json({ message: `I tried to add **${args.name}**, but encountered a database error: \`${resInsert.error.message}\`` });
+        }
+
+        const newBiz = resInsert.data;
+        let discoveryMsg = '';
+
+        // Auto-trigger discovery if a URL was provided
+        if (args.url && newBiz) {
+          try {
+            const { data: jobData, error: jobErr } = await supabase
+              .from('discovery_jobs')
+              .insert({
+                app_id: businessSlug,
+                user_id: userId,
+                status: 'pending'
+              })
+              .select()
+              .single();
+
+            if (!jobErr && jobData) {
+              // Fire and forget — runs in background
+              processDiscoveryJob(
+                jobData.id,
+                businessSlug,
+                { website: args.url },
+                args.name,
+                supabase
+              ).catch(console.error);
+              discoveryMsg = ` I've also launched the **Business Intelligence Engine** to study \`${args.url}\` — it will scrape the website, analyse the brand, and store the full profile in the background. This takes about 30–60 seconds.`;
+            }
+          } catch (discoveryErr) {
+            console.error('[Copilot] Auto-discovery failed to start:', discoveryErr);
+          }
+        } else {
+          discoveryMsg = ` No website URL was provided, so please share the URL later and I will study the business for you.`;
+        }
+
+        return res.json({
+          message: `✅ Workspace for **${args.name}** has been created! You can now select it from the workspace dropdown.${discoveryMsg}`,
+          refreshWorkspaces: true
+        });
       }
 
       if (toolCall.function.name === "run_business_discovery") {

@@ -11,6 +11,11 @@ export function initCalendarV3() {
     newPostBtn.onclick = openNewPostModal;
   }
 
+  const clearPostsBtn = document.getElementById('btn-clear-posts');
+  if (clearPostsBtn) {
+    clearPostsBtn.onclick = clearAllCalendarPosts;
+  }
+
   window.addEventListener('workspaceChanged', loadCalendar);
   loadCalendar();
 }
@@ -264,6 +269,24 @@ window.deleteCalendarPost = async function(postId) {
   } catch (err) {
     console.error(err);
     alert('Error deleting post.');
+  }
+};
+
+window.clearAllCalendarPosts = async function() {
+  if (!state.activeWorkspaceId) return;
+  if (!confirm(`Are you sure you want to PERMANENTLY delete ALL scheduled posts for ${state.activeWorkspace || 'this workspace'}?`)) return;
+  
+  try {
+    const res = await requestApi(`/api/calendar/${state.activeWorkspaceId}`, { method: 'DELETE' });
+    if (res.success) {
+      loadCalendar();
+      if (window.__showToast) window.__showToast('All posts cleared.', 'success');
+    } else {
+      alert('Failed to clear posts: ' + res.error);
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Error clearing posts.');
   }
 };
 
