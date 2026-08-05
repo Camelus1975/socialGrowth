@@ -39,9 +39,11 @@ export async function loadMediaGrid() {
 
     let html = '';
     data.media.forEach(asset => {
-      const isVideo = asset.media_type === 'video' || asset.media_url.endsWith('.mp4');
-      const previewUrl = asset.media_url;
+      const url = asset.storage_path || asset.media_url || '';
+      const isVideo = (asset.file_type && asset.file_type.includes('video')) || (asset.media_type === 'video') || url.toLowerCase().endsWith('.mp4');
+      const previewUrl = url;
       const typeLabel = isVideo ? '🎥 Video' : '🖼️ Image';
+      const caption = asset.description || asset.prompt || asset.name || 'Generated Media Asset';
 
       html += `
         <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:12px; overflow:hidden; position:relative; cursor:zoom-in; transition:transform 0.2s;" 
@@ -54,11 +56,11 @@ export async function loadMediaGrid() {
           <div style="aspect-ratio: 1 / 1; display:flex; justify-content:center; align-items:center; background:#111;">
             ${isVideo ? 
               `<video src="${previewUrl}" style="width:100%; height:100%; object-fit:cover;" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>` : 
-              `<img src="${previewUrl}" style="width:100%; height:100%; object-fit:cover;" />`
+              `<img src="${previewUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://placehold.co/400?text=Image+Not+Found'"/>`
             }
           </div>
           <div style="padding:12px;">
-            <p style="margin:0; font-size:0.85rem; color:var(--text-main); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;" title="${asset.prompt || 'Generated media'}">${asset.prompt || 'Generated Media Asset'}</p>
+            <p style="margin:0; font-size:0.85rem; color:var(--text-main); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;" title="${caption}">${caption}</p>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
                 <p style="margin:0; font-size:0.75rem; color:var(--text-muted);">${new Date(asset.created_at).toLocaleDateString()}</p>
                 <button onclick="event.stopPropagation(); window.deleteMediaAsset('${asset.id}')" style="background:none; border:none; color:var(--error); cursor:pointer; padding:0; font-size:1.1rem;" title="Delete Asset">🗑️</button>
