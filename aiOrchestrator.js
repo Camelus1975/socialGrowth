@@ -511,7 +511,7 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
           date.setHours(12, 0, 0, 0);
           
           return {
-            user_id: uid,
+            user_id: userId,
             app_id: appId,
             platform: v.platform || 'linkedin',
             publish_at: date.toISOString(),
