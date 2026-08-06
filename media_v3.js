@@ -40,7 +40,7 @@ export async function loadMediaGrid() {
     let html = '';
     data.media.forEach(asset => {
       const url = asset.storage_path || asset.media_url || '';
-      const isVideo = (asset.file_type && asset.file_type.includes('video')) || (asset.media_type === 'video') || url.toLowerCase().endsWith('.mp4');
+      const isVideo = (asset.file_type && asset.file_type.includes('video')) || (asset.media_type === 'video') || url?.toLowerCase()?.endsWith('.mp4');
       const previewUrl = url;
       const typeLabel = isVideo ? '🎥 Video' : '🖼️ Image';
       const caption = asset.description || asset.prompt || asset.name || 'Generated Media Asset';

@@ -6,31 +6,38 @@ const config = require('./config');
  * Transforms AI-generated strategy into a pending Ad Campaign
  */
 async function createPendingCampaign(appId, strategyData, authHeader) {
-  const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
-    global: { headers: { Authorization: authHeader } }
-  });
-
   // Extract budget and objective from strategy
   const budget = strategyData.budget_allocation ? Object.values(strategyData.budget_allocation).reduce((a, b) => a + b, 0) : 500;
   const objective = strategyData.objective || 'installs';
   
-  const { data, error } = await supabase
-    .from('ad_campaigns')
-    .insert([{
-      app_id: appId,
-      name: strategyData.campaign_name || 'AI Generated Campaign',
-      objective: objective,
-      total_budget: budget,
-      daily_budget: budget / 7, // Default to 7 days
-      status: 'pending_approval',
-      strategy_context: strategyData
-    }])
-    .select();
+  const insertData = {
+    app_id: appId,
+    name: strategyData.campaign_name || 'AI Generated Campaign',
+    objective: objective,
+    total_budget: budget,
+    daily_budget: budget / 7, // Default to 7 days
+    status: 'pending_approval',
+    strategy_context: strategyData
+  };
 
-  if (error) {
-    console.error("Error creating campaign:", error);
-    throw error;
+  const res = await fetch(`${config.SUPABASE_URL}/rest/v1/ad_campaigns?select=*`, {
+    method: 'POST',
+    headers: {
+      'apikey': config.SUPABASE_ANON_KEY,
+      'Authorization': authHeader,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    },
+    body: JSON.stringify([insertData])
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("Error creating campaign:", errorText);
+    throw new Error(errorText);
   }
+  
+  const data = await res.json();
   return data[0];
 }
 
