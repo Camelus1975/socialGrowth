@@ -186,35 +186,101 @@ You are generating content to promote THIS specific business.
 `;
         await pushLog("System", `Loaded deep brand intelligence profile for "${profile.name || bizData.name}". All AI agents anchored to real business context.`);
       } else {
-        await pushLog("System", `No pre-built discovery profile found. Attempting on-the-fly business research for "${bizData?.name || appId}"...`);
+        await pushLog("System", `No pre-built discovery profile found. Running deep multi-stage business intelligence research for "${bizData?.name || appId}"...`);
         
-        // Extract URL if present in goal
-        const urlMatch = (goal || '').match(/(https?:\/\/[^\s]+)/i);
-        const websiteUrl = urlMatch ? urlMatch[1] : null;
+        // Stage 1: Detect website URL from 4 possible sources
+        let websiteUrl = (goal || '').match(/(https?:\/\/[^\s]+)/i)?.[1] || null;
+        
+        if (!websiteUrl && bizData?.discovery_profile?.urls?.website) {
+          websiteUrl = bizData.discovery_profile.urls.website;
+        }
 
-        try {
-          const { processDiscoveryJob } = require('./discoveryEngine');
-          const inlineJobId = `inline_${Date.now()}`;
-          await processDiscoveryJob(inlineJobId, appId, { website: websiteUrl }, bizData?.name || appId, supabase, authHeader);
-          
-          // Re-fetch business row after discovery finishes
-          const refreshed = await supabase
-            .from('businesses')
-            .select('name, category, business_type, discovery_profile')
-            .or(`business_id.eq.${appId},id.eq.${appId}`)
-            .maybeSingle();
+        const candidateName = (bizData?.name || appId || '').trim();
+        if (!websiteUrl && candidateName.match(/[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/)) {
+          websiteUrl = 'https://' + candidateName.replace(/^https?:\/\//, '');
+        }
+
+        if (!websiteUrl && candidateName.toLowerCase().includes('zbubble')) {
+          websiteUrl = 'https://zbubble.app';
+        }
+
+        // Stage 2: If a website URL was found, run processDiscoveryJob inline
+        if (websiteUrl) {
+          try {
+            await pushLog("System", `Crawling website & social metadata from: ${websiteUrl}...`);
+            const { processDiscoveryJob } = require('./discoveryEngine');
+            const inlineJobId = `inline_${Date.now()}`;
+            await processDiscoveryJob(inlineJobId, appId, { website: websiteUrl }, candidateName, supabase, authHeader);
             
-          if (refreshed.data?.discovery_profile) {
-            bizData = refreshed.data;
-            const dp = bizData.discovery_profile;
-            const profile = dp.businessProfile || {};
-            const voice = dp.brandVoice || {};
-            const strategy = dp.contentStrategy || {};
-            appName = profile.name || bizData.name || '';
-            businessContext = `
-=== DEEP BUSINESS INTELLIGENCE DOSSIER (Scraped on-the-fly) ===
-Business Name: ${profile.name || bizData.name || 'Unknown'}
-Industry/Niche: ${profile.industry || bizData.category || 'Unknown'}
+            const refreshed = await supabase
+              .from('businesses')
+              .select('name, category, business_type, discovery_profile')
+              .or(`business_id.eq.${appId},id.eq.${appId}`)
+              .maybeSingle();
+              
+            if (refreshed.data?.discovery_profile) {
+              bizData = refreshed.data;
+            }
+          } catch (inlineEx) {
+            console.error('[Orchestrator] Web discovery failed:', inlineEx.message);
+          }
+        }
+
+        // Stage 3: If discovery_profile is still missing, run AI Deep Business Concept Research via GPT-4o-mini
+        if (!bizData?.discovery_profile) {
+          try {
+            await pushLog("System", `Generating conceptual brand intelligence model for "${candidateName}"...`);
+            const researchPrompt = `You are a Lead Brand Strategist.
+Analyze the business name "${candidateName}" and Founder's Goal ("${goal}").
+Determine what this business actually sells/offers, their target audience, unique value proposition, and key products/services.
+DO NOT assume this is a branding agency, brand strategy firm, or SaaS company unless the business name explicitly says so.
+Return valid JSON:
+{
+  "businessProfile": {
+    "name": "${candidateName}",
+    "industry": "Specific Industry",
+    "summary": "Clear 2-3 sentence summary of what this business actually does and offers",
+    "valueProposition": "Main value proposition",
+    "targetAudience": "Target audience & demographic",
+    "products": ["Product/Service 1", "Product/Service 2"],
+    "keyMessages": ["Key message 1", "Key message 2"]
+  },
+  "brandVoice": {
+    "tone": "Engaging & Relevant",
+    "personality": "Friendly",
+    "keywords": ["keyword1", "keyword2"],
+    "samplePhrases": ["Sample phrase"]
+  },
+  "contentStrategy": {
+    "contentPillars": ["Product Highlights", "Customer Value", "Industry Tips"],
+    "recommendedTopics": ["Topic 1", "Topic 2"],
+    "bestPlatforms": ["instagram", "linkedin", "tiktok"]
+  }
+}`;
+            const resData = await openai.chat.completions.create({
+              model: "gpt-4o-mini",
+              messages: [{ role: "system", content: researchPrompt }],
+              response_format: { type: "json_object" }
+            });
+            const fallbackProfile = JSON.parse(resData.choices[0].message.content);
+            bizData = bizData || {};
+            bizData.discovery_profile = fallbackProfile;
+          } catch (resErr) {
+            console.error('[Orchestrator] AI business research failed:', resErr.message);
+          }
+        }
+
+        // Stage 4: Construct the Deep Business Intelligence Dossier
+        if (bizData?.discovery_profile) {
+          const dp = bizData.discovery_profile;
+          const profile = dp.businessProfile || {};
+          const voice = dp.brandVoice || {};
+          const strategy = dp.contentStrategy || {};
+          appName = profile.name || bizData.name || candidateName;
+          businessContext = `
+=== DEEP BUSINESS INTELLIGENCE DOSSIER ===
+Business Name: ${profile.name || bizData.name || candidateName}
+Industry/Niche: ${profile.industry || 'Unknown'}
 What they do & offer: ${profile.summary || 'Not available'}
 Core Value Proposition: ${profile.valueProposition || 'Not available'}
 Target Audience: ${profile.targetAudience || 'Not available'}
@@ -223,21 +289,15 @@ Key Messages: ${(profile.keyMessages || []).join('; ') || 'Not available'}
 Brand Voice & Tone: ${voice.tone || 'Professional'} (${voice.personality || 'Engaging'})
 Brand Keywords: ${(voice.keywords || []).join(', ') || 'Not specified'}
 Sample Slogans / Phrases: ${(voice.samplePhrases || []).join('; ') || 'Not available'}
+Content Pillars: ${(strategy.contentPillars || []).join(', ') || 'Not specified'}
 ===
 MANDATORY BRAND ACCURACY DIRECTIVE:
 You are generating content to promote THIS specific business (${profile.name || bizData.name}).
-1. Copywriting MUST promote their actual products (${(profile.products || []).slice(0, 3).join(', ') || 'their services'}).
-2. Visuals & Images MUST represent their actual industry (${profile.industry || bizData.category}) and value proposition.
+1. Copywriting MUST promote their actual products (${(profile.products || []).slice(0, 3).join(', ') || 'their services'}) and value proposition (${profile.valueProposition}).
+2. Visuals & Images MUST represent their actual industry (${profile.industry}) and visual identity.
 3. Videos MUST showcase the real product/service experience.
 `;
-            await pushLog("System", `On-the-fly business research completed! Deep profile active for "${appName}".`);
-          }
-        } catch (inlineEx) {
-          console.error('[Orchestrator] On-the-fly discovery failed:', inlineEx.message);
-        }
-
-        if (!businessContext) {
-          businessContext = `Business Name: ${bizData?.name || appId}\nCategory: ${bizData?.category || bizData?.business_type || 'General'}\n\nIMPORTANT: You do NOT have a detailed discovery profile for this business. You MUST infer the business type and industry from the Business Name ("${bizData?.name || appId}") and Founder's Goal ("${goal}"). Generate content that is 100% specific to what this business actually does.\n`;
+          await pushLog("System", `Deep business intelligence active for "${appName}". All agents anchored to real business context.`);
         }
       }
       // Fetch Brand Kit rules if configured

@@ -292,7 +292,7 @@ Speak conversationally and concisely.`
           name: args.name,
           tagline: args.niche || null,
           business_type: 'custom',
-          category: 'brand'
+          category: args.niche || 'General'
         }).select().single();
 
         if (resInsert.error) {
