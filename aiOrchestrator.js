@@ -551,13 +551,106 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
             (videoAgent.result.storyboard || []).map(s => `Scene ${s.scene_number} (${s.duration}s): ${s.visual_direction}`).join('\n') +
             `\n\n🎥 Recommended Background Video: Search for "${videoAgent.result.video_search_term || 'relevant business footage'}" on Pexels/Pixabay.`;
           
+          let finalVideoUrl = generatedImages[0] || null;
+
+          if (config.REPLICATE_API_TOKEN) {
+            try {
+              console.log(`[Orchestrator] Generating Video via Replicate minimax/video-01...`);
+              await pushLog("Video Marketing Agent", "Rendering promotional video via AI (minimax/video-01)... This may take 60-90 seconds.");
+              
+              const videoPrompt = `Cinematic 4k high quality video. ${videoAgent.result.video_concept} ${videoAgent.result.storyboard && videoAgent.result.storyboard.length > 0 ? videoAgent.result.storyboard[0].visual_direction : ''}`;
+              const replicateRes = await fetch('https://api.replicate.com/v1/models/minimax/video-01/predictions', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${config.REPLICATE_API_TOKEN}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  input: { prompt: videoPrompt }
+                })
+              });
+              
+              const prediction = await replicateRes.json();
+              
+              if (prediction.error) {
+                console.error(`[Orchestrator] Replicate Video Error:`, prediction.error);
+                await pushLog("Video Marketing Agent", "Failed to generate video (Model Error).");
+              } else if (prediction.urls && prediction.urls.get) {
+                let status = prediction.status;
+                let getRes;
+                let getJson;
+                
+                // Poll until complete
+                while (status === 'starting' || status === 'processing') {
+                  await new Promise(resolve => setTimeout(resolve, 5000));
+                  getRes = await fetch(prediction.urls.get, {
+                    headers: { 'Authorization': `Bearer ${config.REPLICATE_API_TOKEN}` }
+                  });
+                  getJson = await getRes.json();
+                  status = getJson.status;
+                  console.log(`[Orchestrator] Video status: ${status}...`);
+                }
+                
+                if (status === 'succeeded' && getJson.output) {
+                  const videoDownloadUrl = Array.isArray(getJson.output) ? getJson.output[0] : getJson.output;
+                  console.log(`[Orchestrator] Video succeeded! URL: ${videoDownloadUrl}`);
+                  
+                  // Download the video buffer
+                  const vidRes = await fetch(videoDownloadUrl);
+                  const vidBuffer = await vidRes.arrayBuffer();
+                  
+                  // Upload to Supabase Storage
+                  const fileName = `generated_vid_${appId}_${Date.now()}.mp4`;
+                  const { data: uploadData, error: uploadErr } = await supabase.storage
+                    .from('media')
+                    .upload(fileName, vidBuffer, { contentType: 'video/mp4', upsert: true });
+                  
+                  if (!uploadErr && uploadData) {
+                    const { data: urlData } = supabase.storage.from('media').getPublicUrl(fileName);
+                    finalVideoUrl = urlData?.publicUrl || finalVideoUrl;
+                    console.log(`[Orchestrator] Uploaded video to Supabase storage: ${finalVideoUrl}`);
+                    
+                    // Also save to 'media' table so it shows up in Media Assets
+                    if (!authHeader || !authHeader.includes('mock-supabase-jwt-token')) {
+                       await fetch(`${config.SUPABASE_URL}/rest/v1/media`, {
+                         method: 'POST',
+                         headers: {
+                           'apikey': config.SUPABASE_ANON_KEY,
+                           'Authorization': authHeader,
+                           'Content-Type': 'application/json',
+                           'Prefer': 'return=minimal'
+                         },
+                         body: JSON.stringify({
+                           app_id: appId,
+                           name: `${appName || 'Campaign'} - Promo Video`,
+                           file_type: 'video/mp4',
+                           folder: 'AI Generated',
+                           tag: 'ai-generated',
+                           description: `Auto-generated AI promotional video.`,
+                           storage_path: finalVideoUrl
+                         })
+                       });
+                    }
+                    await pushLog("Video Marketing Agent", "Promotional video successfully generated and saved to Media Assets ✓");
+                  }
+                } else {
+                  console.error(`[Orchestrator] Video failed or was canceled:`, status);
+                  await pushLog("Video Marketing Agent", "Video rendering failed or was aborted.");
+                }
+              }
+            } catch (vidErr) {
+              console.error(`[Orchestrator] Video generation exception:`, vidErr.message);
+              await pushLog("Video Marketing Agent", "Video generation encountered an error.");
+            }
+          }
+          
           postsToInsert.push({
             user_id: userId,
             app_id: appId,
             platform: 'tiktok',
             publish_at: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
             content: scriptText,
-            media_url: generatedImages[0] || null, // Use the first generated AI image as a storyboard thumbnail instead of a random MP4
+            media_url: finalVideoUrl,
             status: 'scheduled'
           });
         }
