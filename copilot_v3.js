@@ -41,6 +41,17 @@ export function initCopilotV3(state) {
         if (response.refreshWorkspaces) {
           window.dispatchEvent(new CustomEvent('refreshWorkspaces'));
         }
+        
+        // Auto-refresh the calendar periodically because the Orchestrator runs in the background
+        if (response.message && response.message.includes("AI Orchestrator")) {
+          let pollCount = 0;
+          const pollInterval = setInterval(() => {
+            pollCount++;
+            window.dispatchEvent(new CustomEvent('workspaceChanged'));
+            // Stop polling after 180 seconds (18 times)
+            if (pollCount >= 18) clearInterval(pollInterval);
+          }, 10000);
+        }
       } else {
         appendMessage('ai', 'Sorry, I encountered an error processing that.');
       }
