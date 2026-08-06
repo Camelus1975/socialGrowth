@@ -63,7 +63,8 @@ Output JSON format: { "aso_recommendations": "...", "keywords": ["..."] }`,
 Role: Plan and storyboard video marketing assets (TikToks, Reels, Ads).
 Input: A strategy from the CMO and business intelligence context.
 CRITICAL: Base your video concept entirely on the specific business profile provided. Highlight their actual products, target audience, and value proposition.
-Output JSON format: { "video_concept": "...", "target_audience": "...", "video_search_term": "A 2-3 word search query for a relevant stock background video (e.g. 'office workers', 'abstract technology', 'coffee shop')", "storyboard": [ { "scene_number": 1, "visual_direction": "...", "duration": 3 } ] }`,
+CRITICAL RULE FOR AI VIDEO: The 'visual_direction' of Scene 1 will be sent DIRECTLY to an AI Text-to-Video generator (like Sora/Minimax). The AI model does NOT know your brand name. You MUST describe the physical products, services, or actions explicitly. Instead of saying 'A video for [Brand Name]', describe what it physically looks like (e.g., 'A person holding a glowing bubble with a message inside'). Do NOT ask for text overlays.
+Output JSON format: { "video_concept": "...", "target_audience": "...", "video_search_term": "A 2-3 word search query...", "storyboard": [ { "scene_number": 1, "visual_direction": "Highly detailed physical visual description of the scene without using the brand name...", "duration": 5 } ] }`,
 
   PublishingAgent: `You are the Publishing Agent.
 Role: Channel selection, format adaptation, and scheduling intelligence.
@@ -180,7 +181,7 @@ Best Platforms: ${(strategy.bestPlatforms || []).join(', ') || 'Not specified'}
 `;
         await pushLog("System", `Loaded brand intelligence profile for "${profile.name || bizData.name}". AI agents will use real business context.`);
       } else {
-        businessContext = `Business Name: ${bizData?.name || appId}\nCategory: ${bizData?.category || businessType}\n`;
+        businessContext = `Business Name: ${bizData?.name || appId}\nCategory: ${bizData?.category || bizData?.business_type || 'General'}\n\nIMPORTANT: You do NOT have a detailed discovery profile for this business. You MUST infer the business type and industry from the Business Name and any user-provided goal. Do NOT assume this is a SaaS or tech company unless the name or goal explicitly indicates it. Generate content that is specific and relevant to what this business actually does based on its name.\n`;
         await pushLog("System", "No discovery profile found. Run Business Discovery first for better results.");
       }
       // Fetch Brand Kit rules if configured
@@ -243,7 +244,7 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: AGENT_PROMPTS.CMO + "\n" + langDirective + "\n" + typeDirective },
-        { role: "user", content: `${businessContext}\nBusiness Name: ${appName || 'Unknown'}\nBusiness Type: ${bizData?.discovery_profile?.businessProfile?.industry || bizData?.category || businessType}\nFounder's Goal: ${goal}\n\n${memoryContext}` }
+        { role: "user", content: `${businessContext}\nBusiness Name: ${appName || 'Unknown'}\nBusiness Type: ${bizData?.discovery_profile?.businessProfile?.industry || bizData?.category || bizData?.business_type || 'Infer from Business Name'}\nFounder's Goal: ${goal}\n\nIMPORTANT: If the Business Type says 'Infer from Business Name', you MUST determine the industry from the business name and goal. Do NOT default to SaaS or technology.\n${memoryContext}` }
       ],
       response_format: { type: "json_object" }
     });
@@ -376,7 +377,8 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
           for (let i = 0; i < totalImages; i++) {
             const promptText = imagePrompts[i];
             const postText = contentWriter.result.copy_variants[i]?.text || '';
-            const enhancedPrompt = `A high-end, clean photographic visual for "${appName || businessType}" business. Theme: "${postText.substring(0, 150)}". Visual direction: ${promptText.substring(0, 400)}. Style: Clean modern photography, vibrant colors, cinematic lighting, 4k, masterpiece. CRITICAL RULE: This image must be 100% text-free. Do NOT include ANY text, letters, words, numbers, logos, watermarks, typography, captions, signage, or written language anywhere in the image. Pure visual only.`;
+            const businessDescription = bizData?.discovery_profile?.businessProfile?.summary || bizData?.category || bizData?.business_type || '';
+            const enhancedPrompt = `A high-end, clean photographic visual for "${appName}" business${businessDescription ? ' (' + businessDescription + ')' : ''}. Theme: "${postText.substring(0, 150)}". Visual direction: ${promptText.substring(0, 400)}. Style: Clean modern photography, vibrant colors, cinematic lighting, 4k, masterpiece. CRITICAL RULE: This image must be 100% text-free. Do NOT include ANY text, letters, words, numbers, logos, watermarks, typography, captions, signage, or written language anywhere in the image. Pure visual only.`;
             
             let imageUrl = null;
             
@@ -558,7 +560,9 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
               console.log(`[Orchestrator] Generating Video via Replicate minimax/video-01...`);
               await pushLog("Video Marketing Agent", "Rendering promotional video via AI (minimax/video-01)... This may take 60-90 seconds.");
               
-              const videoPrompt = `Cinematic 4k high quality video. ${videoAgent.result.video_concept} ${videoAgent.result.storyboard && videoAgent.result.storyboard.length > 0 ? videoAgent.result.storyboard[0].visual_direction : ''}`;
+              const industryContext = bizData?.discovery_profile?.businessProfile?.industry || bizData?.category || 'business';
+              const productContext = bizData?.discovery_profile?.businessProfile?.summary ? `that ${bizData.discovery_profile.businessProfile.summary}` : '';
+              const videoPrompt = `Cinematic 4k high quality video. Subject: A ${industryContext} ${productContext}. Action: ${videoAgent.result.video_concept} ${videoAgent.result.storyboard && videoAgent.result.storyboard.length > 0 ? videoAgent.result.storyboard[0].visual_direction : ''}. Photorealistic, 8k resolution, highly detailed.`;
               const replicateRes = await fetch('https://api.replicate.com/v1/models/minimax/video-01/predictions', {
                 method: 'POST',
                 headers: {

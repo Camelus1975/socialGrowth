@@ -331,7 +331,7 @@ app.post('/api/discovery/start', async (req, res) => {
       business_id: appId,
       user_id: req.user.id,
       name: name || 'Discovered Business',
-      business_type: businessType || 'saas',
+      business_type: businessType || 'custom',
       category: 'Discovered',
       metrics_history: {}
     }]);
@@ -866,7 +866,7 @@ app.post('/api/agents/orchestration/trigger', async (req, res) => {
 
   const authHeader = req.headers.authorization;
   const language = req.headers['x-app-language'] || 'en';
-  const businessType = req.body.businessType || 'saas';
+  const businessType = req.body.businessType || 'auto';
   const campaignType = req.body.campaignType || 'both';
   const userId = req.user?.id;
 
