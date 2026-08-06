@@ -306,27 +306,32 @@ Speak conversationally and concisely.`
         // Auto-trigger discovery if a URL was provided
         if (args.url && newBiz) {
           try {
-            const { data: jobData, error: jobErr } = await supabase
+            const urlsObj = { website: args.url, instagram: args.instagramUrl, linkedin: args.linkedinUrl };
+            let jobId = `job_${Date.now()}`;
+            
+            const { data: jobData } = await userSupabase
               .from('discovery_jobs')
               .insert({
-                app_id: businessSlug,
-                user_id: userId,
-                status: 'pending'
+                business_id: newBiz.id,
+                urls_to_scan: urlsObj,
+                status: 'pending',
+                progress_percent: 0
               })
               .select()
               .single();
+              
+            if (jobData) jobId = jobData.id;
 
-            if (!jobErr && jobData) {
-              // Fire and forget — runs in background
-              processDiscoveryJob(
-                jobData.id,
-                businessSlug,
-                { website: args.url },
-                args.name,
-                supabase
-              ).catch(console.error);
-              discoveryMsg = ` I've also launched the **Business Intelligence Engine** to study \`${args.url}\` — it will scrape the website, analyse the brand, and store the full profile in the background. This takes about 30–60 seconds.`;
-            }
+            processDiscoveryJob(
+              jobId,
+              businessSlug,
+              urlsObj,
+              args.name,
+              userSupabase,
+              req.headers.authorization
+            ).catch(console.error);
+
+            discoveryMsg = ` I've also launched the **Business Intelligence Engine** to study \`${args.url}\` — it will scrape the website, subpages, social channels, and store the full profile in the background. This takes about 30–60 seconds.`;
           } catch (discoveryErr) {
             console.error('[Copilot] Auto-discovery failed to start:', discoveryErr);
           }
@@ -343,17 +348,44 @@ Speak conversationally and concisely.`
       if (toolCall.function.name === "run_business_discovery") {
         if (!args.appId) return res.json({ message: "I need to be inside a specific workspace to run discovery. Please select a workspace first!" });
         
-        // Create job
-        const { data, error } = await userSupabase.from('discovery_jobs').insert({
-          app_id: args.appId,
-          user_id: userId,
-          status: 'pending'
-        }).select().single();
-        
-        if (error) return res.json({ message: "Failed to initialize the Discovery Engine." });
-        
-        // Fire and forget background discovery
-        processDiscoveryJob(data.id, args.appId, { website: args.url, instagram: args.instagramUrl, linkedin: args.linkedinUrl }, activeWorkspace, supabase).catch(console.error);
+        // Fetch business UUID if available
+        let bizUuid = null;
+        try {
+          const { data: bizRows } = await userSupabase
+            .from('businesses')
+            .select('id, name')
+            .or(`business_id.eq.${args.appId},id.eq.${args.appId}`)
+            .limit(1);
+          if (bizRows && bizRows.length > 0) bizUuid = bizRows[0].id;
+        } catch (e) {}
+
+        const urlsObj = { website: args.url, instagram: args.instagramUrl, linkedin: args.linkedinUrl };
+        let jobId = `job_${Date.now()}`;
+
+        // Attempt insert into discovery_jobs using correct column name (business_id)
+        try {
+          const { data: jobData, error: jobErr } = await userSupabase.from('discovery_jobs').insert({
+            business_id: bizUuid || args.appId,
+            urls_to_scan: urlsObj,
+            status: 'pending',
+            progress_percent: 0
+          }).select().single();
+          
+          if (jobData) jobId = jobData.id;
+          if (jobErr) console.warn('[Copilot] Note on discovery_jobs insert:', jobErr.message);
+        } catch (jEx) {
+          console.warn('[Copilot] discovery_jobs insert exception:', jEx.message);
+        }
+
+        // Fire and forget background discovery (ALWAYS runs regardless of job insert status!)
+        processDiscoveryJob(
+          jobId,
+          args.appId,
+          urlsObj,
+          activeWorkspace || 'Business',
+          userSupabase,
+          req.headers.authorization
+        ).catch(console.error);
         
         return res.json({ message: `I have dispatched the **Business Intelligence Engine** to deeply analyze \`${args.url}\`${args.instagramUrl ? ` and Instagram (\`${args.instagramUrl}\`)` : ''}. It is crawling the website, subpages, metadata, and brand assets in the background to build your custom strategy profile!` });
       }
