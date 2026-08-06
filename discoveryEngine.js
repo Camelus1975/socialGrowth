@@ -1,20 +1,32 @@
 /**
- * Extract Social Links & Subpages from raw HTML
+ * Extract Social & App Store Links from raw HTML
  */
 function extractLinksAndSocials(html, baseUrl) {
-  const socialLinks = { instagram: null, linkedin: null, facebook: null, twitter: null, tiktok: null };
+  const socialLinks = { 
+    instagram: null, 
+    linkedin: null, 
+    facebook: null, 
+    twitter: null, 
+    tiktok: null,
+    youtube: null,
+    appstore: null,
+    playstore: null
+  };
   const subpages = new Set();
   
   if (!html) return { socialLinks, subpages: [] };
 
-  const hrefMatches = html.match(/href=["'](https?:\/\/[^"']+)["']/gi) || [];
+  const hrefMatches = html.match(/href=["']([^"']+)["']/gi) || [];
   for (const match of hrefMatches) {
-    const link = match.replace(/href=["']/i, '').replace(/["']$/, '');
+    const link = match.replace(/^href=["']/i, '').replace(/["']$/, '');
     if (!socialLinks.instagram && link.includes('instagram.com/')) socialLinks.instagram = link;
     if (!socialLinks.linkedin && link.includes('linkedin.com/')) socialLinks.linkedin = link;
     if (!socialLinks.facebook && link.includes('facebook.com/')) socialLinks.facebook = link;
     if (!socialLinks.twitter && (link.includes('twitter.com/') || link.includes('x.com/'))) socialLinks.twitter = link;
     if (!socialLinks.tiktok && link.includes('tiktok.com/')) socialLinks.tiktok = link;
+    if (!socialLinks.youtube && link.includes('youtube.com/')) socialLinks.youtube = link;
+    if (!socialLinks.appstore && link.includes('apps.apple.com/')) socialLinks.appstore = link;
+    if (!socialLinks.playstore && link.includes('play.google.com/')) socialLinks.playstore = link;
 
     if (baseUrl) {
       try {
@@ -22,7 +34,7 @@ function extractLinksAndSocials(html, baseUrl) {
         const parsedLink = new URL(link, baseUrl);
         if (parsedLink.hostname === parsedBase.hostname) {
           const path = parsedLink.pathname.toLowerCase();
-          if (path.match(/\/(about|services|products|pricing|features|about-us|contact|our-story)/i) && path !== parsedBase.pathname.toLowerCase()) {
+          if (path.match(/\/(about|services|products|pricing|features|about-us|contact|our-story|guide|support|safety)/i) && path !== parsedBase.pathname.toLowerCase()) {
             subpages.add(parsedLink.href);
           }
         }
@@ -30,17 +42,17 @@ function extractLinksAndSocials(html, baseUrl) {
     }
   }
 
-  return { socialLinks, subpages: Array.from(subpages).slice(0, 3) };
+  return { socialLinks, subpages: Array.from(subpages).slice(0, 4) };
 }
 
 /**
  * Fetch real content from a URL using Node.js built-in fetch.
- * Extracts metadata, og tags, json-ld schema, and main page body text.
+ * Extracts metadata, og tags, json-ld schema, social links, and main page body text.
  */
 async function scrapeWebContent(url, isMainPage = true) {
   if (!url || url === 'Not provided' || url === 'N/A') return { text: '', socialLinks: {}, subpages: [] };
   try {
-    let targetUrl = url;
+    let targetUrl = url.trim();
     if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
       targetUrl = 'https://' + targetUrl;
     }
@@ -61,6 +73,9 @@ async function scrapeWebContent(url, isMainPage = true) {
     if (!response.ok) return { text: `[Could not fetch ${targetUrl}: HTTP ${response.status}]`, socialLinks: {}, subpages: [] };
     
     const html = await response.text();
+
+    // FIRST: Extract social links and subpages from full unstripped HTML!
+    const { socialLinks, subpages } = isMainPage ? extractLinksAndSocials(html, targetUrl) : { socialLinks: {}, subpages: [] };
     
     const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
     const title = titleMatch ? titleMatch[1].trim() : '';
@@ -82,16 +97,20 @@ async function scrapeWebContent(url, isMainPage = true) {
       }
     }
 
-    const { socialLinks, subpages } = isMainPage ? extractLinksAndSocials(html, targetUrl) : { socialLinks: {}, subpages: [] };
+    let linksSummary = '';
+    if (socialLinks.instagram) linksSummary += `[INSTAGRAM]: ${socialLinks.instagram}\n`;
+    if (socialLinks.tiktok) linksSummary += `[TIKTOK]: ${socialLinks.tiktok}\n`;
+    if (socialLinks.youtube) linksSummary += `[YOUTUBE]: ${socialLinks.youtube}\n`;
+    if (socialLinks.appstore) linksSummary += `[APP STORE]: ${socialLinks.appstore}\n`;
+    if (socialLinks.playstore) linksSummary += `[GOOGLE PLAY]: ${socialLinks.playstore}\n`;
 
-    let metaInfo = `[URL]: ${targetUrl}\n[TITLE]: ${ogTitle || title}\n[META DESCRIPTION]: ${metaDesc}\n${jsonLdSummary}\n`;
+    let metaInfo = `[URL]: ${targetUrl}\n[TITLE]: ${ogTitle || title}\n[META DESCRIPTION]: ${metaDesc}\n${linksSummary}${jsonLdSummary}\n`;
 
+    // Clean text WITHOUT stripping header/footer/nav tags so core features & CTA text are preserved!
     let text = html
       .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
       .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-      .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
-      .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
-      .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, '')
+      .replace(/<svg[^>]*>[\s\S]*?<\/svg>/gi, '')
       .replace(/<[^>]+>/g, ' ')
       .replace(/&nbsp;/g, ' ')
       .replace(/&amp;/g, '&')
@@ -103,8 +122,8 @@ async function scrapeWebContent(url, isMainPage = true) {
     
     text = metaInfo + text;
     
-    if (text.length > 5000) {
-      text = text.substring(0, 5000) + '... [truncated]';
+    if (text.length > 6000) {
+      text = text.substring(0, 6000) + '... [truncated]';
     }
     
     return { text, socialLinks, subpages };
