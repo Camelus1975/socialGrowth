@@ -20,6 +20,11 @@ async function createPendingCampaign(appId, strategyData, authHeader) {
     strategy_context: strategyData
   };
 
+  if (authHeader && authHeader.includes('mock-supabase-jwt-token')) {
+    console.log('[Advertising] Mock token detected. Skipping DB insert for ad campaign.');
+    return insertData;
+  }
+
   const res = await fetch(`${config.SUPABASE_URL}/rest/v1/ad_campaigns?select=*`, {
     method: 'POST',
     headers: {
