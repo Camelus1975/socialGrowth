@@ -122,13 +122,17 @@ async function runMarketingOrchestration(jobId, appId, goal, authHeader, languag
     // 0. Fetch Business Context (discovery_profile with real scraped data)
     let businessContext = "";
     let appName = "";
+    let bizData = null;
+    let bizErr = null;
     try {
       console.log(`[Orchestrator] Looking up business with business_id="${appId}"...`);
-      let { data: bizData, error: bizErr } = await supabase
+      const result = await supabase
         .from('businesses')
         .select('name, category, business_type, discovery_profile')
         .eq('business_id', appId)
         .maybeSingle();
+      bizData = result.data;
+      bizErr = result.error;
         
       if (!bizData) {
         const fallback = await supabase
