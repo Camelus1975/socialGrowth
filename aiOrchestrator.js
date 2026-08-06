@@ -314,11 +314,33 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
       const agentKey = delegation.agent.replace(/\s/g, ''); // e.g. "GrowthAnalyst"
       if (!AGENT_PROMPTS[agentKey]) return null;
 
+      const profile = bizData?.discovery_profile?.businessProfile || {};
+      const voice = bizData?.discovery_profile?.brandVoice || {};
+
+      const agentUserPrompt = `
+=== BUSINESS TO PROMOTE ===
+Brand Name: ${appName || bizData?.name || 'Business'}
+Industry/Niche: ${profile.industry || bizData?.category || 'General'}
+What this business actually does: ${profile.summary || bizData?.tagline || 'Core business offerings'}
+Value Proposition: ${profile.valueProposition || 'Key benefits'}
+Target Audience: ${profile.targetAudience || 'Target customers'}
+Products/Services List: ${(profile.products || []).join(', ') || 'Offerings'}
+Key Messages: ${(profile.keyMessages || []).join('; ') || 'Brand messages'}
+Brand Voice: ${voice.tone || 'Professional'} (${voice.personality || 'Engaging'})
+
+=== CMO STRATEGY & YOUR TASK ===
+CMO Strategy Summary: ${cmoData.strategy_summary}
+Your Assigned Task: ${delegation.task}
+
+CRITICAL MANDATE FOR YOUR OUTPUT:
+Every single piece of copy, post variant, visual description, or video scene you produce MUST be 100% specific to ${appName || bizData?.name || 'this business'}. You MUST explicitly mention the brand name "${appName || bizData?.name}", its unique product features (${(profile.products || []).join(', ')}), and its core value proposition. DO NOT output generic, template, or vague marketing text.
+`;
+
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini", // Lower cost model for execution agents
         messages: [
           { role: "system", content: AGENT_PROMPTS[agentKey] + "\n" + langDirective + "\n" + businessContext },
-          { role: "user", content: `CMO Strategy: ${cmoData.strategy_summary}\nYour Task: ${delegation.task}` }
+          { role: "user", content: agentUserPrompt }
         ],
         response_format: { type: "json_object" }
       });
@@ -620,9 +642,9 @@ Forbidden Words/Slang: ${(brandKit.forbidden_words || []).join(', ') || 'None'}
             console.log(`[Orchestrator] Generating Video via Replicate minimax/video-01...`);
             await pushLog("Video Marketing Agent", "Rendering promotional video via AI (minimax/video-01)... This may take 60-90 seconds.");
             
-            const industryContext = bizData?.discovery_profile?.businessProfile?.industry || bizData?.category || 'business';
-            const productContext = bizData?.discovery_profile?.businessProfile?.summary ? `that ${bizData.discovery_profile.businessProfile.summary}` : '';
-            const videoPrompt = `Cinematic 4k high quality video. Subject: A ${industryContext} ${productContext}. Action: ${videoAgent.result.video_concept} ${videoAgent.result.storyboard && videoAgent.result.storyboard.length > 0 ? videoAgent.result.storyboard[0].visual_direction : ''}. Photorealistic, 8k resolution, highly detailed.`;
+            const profileSummary = bizData?.discovery_profile?.businessProfile?.summary || bizData?.tagline || '';
+            const videoScene = videoAgent.result.storyboard && videoAgent.result.storyboard.length > 0 ? videoAgent.result.storyboard[0].visual_direction : '';
+            const videoPrompt = `Cinematic 4k high quality commercial video for "${appName || 'Business'}". Product & Concept: ${profileSummary}. Visual Action: ${videoAgent.result.video_concept}. Scene: ${videoScene}. Photorealistic, 8k resolution, highly detailed, vibrant lighting.`;
             const replicateRes = await fetch('https://api.replicate.com/v1/models/minimax/video-01/predictions', {
               method: 'POST',
               headers: {
