@@ -1,85 +1,91 @@
-// AI Business Discovery & Brand Intelligence Engine
-const { createClient } = require('@supabase/supabase-js');
-const config = require('./config');
-const { OpenAI } = require('openai');
+/**
+ * Extract Social Links & Subpages from raw HTML
+ */
+function extractLinksAndSocials(html, baseUrl) {
+  const socialLinks = { instagram: null, linkedin: null, facebook: null, twitter: null, tiktok: null };
+  const subpages = new Set();
+  
+  if (!html) return { socialLinks, subpages: [] };
 
-const openai = new OpenAI({
-  apiKey: config.OPENAI_API_KEY,
-});
+  const hrefMatches = html.match(/href=["'](https?:\/\/[^"']+)["']/gi) || [];
+  for (const match of hrefMatches) {
+    const link = match.replace(/href=["']/i, '').replace(/["']$/, '');
+    if (!socialLinks.instagram && link.includes('instagram.com/')) socialLinks.instagram = link;
+    if (!socialLinks.linkedin && link.includes('linkedin.com/')) socialLinks.linkedin = link;
+    if (!socialLinks.facebook && link.includes('facebook.com/')) socialLinks.facebook = link;
+    if (!socialLinks.twitter && (link.includes('twitter.com/') || link.includes('x.com/'))) socialLinks.twitter = link;
+    if (!socialLinks.tiktok && link.includes('tiktok.com/')) socialLinks.tiktok = link;
 
-// Sleep helper
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-async function updateJobStatus(supabase, jobId, status, progress, logMessage) {
-  try {
-    const { data: job, error: selectErr } = await supabase
-      .from('discovery_jobs')
-      .select('logs')
-      .eq('id', jobId)
-      .single();
-      
-    if (selectErr && selectErr.code !== 'PGRST116') {
-      console.error(`[Discovery Engine] Error fetching job logs:`, selectErr);
+    if (baseUrl) {
+      try {
+        const parsedBase = new URL(baseUrl);
+        const parsedLink = new URL(link, baseUrl);
+        if (parsedLink.hostname === parsedBase.hostname) {
+          const path = parsedLink.pathname.toLowerCase();
+          if (path.match(/\/(about|services|products|pricing|features|about-us|contact|our-story)/i) && path !== parsedBase.pathname.toLowerCase()) {
+            subpages.add(parsedLink.href);
+          }
+        }
+      } catch (e) {}
     }
-
-    const currentLogs = job?.logs || [];
-    if (logMessage) currentLogs.push(`[${new Date().toISOString()}] ${logMessage}`);
-
-    const { error: updateErr } = await supabase
-      .from('discovery_jobs')
-      .update({
-        status,
-        progress_percent: progress,
-        logs: currentLogs,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', jobId);
-      
-    if (updateErr) {
-      console.error(`[Discovery Engine] Error updating job:`, updateErr);
-    }
-      
-    console.log(`[Discovery Engine] Job ${jobId}: ${status} (${progress}%) - ${logMessage}`);
-  } catch (err) {
-    console.error(`[Discovery Engine Error] Failed to update job ${jobId}:`, err);
   }
+
+  return { socialLinks, subpages: Array.from(subpages).slice(0, 3) };
 }
 
 /**
  * Fetch real content from a URL using Node.js built-in fetch.
- * Extracts text from HTML by stripping tags, scripts, styles.
+ * Extracts metadata, og tags, json-ld schema, and main page body text.
  */
-async function scrapeWebContent(url) {
-  if (!url || url === 'Not provided') return '';
+async function scrapeWebContent(url, isMainPage = true) {
+  if (!url || url === 'Not provided' || url === 'N/A') return { text: '', socialLinks: {}, subpages: [] };
   try {
+    let targetUrl = url;
+    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+      targetUrl = 'https://' + targetUrl;
+    }
+
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000); // 15s timeout
+    const timeout = setTimeout(() => controller.abort(), 12000);
     
-    const response = await fetch(url, {
+    const response = await fetch(targetUrl, {
       signal: controller.signal,
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; GrowthSuiteBot/1.0; +https://socialgrowth.app)',
-        'Accept': 'text/html,application/xhtml+xml',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
       }
     });
     clearTimeout(timeout);
     
-    if (!response.ok) return `[Could not fetch: HTTP ${response.status}]`;
+    if (!response.ok) return { text: `[Could not fetch ${targetUrl}: HTTP ${response.status}]`, socialLinks: {}, subpages: [] };
     
     const html = await response.text();
     
-    // Extract title and meta description before stripping tags
-    let titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-    let title = titleMatch ? titleMatch[1].trim() : '';
+    const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+    const title = titleMatch ? titleMatch[1].trim() : '';
 
-    let metaDescMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']*)["'][^>]*>/i) || 
+    const metaDescMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']*)["'][^>]*>/i) || 
                         html.match(/<meta[^>]*content=["']([^"']*)["'][^>]*name=["']description["'][^>]*>/i) ||
                         html.match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']*)["'][^>]*>/i);
-    let metaDesc = metaDescMatch ? metaDescMatch[1].trim() : '';
+    const metaDesc = metaDescMatch ? metaDescMatch[1].trim() : '';
 
-    let metaInfo = `[META TITLE]: ${title}\n[META DESCRIPTION]: ${metaDesc}\n\n`;
+    const ogTitleMatch = html.match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']*)["'][^>]*>/i);
+    const ogTitle = ogTitleMatch ? ogTitleMatch[1].trim() : '';
 
-    // Strip scripts, styles, and HTML tags to get clean text
+    let jsonLdSummary = '';
+    const jsonLdMatches = html.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi) || [];
+    for (const jMatch of jsonLdMatches.slice(0, 2)) {
+      const jsonText = jMatch.replace(/<script[^>]*>/i, '').replace(/<\/script>/i, '').trim();
+      if (jsonText.length > 20 && jsonText.length < 1500) {
+        jsonLdSummary += `[SCHEMA JSON-LD]: ${jsonText.substring(0, 800)}\n`;
+      }
+    }
+
+    const { socialLinks, subpages } = isMainPage ? extractLinksAndSocials(html, targetUrl) : { socialLinks: {}, subpages: [] };
+
+    let metaInfo = `[URL]: ${targetUrl}\n[TITLE]: ${ogTitle || title}\n[META DESCRIPTION]: ${metaDesc}\n${jsonLdSummary}\n`;
+
     let text = html
       .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
       .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
@@ -97,134 +103,150 @@ async function scrapeWebContent(url) {
     
     text = metaInfo + text;
     
-    // Limit to ~4000 chars to stay within context limits
-    if (text.length > 4000) {
-      text = text.substring(0, 4000) + '... [truncated]';
+    if (text.length > 5000) {
+      text = text.substring(0, 5000) + '... [truncated]';
     }
     
-    return text;
+    return { text, socialLinks, subpages };
   } catch (err) {
     console.warn(`[Discovery Engine] Failed to scrape ${url}: ${err.message}`);
-    return `[Could not fetch: ${err.message}]`;
+    return { text: `[Could not fetch ${url}: ${err.message}]`, socialLinks: {}, subpages: [] };
   }
 }
 
 /**
  * Process a business discovery job.
- * 1. Scrapes real content from the provided URLs
- * 2. Sends the actual website text to GPT for analysis
- * 3. Saves the brand intelligence profile to the business record
+ * 1. Scrapes homepage + subpages + social media profiles
+ * 2. Sends comprehensive scraped text to GPT-4o-mini for deep brand strategy analysis
+ * 3. Saves the rich brand intelligence profile to the database (matching id AND business_id)
  */
-async function processDiscoveryJob(jobId, appId, urls, appName, providedSupabase = null) {
+async function processDiscoveryJob(jobId, appId, urls = {}, appName = '', providedSupabase = null) {
   let supabase = providedSupabase;
   try {
     if (!supabase) {
       supabase = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_KEY || config.SUPABASE_ANON_KEY);
     }
     
-    await updateJobStatus(supabase, jobId, 'scanning', 10, 'Initializing web scrapers...');
+    const inputUrls = typeof urls === 'string' ? { website: urls } : (urls || {});
+    await updateJobStatus(supabase, jobId, 'scanning', 10, 'Initializing deep multi-source web scrapers...');
     
-    // Step 1: Scrape real website content
-    await updateJobStatus(supabase, jobId, 'scanning', 20, `Fetching website content from: ${urls.website || 'N/A'}`);
-    const websiteContent = await scrapeWebContent(urls.website);
+    // Step 1: Scrape main website content
+    await updateJobStatus(supabase, jobId, 'scanning', 20, `Fetching website content from: ${inputUrls.website || 'N/A'}`);
+    const mainPageResult = await scrapeWebContent(inputUrls.website, true);
     
-    // Step 2: Scrape social media pages
-    await updateJobStatus(supabase, jobId, 'scanning', 40, 'Fetching social media profiles...');
-    const instagramContent = await scrapeWebContent(urls.instagram);
-    const linkedinContent = await scrapeWebContent(urls.linkedin);
-    const googleBusinessContent = await scrapeWebContent(urls.google_business);
+    // Step 2: Scrape subpages found on the site
+    let subpagesText = '';
+    if (mainPageResult.subpages && mainPageResult.subpages.length > 0) {
+      await updateJobStatus(supabase, jobId, 'scanning', 35, `Crawling ${mainPageResult.subpages.length} subpages (/about, /services, /products)...`);
+      const subpageResults = await Promise.all(
+        mainPageResult.subpages.map(subUrl => scrapeWebContent(subUrl, false))
+      );
+      subpagesText = subpageResults.map(r => r.text).filter(Boolean).join('\n\n--- SUBPAGE ---\n\n');
+    }
+
+    // Step 3: Auto-detect social links if not explicitly provided
+    const instagramUrl = inputUrls.instagram || mainPageResult.socialLinks?.instagram;
+    const linkedinUrl = inputUrls.linkedin || mainPageResult.socialLinks?.linkedin;
+    const facebookUrl = inputUrls.facebook || mainPageResult.socialLinks?.facebook;
+
+    // Step 4: Scrape social media pages if available
+    await updateJobStatus(supabase, jobId, 'scanning', 50, 'Fetching social media profiles & metadata...');
+    const instagramRes = await scrapeWebContent(instagramUrl, false);
+    const linkedinRes = await scrapeWebContent(linkedinUrl, false);
+    const googleBusinessRes = await scrapeWebContent(inputUrls.google_business, false);
     
     const scrapedDataSummary = `
-=== REAL WEBSITE CONTENT (scraped from ${urls.website || 'N/A'}) ===
-${websiteContent || 'No website content available'}
+=== MAIN WEBSITE HOMEPAGE (${inputUrls.website || 'N/A'}) ===
+${mainPageResult.text || 'No website content available'}
 
-=== INSTAGRAM PAGE CONTENT (scraped from ${urls.instagram || 'N/A'}) ===
-${instagramContent || 'No Instagram content available'}
+=== KEY SUBPAGES (/about, /services, /products) ===
+${subpagesText || 'No subpages crawled'}
 
-=== LINKEDIN PAGE CONTENT (scraped from ${urls.linkedin || 'N/A'}) ===
-${linkedinContent || 'No LinkedIn content available'}
+=== INSTAGRAM PROFILE (${instagramUrl || 'N/A'}) ===
+${instagramRes.text || 'No Instagram profile content available'}
 
-=== GOOGLE BUSINESS PROFILE CONTENT (scraped from ${urls.google_business || 'N/A'}) ===
-${googleBusinessContent || 'No Google Business Profile content available'}
+=== LINKEDIN PROFILE (${linkedinUrl || 'N/A'}) ===
+${linkedinRes.text || 'No LinkedIn profile content available'}
+
+=== GOOGLE BUSINESS PROFILE (${inputUrls.google_business || 'N/A'}) ===
+${googleBusinessRes.text || 'No Google Business Profile content available'}
     `.trim();
     
-    const hasRealContent = websiteContent.length > 50 || instagramContent.length > 50 || linkedinContent.length > 50;
+    const totalChars = (mainPageResult.text || '').length + subpagesText.length + (instagramRes.text || '').length;
+    const hasRealContent = totalChars > 50;
     
-    await updateJobStatus(supabase, jobId, 'analyzing', 60, 
+    await updateJobStatus(supabase, jobId, 'analyzing', 65, 
       hasRealContent 
-        ? `Successfully scraped ${websiteContent.length + instagramContent.length + linkedinContent.length} characters of real content. Running AI analysis...`
-        : 'Limited web content found. Running AI analysis with available data...');
+        ? `Successfully scraped ${totalChars} characters of deep content across website & social channels. Running AI analysis...`
+        : 'Limited web content found. Running AI brand analysis with available signals...');
     
-    // Step 3: AI Analysis with real scraped content
+    // Step 5: Deep AI Analysis
     const systemPrompt = `
-    You are an AI brand strategist and marketing expert.
-    You have been given REAL SCRAPED CONTENT from the brand's website and social media pages.
-    Analyze this REAL content carefully to understand:
-    - What the business actually does (products/services)
-    - Their target audience
-    - Their brand voice and tone
-    - Their visual identity cues
-    - Their competitive positioning
-    - For Google Business Profile, specifically look for star ratings, number of reviews, and local address in the META DESCRIPTION.
-    
-    Business/App Name: ${appName || 'Not provided'}
-    Website URL: ${urls.website || 'Not provided'}
-    Instagram URL: ${urls.instagram || 'Not provided'}
-    LinkedIn URL: ${urls.linkedin || 'Not provided'}
-    Google Business Profile URL: ${urls.google_business || 'Not provided'}
-    
+    You are a Lead Brand Strategist & CMO.
+    Analyze the following REAL SCRAPED CONTENT from a business website and its social channels.
+    Extract an extremely accurate, detailed Brand Intelligence Profile that can be used by AI copywriters and visual creators to generate highly targeted social media posts and videos.
+
+    Analyze:
+    1. Exact Business Profile: What does this business actually sell/offer? What is their unique value proposition?
+    2. Target Audience & Customer Pain Points: Who buys from them and why?
+    3. Brand Voice & Tone: Tone of voice, slogans, key phrases, keywords, personality.
+    4. Content Pillars & Key Messages: Core themes to promote this specific business.
+
+    Business Name: ${appName || 'Not provided'}
+    Website URL: ${inputUrls.website || 'Not provided'}
+    Instagram URL: ${instagramUrl || 'Not provided'}
+
     REAL SCRAPED CONTENT:
     ${scrapedDataSummary}
-    
-    Based on this REAL content, generate an accurate brand intelligence profile.
-    Return ONLY valid JSON with this structure:
+
+    Return ONLY valid JSON matching this exact structure:
     {
       "businessProfile": {
-        "name": "Brand Name",
-        "industry": "Industry",
-        "summary": "2-3 sentence summary of what this business actually does, based on the scraped content",
-        "valueProposition": "Their main value proposition as found in the content",
-        "targetAudience": "Who their customers/users are based on the content",
-        "products": ["Product/Service 1", "Product/Service 2"],
-        "keyMessages": ["Key message 1 found on their site", "Key message 2"],
+        "name": "Exact Brand Name",
+        "industry": "Specific Industry/Niche (e.g., Artisan Coffee Roaster, B2B SaaS, Fitness Studio)",
+        "summary": "Detailed 2-3 sentence summary of what this business actually offers and why customers choose them",
+        "valueProposition": "Main value proposition found in content",
+        "targetAudience": "Specific customer persona & demographic",
+        "products": ["Product/Service 1", "Product/Service 2", "Product/Service 3"],
+        "keyMessages": ["Key brand message 1", "Key brand message 2"],
         "localPresence": {
-          "rating": "Extract rating (e.g. 4.8) or null",
-          "reviews": "Extract review count (e.g. 120) or null",
+          "rating": "Extract rating or null",
+          "reviews": "Extract review count or null",
           "address": "Extract address if available or null"
         }
       },
       "brandKit": {
         "colors": {
-          "primary": "#hex",
-          "secondary": "#hex",
-          "accent": "#hex",
-          "background": "#hex"
+          "primary": "#6366F1",
+          "secondary": "#4F46E5",
+          "accent": "#EC4899",
+          "background": "#0F172A"
         },
         "typography": {
-          "headings": "Font Name",
-          "body": "Font Name"
+          "headings": "Inter",
+          "body": "Inter"
         }
       },
       "brandVoice": {
-        "tone": "e.g. Professional, playful",
-        "personality": "e.g. The Creator, The Sage",
+        "tone": "Specific tone (e.g. Energetic & Educational, Authoritative & Professional)",
+        "personality": "Brand personality archetype",
         "keywords": ["keyword1", "keyword2", "keyword3"],
-        "samplePhrases": ["A phrase they use", "Another common phrase"]
+        "samplePhrases": ["Exact phrase or slogan from site", "Another brand phrase"]
       },
       "personas": [
-        { "name": "Persona 1", "description": "Who they are", "painPoints": ["..."], "goals": ["..."] }
+        { "name": "Primary Customer", "description": "Description", "painPoints": ["Pain point 1"], "goals": ["Goal 1"] }
       ],
       "contentStrategy": {
         "recommendedTopics": ["Topic 1", "Topic 2", "Topic 3"],
-        "contentPillars": ["Pillar 1", "Pillar 2", "Pillar 3"],
-        "bestPlatforms": ["platform1", "platform2"],
-        "postingFrequency": "e.g. 3-5 times per week"
+        "contentPillars": ["Product Showcases", "Customer Success Stories", "Industry Insights"],
+        "bestPlatforms": ["instagram", "linkedin", "tiktok"],
+        "postingFrequency": "4-5 times per week"
       },
       "audits": {
-        "websiteScore": 85,
-        "socialScore": 72,
-        "marketingReadinessScore": 78,
-        "growthOpportunities": ["Opportunity 1", "Opportunity 2"]
+        "websiteScore": 88,
+        "socialScore": 75,
+        "marketingReadinessScore": 82,
+        "growthOpportunities": ["Highlight customer reviews on social", "Launch video product walkthroughs"]
       }
     }
     `;
@@ -237,7 +259,7 @@ ${googleBusinessContent || 'No Google Business Profile content available'}
       openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [{ role: "system", content: systemPrompt }],
-        temperature: 0.5,
+        temperature: 0.4,
         response_format: { type: "json_object" }
       }),
       timeoutPromise
@@ -245,25 +267,33 @@ ${googleBusinessContent || 'No Google Business Profile content available'}
 
     const discoveryData = JSON.parse(response.choices[0].message.content);
     
-    // Add a generated logo placeholder
-    const appNameEncoded = encodeURIComponent(discoveryData?.businessProfile?.name || appName || 'App');
+    // Add generated logo placeholder
+    const finalBrandName = discoveryData?.businessProfile?.name || appName || 'App';
+    const appNameEncoded = encodeURIComponent(finalBrandName);
     const primaryColor = (discoveryData?.brandKit?.colors?.primary || '#8B5CF6').replace('#', '');
     discoveryData.brandKit = discoveryData.brandKit || { colors: { primary: '#8B5CF6' } };
     discoveryData.brandKit.logoUrl = `https://ui-avatars.com/api/?name=${appNameEncoded}&background=${primaryColor}&color=fff&size=512`;
     
-    // Save URLs into the discovery profile
-    discoveryData.urls = urls;
+    discoveryData.urls = { ...inputUrls, instagram: instagramUrl, linkedin: linkedinUrl, facebook: facebookUrl };
 
-    await updateJobStatus(supabase, jobId, 'analyzing', 85, 'Saving brand intelligence profile to database...');
+    await updateJobStatus(supabase, jobId, 'analyzing', 85, 'Saving deep brand intelligence profile to database...');
 
-    // Save to the businesses table
-    await supabase
-      .from('businesses')
-      .update({ discovery_profile: discoveryData })
-      .eq('id', appId);
+    // Save to the businesses table by BOTH id AND business_id to guarantee match
+    const updatePayload = { 
+      discovery_profile: discoveryData,
+      name: finalBrandName,
+      category: discoveryData?.businessProfile?.industry || undefined,
+      business_type: discoveryData?.businessProfile?.industry ? 'custom' : undefined,
+      tagline: discoveryData?.businessProfile?.valueProposition || undefined
+    };
+
+    if (appId) {
+      await supabase.from('businesses').update(updatePayload).eq('business_id', appId);
+      await supabase.from('businesses').update(updatePayload).eq('id', appId);
+    }
 
     // Complete Job
-    await updateJobStatus(supabase, jobId, 'complete', 100, 'Brand Intelligence Profile generated from real website content.');
+    await updateJobStatus(supabase, jobId, 'complete', 100, 'Deep Brand Intelligence Profile successfully generated & active.');
     
   } catch (err) {
     console.error(`[Discovery Engine] Job ${jobId} failed:`, err);

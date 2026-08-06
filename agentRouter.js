@@ -36,12 +36,14 @@ const tools = [
     type: "function",
     function: {
       name: "run_business_discovery",
-      description: "Scrapes a website to build a deep business intelligence profile (brand voice, target audience, content strategy). Use this when the user wants you to 'learn' or 'read' a website.",
+      description: "Scrapes a website and social media channels to build a deep business intelligence profile (brand voice, target audience, content strategy, products). Use this when the user wants you to 'learn', 'study', or 'read' a website or Instagram page.",
       parameters: {
         type: "object",
         properties: {
-          appId: { type: "string", description: "The UUID of the business (fetch from context)" },
-          url: { type: "string", description: "The website URL to scrape" }
+          appId: { type: "string", description: "The UUID or slug of the business (fetch from context)" },
+          url: { type: "string", description: "The website URL to scrape" },
+          instagramUrl: { type: "string", description: "Optional Instagram profile URL" },
+          linkedinUrl: { type: "string", description: "Optional LinkedIn profile URL" }
         },
         required: ["appId", "url"]
       }
@@ -350,10 +352,10 @@ Speak conversationally and concisely.`
         
         if (error) return res.json({ message: "Failed to initialize the Discovery Engine." });
         
-        // Fire and forget
-        processDiscoveryJob(data.id, args.appId, { website: args.url }, activeWorkspace, supabase).catch(console.error);
+        // Fire and forget background discovery
+        processDiscoveryJob(data.id, args.appId, { website: args.url, instagram: args.instagramUrl, linkedin: args.linkedinUrl }, activeWorkspace, supabase).catch(console.error);
         
-        return res.json({ message: `I have dispatched the **Discovery Engine** to scrape and analyze \`${args.url}\`. It's currently building a deep Business Intelligence Profile in the background!` });
+        return res.json({ message: `I have dispatched the **Business Intelligence Engine** to deeply analyze \`${args.url}\`${args.instagramUrl ? ` and Instagram (\`${args.instagramUrl}\`)` : ''}. It is crawling the website, subpages, metadata, and brand assets in the background to build your custom strategy profile!` });
       }
 
       if (toolCall.function.name === "trigger_orchestration") {
