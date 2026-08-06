@@ -186,8 +186,59 @@ You are generating content to promote THIS specific business.
 `;
         await pushLog("System", `Loaded deep brand intelligence profile for "${profile.name || bizData.name}". All AI agents anchored to real business context.`);
       } else {
-        businessContext = `Business Name: ${bizData?.name || appId}\nCategory: ${bizData?.category || bizData?.business_type || 'General'}\n\nIMPORTANT: You do NOT have a detailed discovery profile for this business. You MUST infer the business type and industry from the Business Name and any user-provided goal. Do NOT assume this is a SaaS or tech company unless the name or goal explicitly indicates it. Generate content that is specific and relevant to what this business actually does based on its name.\n`;
-        await pushLog("System", "No discovery profile found. Run Business Discovery first for better results.");
+        await pushLog("System", `No pre-built discovery profile found. Attempting on-the-fly business research for "${bizData?.name || appId}"...`);
+        
+        // Extract URL if present in goal
+        const urlMatch = (goal || '').match(/(https?:\/\/[^\s]+)/i);
+        const websiteUrl = urlMatch ? urlMatch[1] : null;
+
+        try {
+          const { processDiscoveryJob } = require('./discoveryEngine');
+          const inlineJobId = `inline_${Date.now()}`;
+          await processDiscoveryJob(inlineJobId, appId, { website: websiteUrl }, bizData?.name || appId, supabase, authHeader);
+          
+          // Re-fetch business row after discovery finishes
+          const refreshed = await supabase
+            .from('businesses')
+            .select('name, category, business_type, discovery_profile')
+            .or(`business_id.eq.${appId},id.eq.${appId}`)
+            .maybeSingle();
+            
+          if (refreshed.data?.discovery_profile) {
+            bizData = refreshed.data;
+            const dp = bizData.discovery_profile;
+            const profile = dp.businessProfile || {};
+            const voice = dp.brandVoice || {};
+            const strategy = dp.contentStrategy || {};
+            appName = profile.name || bizData.name || '';
+            businessContext = `
+=== DEEP BUSINESS INTELLIGENCE DOSSIER (Scraped on-the-fly) ===
+Business Name: ${profile.name || bizData.name || 'Unknown'}
+Industry/Niche: ${profile.industry || bizData.category || 'Unknown'}
+What they do & offer: ${profile.summary || 'Not available'}
+Core Value Proposition: ${profile.valueProposition || 'Not available'}
+Target Audience: ${profile.targetAudience || 'Not available'}
+Products / Services List: ${(profile.products || []).join(', ') || 'Not specified'}
+Key Messages: ${(profile.keyMessages || []).join('; ') || 'Not available'}
+Brand Voice & Tone: ${voice.tone || 'Professional'} (${voice.personality || 'Engaging'})
+Brand Keywords: ${(voice.keywords || []).join(', ') || 'Not specified'}
+Sample Slogans / Phrases: ${(voice.samplePhrases || []).join('; ') || 'Not available'}
+===
+MANDATORY BRAND ACCURACY DIRECTIVE:
+You are generating content to promote THIS specific business (${profile.name || bizData.name}).
+1. Copywriting MUST promote their actual products (${(profile.products || []).slice(0, 3).join(', ') || 'their services'}).
+2. Visuals & Images MUST represent their actual industry (${profile.industry || bizData.category}) and value proposition.
+3. Videos MUST showcase the real product/service experience.
+`;
+            await pushLog("System", `On-the-fly business research completed! Deep profile active for "${appName}".`);
+          }
+        } catch (inlineEx) {
+          console.error('[Orchestrator] On-the-fly discovery failed:', inlineEx.message);
+        }
+
+        if (!businessContext) {
+          businessContext = `Business Name: ${bizData?.name || appId}\nCategory: ${bizData?.category || bizData?.business_type || 'General'}\n\nIMPORTANT: You do NOT have a detailed discovery profile for this business. You MUST infer the business type and industry from the Business Name ("${bizData?.name || appId}") and Founder's Goal ("${goal}"). Generate content that is 100% specific to what this business actually does.\n`;
+        }
       }
       // Fetch Brand Kit rules if configured
       try {

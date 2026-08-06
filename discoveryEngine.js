@@ -120,7 +120,7 @@ async function scrapeWebContent(url, isMainPage = true) {
  * 2. Sends comprehensive scraped text to GPT-4o-mini for deep brand strategy analysis
  * 3. Saves the rich brand intelligence profile to the database (matching id AND business_id)
  */
-async function processDiscoveryJob(jobId, appId, urls = {}, appName = '', providedSupabase = null) {
+async function processDiscoveryJob(jobId, appId, urls = {}, appName = '', providedSupabase = null, authHeader = null) {
   let supabase = providedSupabase;
   try {
     if (!supabase) {
@@ -288,8 +288,36 @@ ${googleBusinessRes.text || 'No Google Business Profile content available'}
     };
 
     if (appId) {
-      await supabase.from('businesses').update(updatePayload).eq('business_id', appId);
-      await supabase.from('businesses').update(updatePayload).eq('id', appId);
+      if (supabase) {
+        await supabase.from('businesses').update(updatePayload).eq('business_id', appId);
+        await supabase.from('businesses').update(updatePayload).eq('id', appId);
+      }
+
+      if (authHeader && !authHeader.includes('mock-supabase-jwt-token')) {
+        try {
+          await fetch(`${config.SUPABASE_URL}/rest/v1/businesses?business_id=eq.${encodeURIComponent(appId)}`, {
+            method: 'PATCH',
+            headers: {
+              'apikey': config.SUPABASE_ANON_KEY,
+              'Authorization': authHeader,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatePayload)
+          });
+          await fetch(`${config.SUPABASE_URL}/rest/v1/businesses?id=eq.${encodeURIComponent(appId)}`, {
+            method: 'PATCH',
+            headers: {
+              'apikey': config.SUPABASE_ANON_KEY,
+              'Authorization': authHeader,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatePayload)
+          });
+          console.log(`[Discovery Engine] Saved business profile via REST API with auth token for ${appId}`);
+        } catch (rErr) {
+          console.error(`[Discovery Engine] REST save failed:`, rErr.message);
+        }
+      }
     }
 
     // Complete Job
