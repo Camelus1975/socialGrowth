@@ -4,7 +4,7 @@ import { initCopilotV3 } from './copilot_v3.js';
 import { initGrowthV3 } from './growth_v3.js';
 import { initInboxV3 } from './inbox_v3.js';
 import { initCalendarV3 } from './calendar_v3.js';
-import { initWorkspaceV3, initiateAddBusiness, deleteWorkspace } from './workspace_v3.js';
+import { initWorkspaceV3, initiateAddBusiness, deleteWorkspace, initBrandKitController, openBrandKitModal, saveBrandKit } from './workspace_v3.js';
 import { initMediaV3 } from './media_v3.js';
 
 // Social Growth AI - V3 Architecture Entry Point
@@ -17,6 +17,7 @@ import { state } from './state.js';
 document.addEventListener('DOMContentLoaded', async () => {
   setupUIEventListeners();
   initAvatarPicker();
+  initBrandKitController();
   
   // Initialize specific V3 modules
   initCopilotV3(state);
@@ -141,6 +142,12 @@ function setupUIEventListeners() {
         break;
       case 'deleteCurrentWorkspace':
         deleteWorkspace();
+        break;
+      case 'openBrandKitModal':
+        openBrandKitModal();
+        break;
+      case 'saveBrandKit':
+        saveBrandKit();
         break;
     }
   });

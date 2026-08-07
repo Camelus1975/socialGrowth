@@ -317,6 +317,12 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
           <span>Theme Mode</span>
           <button class="btn btn-secondary" data-action="toggleThemeMode">Toggle Dark/Light</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+          <div>
+            <span style="display:block; color:white; font-weight:bold;">🎨 Business Logo & Brand Kit</span>
+            <span style="font-size:0.8rem; color:var(--text-muted);">Manage logo, brand colors, and visual style</span>
+          </div>
+          <button class="btn btn-secondary" data-action="openBrandKitModal">Manage Logo</button>
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
           <span>Session</span>
@@ -332,6 +338,66 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary" data-action="closeModal" data-args="settings-modal">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Brand Kit & Business Logo Modal -->
+  <div id="brand-kit-modal" class="custom-modal-overlay">
+    <div class="custom-modal-content" style="max-width: 480px;">
+      <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;">
+        <h3 style="color:white; margin:0; font-size: 1.2rem;">🎨 Business Logo & Brand Kit</h3>
+        <button class="btn btn-secondary" style="padding:4px 10px; border-radius:50%;" data-action="closeModal" data-args="brand-kit-modal">✕</button>
+      </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:16px; padding: 16px 0;">
+        
+        <!-- Business Logo Upload Section -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:12px; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+          <label style="font-size:0.85rem; color:var(--text-muted); font-weight: bold;">Business Logo</label>
+          <div style="position: relative; display: inline-block;">
+            <img id="brand-logo-preview" src="https://ui-avatars.com/api/?name=Brand&background=6366f1&color=fff&size=512" alt="Business Logo" style="width: 95px; height: 95px; border-radius: 16px; object-fit: contain; background: #1a1a2e; padding: 8px; border: 2px solid var(--accent-color, #6366f1); box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);">
+            <label for="brand-logo-file-input" style="position: absolute; bottom: -4px; right: -4px; background: var(--accent-color, #6366f1); color: white; border: 2px solid #111; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.8rem;" title="Upload Business Logo">
+              ✏️
+            </label>
+            <input type="file" id="brand-logo-file-input" accept="image/*" style="display: none;">
+          </div>
+          <div style="display:flex; gap:10px; width:100%;">
+            <button type="button" class="btn btn-secondary" style="flex:1; font-size:0.8rem;" onclick="document.getElementById('brand-logo-file-input').click()">
+              📁 Upload Logo Image
+            </button>
+            <button type="button" class="btn btn-secondary" style="font-size:0.8rem;" id="clear-logo-btn">
+              🔄 Reset
+            </button>
+          </div>
+          <div style="width:100%;">
+            <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">Or paste Logo Image URL:</label>
+            <input type="url" id="brand-logo-url-input" class="input-field" placeholder="https://example.com/logo.png" style="width:100%; font-size:0.85rem;">
+          </div>
+        </div>
+
+        <!-- Brand Voice & Style Inputs -->
+        <div>
+          <label style="display:block; font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">Primary Brand Color:</label>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <input type="color" id="brand-primary-color" value="#6366f1" style="width:40px; height:38px; border:none; border-radius:8px; cursor:pointer; background:none;">
+            <input type="text" id="brand-primary-color-hex" class="input-field" value="#6366f1" style="flex:1; font-size:0.85rem;">
+          </div>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">Tone of Voice:</label>
+          <input type="text" id="brand-tone-input" class="input-field" placeholder="e.g. Friendly, Professional, Bold, Playful" style="width:100%; font-size:0.85rem;">
+        </div>
+
+        <div>
+          <label style="display:block; font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">Visual Style Directive:</label>
+          <input type="text" id="brand-visual-style-input" class="input-field" placeholder="e.g. Modern Minimalist, Vibrant Photos, Dark Mode Aesthetic" style="width:100%; font-size:0.85rem;">
+        </div>
+
+      </div>
+      <div class="modal-footer" style="justify-content: flex-end; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
+        <button class="btn btn-secondary" data-action="closeModal" data-args="brand-kit-modal">Cancel</button>
+        <button class="btn btn-primary" id="save-brand-kit-btn" data-action="saveBrandKit">Save Brand Kit & Logo</button>
       </div>
     </div>
   </div>
