@@ -1,5 +1,5 @@
 import { initAuth, onAuthStateChange, logout, saveUserProfile, initAvatarPicker } from './auth.js';
-import { showToast, openModal, closeModal, toggleThemeMode } from './common.js';
+import { showToast, openModal, closeModal, toggleThemeMode, initTheme } from './common.js';
 import { initCopilotV3 } from './copilot_v3.js';
 import { initGrowthV3 } from './growth_v3.js';
 import { initInboxV3 } from './inbox_v3.js';
@@ -15,6 +15,7 @@ import { state } from './state.js';
 
 // Initialize Application
 document.addEventListener('DOMContentLoaded', async () => {
+  initTheme();
   setupUIEventListeners();
   initAvatarPicker();
   initBrandKitController();

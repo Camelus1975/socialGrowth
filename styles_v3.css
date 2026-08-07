@@ -1,3 +1,5 @@
+@import url('/styles.css');
+
 /* V3 Core Styles */
 :root {
   --bg-deep: #050811;
@@ -9,6 +11,30 @@
   --accent-hover: #4f46e5;
   --font-heading: 'Outfit', sans-serif;
   --font-body: 'Inter', sans-serif;
+}
+
+/* Vibrant Light Mode Default Theme */
+body.light-mode {
+  --bg-deep: #f8fafc;
+  --bg-sidebar: rgba(255, 255, 255, 0.85);
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --border-glass: rgba(226, 232, 240, 0.9);
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-sub: #64748b;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+}
+
+body.light-mode {
+  background-color: #f8fafc !important;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.16) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.14) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.12) 0px, transparent 50%) !important;
+  background-attachment: fixed !important;
+  color: #0f172a !important;
 }
 
 body {
@@ -329,4 +355,95 @@ h1, h2, h3 {
 }
 .workspace-dropdown-item:last-child {
   border-bottom: none;
+}
+
+/* Light Theme Component Specific Adjustments */
+body.light-mode .sidebar {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(16px) !important;
+  border-right: 1px solid rgba(226, 232, 240, 0.9) !important;
+}
+
+body.light-mode .nav-item {
+  color: #475569 !important;
+}
+
+body.light-mode .nav-item:hover {
+  background: rgba(99, 102, 241, 0.08) !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .nav-item.active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.08)) !important;
+  color: #4f46e5 !important;
+  border-left: 4px solid #6366f1 !important;
+  font-weight: 600 !important;
+}
+
+body.light-mode .view-panel,
+body.light-mode .kpi-card,
+body.light-mode .custom-modal-content,
+body.light-mode .chat-input-wrapper,
+body.light-mode .workspace-dropdown-menu {
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
+  box-shadow: 0 10px 30px -5px rgba(99, 102, 241, 0.08), 0 4px 12px rgba(0,0,0,0.03) !important;
+  color: #0f172a !important;
+}
+
+body.light-mode input.chat-input,
+body.light-mode input.input-field {
+  color: #0f172a !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(203, 213, 225, 0.8) !important;
+}
+
+body.light-mode input::placeholder {
+  color: #94a3b8 !important;
+}
+
+body.light-mode .btn-primary {
+  background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3) !important;
+}
+
+body.light-mode .btn-secondary {
+  background: rgba(241, 245, 249, 0.9) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(203, 213, 225, 0.8) !important;
+}
+
+body.light-mode .btn-secondary:hover {
+  background: #ffffff !important;
+  border-color: #6366f1 !important;
+  color: #4f46e5 !important;
+}
+
+body.light-mode h1,
+body.light-mode h2,
+body.light-mode h3,
+body.light-mode h4,
+body.light-mode h5,
+body.light-mode h6,
+body.light-mode strong,
+body.light-mode label {
+  color: #0f172a !important;
+}
+
+body.light-mode .workspace-selector {
+  background: rgba(241, 245, 249, 0.9) !important;
+  border: 1px solid rgba(203, 213, 225, 0.8) !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .workspace-dropdown-item {
+  color: #0f172a !important;
+  border-bottom: 1px solid rgba(241, 245, 249, 0.9) !important;
+}
+
+body.light-mode .workspace-dropdown-item:hover {
+  background: rgba(99, 102, 241, 0.08) !important;
 }

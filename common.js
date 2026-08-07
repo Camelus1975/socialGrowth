@@ -136,6 +136,15 @@ export function createSafeElement(tag, classes = [], text = '') {
 }
 
 // Theme Toggle
+export function initTheme() {
+  const savedTheme = localStorage.getItem('theme_mode');
+  if (savedTheme === 'dark') {
+    document.body.classList.remove('light-mode');
+  } else {
+    document.body.classList.add('light-mode');
+  }
+}
+
 export function toggleThemeMode() {
   const isLight = document.body.classList.toggle('light-mode');
   localStorage.setItem('theme_mode', isLight ? 'light' : 'dark');
