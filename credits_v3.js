@@ -29,11 +29,6 @@ export function initCreditsSystem() {
       const tab = trigger.getAttribute('data-tab') || 'overview';
       openCreditWalletModal(tab);
     }
-
-    const claimBtn = e.target.closest('[data-action="claimDailyReward"]');
-    if (claimBtn) {
-      claimReward('daily_login');
-    }
   });
 }
 
@@ -202,35 +197,28 @@ function renderOverviewTab(container, wallet) {
             <span>⚡</span> ${Number(wallet.balance || 0).toLocaleString()}
             <span style="font-size:0.9rem; font-weight:600; color:#64748b; margin-top:8px;">Credits</span>
           </div>
-          <p style="margin:6px 0 0 0; color:#64748b; font-size:0.85rem;">Refreshes monthly with your ${wallet.subscriptionTier || 'free'} allowance (${wallet.monthlyAllowance} credits).</p>
+          <p style="margin:6px 0 0 0; color:#64748b; font-size:0.85rem;">Includes your monthly allowance of <strong>100 Free Credits/mo</strong> (refreshes every 30 days).</p>
         </div>
         <div style="display:flex; flex-direction:column; gap:8px;">
           <button class="btn btn-primary" onclick="document.querySelector('[data-tab-target=packs]').click()" style="padding:12px 20px; font-weight:700; font-size:0.95rem; border-radius:12px; display:flex; align-items:center; gap:8px;">
             ⚡ Add Instant Credits
           </button>
-          <button data-action="claimDailyReward" style="background:rgba(255,255,255,0.9); border:1px solid rgba(203,213,225,0.8); color:#0f172a; padding:10px 16px; border-radius:12px; cursor:pointer; font-weight:600; font-size:0.85rem; display:flex; align-items:center; justify-content:center; gap:6px;">
-            🎁 Claim Daily Bonus (+2)
-          </button>
         </div>
       </div>
 
       <!-- Quick Metrics Breakdown Grid -->
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:14px;">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px;">
         <div style="background:rgba(248,250,252,0.9); border:1px solid rgba(226,232,240,0.9); border-radius:14px; padding:16px;">
           <span style="font-size:0.75rem; color:#64748b; font-weight:600; text-transform:uppercase;">Monthly Allowance</span>
-          <div style="font-size:1.3rem; font-weight:800; color:#0f172a; margin-top:4px;">${wallet.monthlyAllowance}</div>
+          <div style="font-size:1.3rem; font-weight:800; color:#0f172a; margin-top:4px;">${wallet.monthlyAllowance || 100} / mo</div>
         </div>
         <div style="background:rgba(248,250,252,0.9); border:1px solid rgba(226,232,240,0.9); border-radius:14px; padding:16px;">
           <span style="font-size:0.75rem; color:#64748b; font-weight:600; text-transform:uppercase;">Purchased Packs</span>
-          <div style="font-size:1.3rem; font-weight:800; color:#0f172a; margin-top:4px;">${wallet.purchasedCredits}</div>
-        </div>
-        <div style="background:rgba(248,250,252,0.9); border:1px solid rgba(226,232,240,0.9); border-radius:14px; padding:16px;">
-          <span style="font-size:0.75rem; color:#64748b; font-weight:600; text-transform:uppercase;">Bonus & Rewards</span>
-          <div style="font-size:1.3rem; font-weight:800; color:#10b981; margin-top:4px;">+${wallet.bonusCredits}</div>
+          <div style="font-size:1.3rem; font-weight:800; color:#0f172a; margin-top:4px;">${wallet.purchasedCredits || 0}</div>
         </div>
         <div style="background:rgba(248,250,252,0.9); border:1px solid rgba(226,232,240,0.9); border-radius:14px; padding:16px;">
           <span style="font-size:0.75rem; color:#64748b; font-weight:600; text-transform:uppercase;">Lifetime Spent</span>
-          <div style="font-size:1.3rem; font-weight:800; color:#6366f1; margin-top:4px;">${wallet.lifetimeUsed}</div>
+          <div style="font-size:1.3rem; font-weight:800; color:#6366f1; margin-top:4px;">${wallet.lifetimeUsed || 0}</div>
         </div>
       </div>
 
@@ -602,12 +590,12 @@ export async function renderCreditsView() {
         <div>
           <span style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:#64748b; letter-spacing:0.5px;">Monthly Plan Allowance</span>
           <div style="font-size:2rem; font-weight:800; color:#0f172a; margin:6px 0 2px 0;">
-            ${Number(wallet.monthlyAllowance || 100).toLocaleString()}
+            ${Number(wallet.monthlyAllowance || 100).toLocaleString()} / mo
           </div>
-          <p style="margin:0; font-size:0.8rem; color:#64748b;">Resets every 30-day billing cycle</p>
+          <p style="margin:0; font-size:0.8rem; color:#64748b;">Free 100 credits refreshed automatically every 30 days</p>
         </div>
         <div style="background:rgba(241,245,249,0.9); height:8px; border-radius:4px; overflow:hidden; margin-top:16px;">
-          <div style="background:linear-gradient(90deg, #6366f1, #10b981); height:100%; width:${Math.min(100, wallet.percentRemaining || 50)}%;"></div>
+          <div style="background:linear-gradient(90deg, #6366f1, #10b981); height:100%; width:${Math.min(100, wallet.percentRemaining || 100)}%;"></div>
         </div>
       </div>
 
@@ -621,20 +609,6 @@ export async function renderCreditsView() {
           <p style="margin:0; font-size:0.8rem; color:#64748b;">Never expire. Roll over automatically</p>
         </div>
         <span style="font-size:0.75rem; color:#10b981; font-weight:700; margin-top:16px;">✓ 100% Rollover Protection</span>
-      </div>
-
-      <!-- Bonus & Gamification Card -->
-      <div style="background:rgba(255,255,255,0.92); border:1px solid rgba(226,232,240,0.9); border-radius:18px; padding:22px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 4px 14px rgba(0,0,0,0.03);">
-        <div>
-          <span style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:#64748b; letter-spacing:0.5px;">Claimed Bonus Rewards</span>
-          <div style="font-size:2rem; font-weight:800; color:#10b981; margin:6px 0 2px 0;">
-            +${Number(wallet.bonusCredits || 0).toLocaleString()}
-          </div>
-          <p style="margin:0; font-size:0.8rem; color:#64748b;">From daily logins and referrals</p>
-        </div>
-        <button onclick="window.claimReward('daily_login')" style="background:rgba(241,245,249,0.9); border:1px solid rgba(203,213,225,0.8); color:#0f172a; padding:8px 12px; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; margin-top:16px;">
-          🎁 Claim Today (+2)
-        </button>
       </div>
 
     </div>
