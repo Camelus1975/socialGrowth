@@ -229,10 +229,21 @@ const billingRouter = require('./billingRouter');
 const calendarRouter = require('./calendarRouter');
 const mediaRouter = require('./mediaRouter');
 const creditsRouter = require('./creditsRouter');
+const socialRouter = require('./socialRouter');
+const { socialQueueWorker } = require('./socialQueueWorker');
+
+// Start the enterprise social background publisher
+try {
+  socialQueueWorker.start();
+} catch (e) {
+  console.warn('[SocialWorker] Startup notice:', e.message);
+}
 
 app.use('/api/billing', billingRouter);
 app.use('/api/credits', creditsRouter);
 app.use('/api/admin/credits', creditsRouter);
+app.use('/api/social', socialRouter);
+app.use('/api/integrations', socialRouter);
 app.use('/api/ai-gateway', aiGatewayRouter);
 app.use('/api/agent', agentRouter);
 app.use('/api/calendar', calendarRouter);

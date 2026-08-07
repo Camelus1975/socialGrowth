@@ -7,11 +7,13 @@ import { initCalendarV3 } from './calendar_v3.js';
 import { initWorkspaceV3, initiateAddBusiness, deleteWorkspace, initBrandKitController, openBrandKitModal, saveBrandKit } from './workspace_v3.js';
 import { initMediaV3 } from './media_v3.js';
 import { initCreditsSystem, openCreditWalletModal } from './credits_v3.js';
+import { initSocialConnectionCenter, loadSocialDashboard } from './integrations_v3.js';
 
 // Social Growth AI - V3 Architecture Entry Point
 
 window.__V3_OS__ = true; // Signal we are in V3
 window.openCreditWalletModal = openCreditWalletModal;
+window.loadSocialDashboard = loadSocialDashboard;
 
 import { state } from './state.js';
 
@@ -22,6 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initAvatarPicker();
   initBrandKitController();
   initCreditsSystem();
+  initSocialConnectionCenter();
   
   // Initialize specific V3 modules
   initCopilotV3(state);
@@ -183,6 +186,9 @@ function switchWorkspace(workspaceId) {
 
     if (workspaceId === 'credits' && window.renderCreditsView) {
       window.renderCreditsView();
+    }
+    if (workspaceId === 'integrations') {
+      loadSocialDashboard();
     }
   }
 }

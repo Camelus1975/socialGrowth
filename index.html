@@ -221,68 +221,26 @@
         </div>
       </section>
 
-      <!-- View: Integrations -->
-      <section id="view-integrations" class="view-panel" style="display:none;">
-        <header class="view-header">
-          <h2>Platform Integrations</h2>
+      <!-- View: Universal Social Connection Center -->
+      <section id="view-integrations" class="view-panel" style="display:none; padding:24px; max-width:1300px; margin:0 auto; width:100%;">
+        <header class="view-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px;">
+          <div>
+            <h2 style="margin:0; font-size:1.8rem; font-weight:900; color:var(--text-main, #0f172a); display:flex; align-items:center; gap:10px;">
+              <span>🌐</span> Social Connection Center
+            </h2>
+            <p style="margin:4px 0 0 0; color:var(--text-muted, #64748b); font-size:0.9rem;">
+              Enterprise OAuth 2.0 connection hub for autonomous scheduling, cross-posting, comments moderation, and real-time analytics.
+            </p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button onclick="window.loadSocialDashboard()" class="btn btn-secondary" style="display:flex; align-items:center; gap:6px; font-weight:700; border-radius:12px; padding:10px 16px;">
+              🔄 Sync All Accounts
+            </button>
+          </div>
         </header>
-        <div style="padding:24px; max-width:600px;">
-          <p style="color:var(--text-muted); margin-bottom:24px;">Connect your social media accounts to enable multi-platform publishing.</p>
-          
-          <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:12px; padding:16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <div style="width:40px; height:40px; background:#38bdf8; border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">X</div>
-              <div>
-                <div style="font-weight:bold; color:var(--text-main);">Twitter / X</div>
-                <div style="font-size:0.85rem; color:var(--text-muted);">Not connected</div>
-              </div>
-            </div>
-            <button class="btn btn-secondary" onclick="alert('OAuth Mock: Twitter Connected!')">Connect</button>
-          </div>
 
-          <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:12px; padding:16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <div style="width:40px; height:40px; background:#60a5fa; border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">in</div>
-              <div>
-                <div style="font-weight:bold; color:var(--text-main);">LinkedIn</div>
-                <div style="font-size:0.85rem; color:var(--text-muted);">Not connected</div>
-              </div>
-            </div>
-            <button class="btn btn-secondary" onclick="alert('OAuth Mock: LinkedIn Connected!')">Connect</button>
-          </div>
-
-          <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:12px; padding:16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <div style="width:40px; height:40px; background:#1877F2; border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">f</div>
-              <div>
-                <div style="font-weight:bold; color:var(--text-main);">Facebook</div>
-                <div style="font-size:0.85rem; color:var(--text-muted);">Not connected</div>
-              </div>
-            </div>
-            <button class="btn btn-secondary" onclick="alert('OAuth Mock: Facebook Connected!')">Connect</button>
-          </div>
-
-          <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:12px; padding:16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <div style="width:40px; height:40px; background:linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">ig</div>
-              <div>
-                <div style="font-weight:bold; color:var(--text-main);">Instagram</div>
-                <div style="font-size:0.85rem; color:var(--text-muted);">Not connected</div>
-              </div>
-            </div>
-            <button class="btn btn-secondary" onclick="alert('OAuth Mock: Instagram Connected!')">Connect</button>
-          </div>
-
-          <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:12px; padding:16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <div style="width:40px; height:40px; background:#000000; border:1px solid #ffffff44; border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">tt</div>
-              <div>
-                <div style="font-weight:bold; color:var(--text-main);">TikTok</div>
-                <div style="font-size:0.85rem; color:var(--text-muted);">Not connected</div>
-              </div>
-            </div>
-          </div>
-
+        <div id="integrations-hub-container">
+          <!-- Dynamically populated by integrations_v3.js -->
         </div>
       </section>
 
