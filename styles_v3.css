@@ -514,3 +514,51 @@ body.light-mode .workspace-dropdown-item:hover {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* Inbox View Half-Screen Width 50%/50% Split Layout */
+#view-inbox {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 80px);
+  max-height: 100%;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 24px 32px;
+}
+
+#view-inbox.active {
+  display: flex !important;
+}
+
+.inbox-layout {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important; /* Half screen width equal 50%/50% split */
+  gap: 24px !important;
+  flex: 1 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.inbox-sidebar,
+.inbox-main {
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .inbox-layout {
+    grid-template-columns: 1fr !important;
+  }
+}

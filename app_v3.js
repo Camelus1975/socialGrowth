@@ -168,7 +168,7 @@ function switchWorkspace(workspaceId) {
   // Show target panel
   const targetPanel = document.getElementById('view-' + workspaceId);
   if (targetPanel) {
-    if (workspaceId === 'copilot') {
+    if (workspaceId === 'copilot' || workspaceId === 'inbox') {
       targetPanel.style.display = 'flex';
     } else {
       targetPanel.style.display = 'block';
