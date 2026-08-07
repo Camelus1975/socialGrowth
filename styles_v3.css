@@ -528,20 +528,41 @@ body.light-mode .workspace-dropdown-item:hover {
   background: rgba(99, 102, 241, 0.08) !important;
 }
 
-/* Media Grid Half-Screen Width Styling */
+/* Media Grid - 6 Items Per Row Styling */
 .media-grid,
 .media-asset-grid {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)) !important;
-  gap: 24px !important;
-  padding: 20px 0 !important;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)) !important;
+  gap: 16px !important;
+  padding: 16px 0 !important;
   width: 100% !important;
 }
 
-@media (max-width: 960px) {
+@media (min-width: 1200px) {
   .media-grid,
   .media-asset-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+  }
+}
+
+@media (max-width: 1199px) and (min-width: 900px) {
+  .media-grid,
+  .media-asset-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+@media (max-width: 899px) and (min-width: 600px) {
+  .media-grid,
+  .media-asset-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 599px) {
+  .media-grid,
+  .media-asset-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 }
 
