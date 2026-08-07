@@ -157,9 +157,9 @@ window.openMediaViewer = function(url, type) {
     modal.id = 'global-media-modal';
     modal.className = 'custom-modal-overlay';
     modal.innerHTML = `
-      <div class="custom-modal-content" style="max-width: 800px; padding: 10px; position: relative;">
-        <button class="btn btn-secondary" style="position: absolute; top: -10px; right: -10px; z-index: 1000; border-radius: 50%; padding: 8px 12px; background: var(--bg-surface); border: 1px solid var(--border-glass);" onclick="document.getElementById('global-media-modal').style.display='none'; document.getElementById('global-media-container').innerHTML='';">✕</button>
-        <div id="global-media-container" style="display: flex; justify-content: center; align-items: center; width: 100%; max-height: 80vh; overflow: hidden; border-radius: 8px;">
+      <div class="custom-modal-content" style="width: 50vw; min-width: 500px; max-width: 90vw; padding: 16px; position: relative;">
+        <button class="btn btn-secondary" style="position: absolute; top: -12px; right: -12px; z-index: 1000; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--bg-surface, #1e293b); border: 1px solid var(--border-glass, rgba(255,255,255,0.2)); color: white; cursor: pointer;" onclick="document.getElementById('global-media-modal').style.display='none'; document.getElementById('global-media-container').innerHTML='';">✕</button>
+        <div id="global-media-container" style="display: flex; justify-content: center; align-items: center; width: 100%; max-height: 82vh; overflow: hidden; border-radius: 12px;">
         </div>
       </div>
     `;
@@ -167,10 +167,11 @@ window.openMediaViewer = function(url, type) {
   }
   
   const container = document.getElementById('global-media-container');
-  if (type === 'video' || url.endsWith('.mp4') || url.endsWith('.webm')) {
-    container.innerHTML = `<video src="${url}" controls autoplay style="max-width: 100%; max-height: 80vh; border-radius: 8px;"></video>`;
+  const isVid = type === 'video' || (typeof url === 'string' && (url.endsWith('.mp4') || url.endsWith('.webm')));
+  if (isVid) {
+    container.innerHTML = `<video src="${url}" controls autoplay style="width: 100%; max-height: 82vh; border-radius: 8px; object-fit: contain;"></video>`;
   } else {
-    container.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 80vh; border-radius: 8px; object-fit: contain;" />`;
+    container.innerHTML = `<img src="${url}" style="width: 100%; max-height: 82vh; border-radius: 8px; object-fit: contain;" />`;
   }
   
   modal.style.display = 'flex';
