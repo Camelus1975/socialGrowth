@@ -105,7 +105,6 @@ window.openMediaDetailModal = function(assetId) {
       <div style="display:flex; align-items:center; justify-content:space-between; padding-right:40px; flex-wrap:wrap; gap:12px;">
         <div style="display:flex; align-items:center; gap:10px;">
           <span style="font-size:1.4rem;">${isVideo ? '🎥' : '🖼️'}</span>
-          <h3 style="margin:0; font-size:1.25rem; font-weight:700; color:#0f172a;">${typeLabel}</h3>
         </div>
         <span style="font-size:0.85rem; color:#4f46e5; background:rgba(99,102,241,0.08); padding:6px 14px; border-radius:20px; border:1px solid rgba(99,102,241,0.2); font-weight:600;">📅 ${dateStr}</span>
       </div>
