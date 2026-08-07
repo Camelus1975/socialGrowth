@@ -1552,15 +1552,43 @@ app.get('/api/brand-kit/:appId', async (req, res) => {
   const { appId } = req.params;
   if (!appId) return res.status(400).json({ error: 'appId required' });
 
-  try {
-    const { data, error } = await supabase
-      .from('brand_kits')
-      .select('*')
-      .eq('app_id', appId)
-      .maybeSingle();
+  const authHeader = req.headers.authorization;
+  const userSupabase = (authHeader && authHeader.includes('Bearer'))
+    ? createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, { global: { headers: { Authorization: authHeader } } })
+    : supabase;
 
-    if (error) throw error;
-    res.json({ brandKit: data || null });
+  try {
+    let brandKitData = null;
+    try {
+      const { data } = await userSupabase
+        .from('brand_kits')
+        .select('*')
+        .eq('app_id', appId)
+        .maybeSingle();
+      brandKitData = data;
+    } catch (e) {}
+
+    // Fallback: check businesses discovery_profile
+    if (!brandKitData) {
+      const { data: biz } = await userSupabase
+        .from('businesses')
+        .select('discovery_profile')
+        .or(`business_id.eq.${appId},id.eq.${appId}`)
+        .maybeSingle();
+
+      if (biz?.discovery_profile?.brandKit) {
+        const bk = biz.discovery_profile.brandKit;
+        brandKitData = {
+          app_id: appId,
+          logo_url: bk.logoUrl || null,
+          primary_color: bk.colors?.primary || '#6366f1',
+          tone_of_voice: biz.discovery_profile?.brandVoice?.tone || 'Professional',
+          visual_style: 'Modern Minimalist'
+        };
+      }
+    }
+
+    res.json({ brandKit: brandKitData || null });
   } catch (err) {
     console.error('[BrandKit GET] Error:', err);
     res.status(500).json({ error: err.message });
@@ -1572,28 +1600,63 @@ app.post('/api/brand-kit/:appId', async (req, res) => {
   const brandData = req.body;
   if (!appId) return res.status(400).json({ error: 'appId required' });
 
-  try {
-    const { data, error } = await supabase
-      .from('brand_kits')
-      .upsert({
-        app_id: appId,
-        primary_color: brandData.primary_color || '#6366f1',
-        secondary_color: brandData.secondary_color || '#8b5cf6',
-        accent_color: brandData.accent_color || '#ec4899',
-        font_family: brandData.font_family || 'Inter',
-        logo_url: brandData.logo_url || null,
-        tone_of_voice: brandData.tone_of_voice || 'Professional',
-        target_persona: brandData.target_persona || '',
-        key_phrases: Array.isArray(brandData.key_phrases) ? brandData.key_phrases : (brandData.key_phrases ? brandData.key_phrases.split(',').map(s => s.trim()) : []),
-        forbidden_words: Array.isArray(brandData.forbidden_words) ? brandData.forbidden_words : (brandData.forbidden_words ? brandData.forbidden_words.split(',').map(s => s.trim()) : []),
-        visual_style: brandData.visual_style || 'Modern Minimalist',
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'app_id' })
-      .select()
-      .single();
+  const authHeader = req.headers.authorization;
+  const userSupabase = (authHeader && authHeader.includes('Bearer'))
+    ? createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, { global: { headers: { Authorization: authHeader } } })
+    : supabase;
 
-    if (error) throw error;
-    res.json({ success: true, brandKit: data });
+  try {
+    let savedKit = null;
+    // 1. Try upserting into brand_kits
+    try {
+      const { data } = await userSupabase
+        .from('brand_kits')
+        .upsert({
+          app_id: appId,
+          primary_color: brandData.primary_color || '#6366f1',
+          secondary_color: brandData.secondary_color || '#8b5cf6',
+          accent_color: brandData.accent_color || '#ec4899',
+          font_family: brandData.font_family || 'Inter',
+          logo_url: brandData.logo_url || null,
+          tone_of_voice: brandData.tone_of_voice || 'Professional',
+          target_persona: brandData.target_persona || '',
+          key_phrases: Array.isArray(brandData.key_phrases) ? brandData.key_phrases : [],
+          forbidden_words: Array.isArray(brandData.forbidden_words) ? brandData.forbidden_words : [],
+          visual_style: brandData.visual_style || 'Modern Minimalist',
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'app_id' })
+        .select()
+        .maybeSingle();
+      savedKit = data;
+    } catch (bkErr) {
+      console.warn('[BrandKit POST] brand_kits upsert note:', bkErr.message);
+    }
+
+    // 2. Always update businesses table discovery_profile brandKit
+    try {
+      const { data: biz } = await userSupabase
+        .from('businesses')
+        .select('discovery_profile')
+        .or(`business_id.eq.${appId},id.eq.${appId}`)
+        .maybeSingle();
+
+      if (biz) {
+        const dp = biz.discovery_profile || {};
+        dp.brandKit = dp.brandKit || {};
+        dp.brandKit.logoUrl = brandData.logo_url || dp.brandKit.logoUrl;
+        dp.brandKit.colors = dp.brandKit.colors || {};
+        dp.brandKit.colors.primary = brandData.primary_color || '#6366f1';
+        
+        await userSupabase
+          .from('businesses')
+          .update({ discovery_profile: dp })
+          .or(`business_id.eq.${appId},id.eq.${appId}`);
+      }
+    } catch (dpErr) {
+      console.warn('[BrandKit POST] Business discovery profile update note:', dpErr.message);
+    }
+
+    res.json({ success: true, logo_url: brandData.logo_url, brandKit: savedKit || { logo_url: brandData.logo_url } });
   } catch (err) {
     console.error('[BrandKit POST] Error:', err);
     res.status(500).json({ error: err.message });

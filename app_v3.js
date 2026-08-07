@@ -35,8 +35,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     loginScreen.style.display = 'none';
     appContainer.style.display = 'flex';
     
-    const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Founder';
-    const avatarUrl = user.user_metadata?.avatar_url || 'https://i.pravatar.cc/150?u=' + user.id;
+    const savedLocalName = localStorage.getItem('user_full_name');
+    const savedLocalAvatar = localStorage.getItem('user_avatar_url');
+    const userName = user.user_metadata?.full_name || savedLocalName || user.email?.split('@')[0] || 'Founder';
+    const avatarUrl = user.user_metadata?.avatar_url || savedLocalAvatar || 'https://i.pravatar.cc/150?u=' + user.id;
     
     document.getElementById('user-header-name').textContent = userName;
     document.getElementById('user-header-avatar').src = avatarUrl;

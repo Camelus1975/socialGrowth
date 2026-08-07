@@ -217,10 +217,12 @@ export async function openBrandKitModal() {
   try {
     const res = await requestApi(`/api/brand-kit/${state.activeWorkspaceId}`);
     const bk = res.brandKit || {};
+    const localLogo = localStorage.getItem('brand_logo_' + state.activeWorkspaceId);
+    const effectiveLogo = bk.logo_url || localLogo || null;
     
-    if (bk.logo_url) {
-      if (previewImg) previewImg.src = bk.logo_url;
-      if (urlInput) urlInput.value = bk.logo_url;
+    if (effectiveLogo) {
+      if (previewImg) previewImg.src = effectiveLogo;
+      if (urlInput) urlInput.value = effectiveLogo;
     } else {
       const appName = encodeURIComponent(state.activeWorkspace || 'Brand');
       if (previewImg) previewImg.src = `https://ui-avatars.com/api/?name=${appName}&background=6366f1&color=fff&size=512`;
@@ -316,6 +318,9 @@ export async function saveBrandKit() {
           .eq('business_id', state.activeWorkspaceId);
       }
     }
+
+    // Local cache backup
+    localStorage.setItem('brand_logo_' + state.activeWorkspaceId, finalLogoUrl);
 
     showToast('Business Logo & Brand Kit saved successfully!', 'success');
     closeModal('brand-kit-modal');
