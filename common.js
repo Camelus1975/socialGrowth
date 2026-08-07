@@ -156,10 +156,11 @@ window.openMediaViewer = function(url, type) {
     modal = document.createElement('div');
     modal.id = 'global-media-modal';
     modal.className = 'custom-modal-overlay';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(15,23,42,0.65);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:24px;';
     modal.innerHTML = `
-      <div class="custom-modal-content" style="width: 50vw; min-width: 500px; max-width: 90vw; padding: 16px; position: relative;">
-        <button class="btn btn-secondary" style="position: absolute; top: -12px; right: -12px; z-index: 1000; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--bg-surface, #1e293b); border: 1px solid var(--border-glass, rgba(255,255,255,0.2)); color: white; cursor: pointer;" onclick="document.getElementById('global-media-modal').style.display='none'; document.getElementById('global-media-container').innerHTML='';">✕</button>
-        <div id="global-media-container" style="display: flex; justify-content: center; align-items: center; width: 100%; max-height: 82vh; overflow: hidden; border-radius: 12px;">
+      <div class="custom-modal-content" style="width: 50vw; min-width: 500px; max-width: 90vw; padding: 20px; position: relative; background: rgba(255,255,255,0.92); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.8); border-radius: 20px; box-shadow: 0 25px 60px rgba(15,23,42,0.25), 0 10px 30px rgba(99,102,241,0.12); color: #0f172a;">
+        <button style="position: absolute; top: -12px; right: -12px; z-index: 1000; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(241,245,249,0.9); border: 1px solid rgba(203,213,225,0.8); color: #0f172a; cursor: pointer; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" onclick="document.getElementById('global-media-modal').style.display='none'; document.getElementById('global-media-container').innerHTML='';">✕</button>
+        <div id="global-media-container" style="display: flex; justify-content: center; align-items: center; width: 100%; max-height: 82vh; overflow: hidden; border-radius: 12px; background: #000; border: 1px solid rgba(226,232,240,0.8);">
         </div>
       </div>
     `;

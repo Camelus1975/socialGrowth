@@ -95,23 +95,23 @@ window.openMediaDetailModal = function(assetId) {
 
   const modal = document.createElement('div');
   modal.id = 'media-detail-modal';
-  modal.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.82);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px;';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(15,23,42,0.65);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:24px;';
 
   modal.innerHTML = `
-    <div style="background:var(--bg-panel, #0f172a); border:1px solid var(--border-glass, rgba(255,255,255,0.15)); border-radius:18px; width:100%; max-width:840px; max-height:90vh; overflow-y:auto; padding:28px; position:relative; box-shadow:0 25px 60px rgba(0,0,0,0.7); display:flex; flex-direction:column; gap:20px;">
+    <div style="background:rgba(255,255,255,0.92); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border:1px solid rgba(255,255,255,0.8); border-radius:20px; width:100%; max-width:840px; max-height:90vh; overflow-y:auto; padding:28px; position:relative; box-shadow:0 25px 60px rgba(15,23,42,0.25), 0 10px 30px rgba(99,102,241,0.12); color:#0f172a; display:flex; flex-direction:column; gap:20px;">
       
-      <button id="close-media-modal-btn" style="position:absolute; top:18px; right:18px; background:rgba(255,255,255,0.08); border:1px solid var(--border-glass, rgba(255,255,255,0.15)); color:var(--text-main, #fff); border-radius:50%; width:36px; height:36px; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; z-index:10;">✕</button>
+      <button id="close-media-modal-btn" style="position:absolute; top:18px; right:18px; background:rgba(241,245,249,0.9); border:1px solid rgba(203,213,225,0.8); color:#0f172a; border-radius:50%; width:36px; height:36px; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; z-index:10; font-weight:bold; box-shadow:0 2px 8px rgba(0,0,0,0.08);">✕</button>
 
       <div style="display:flex; align-items:center; justify-content:space-between; padding-right:40px; flex-wrap:wrap; gap:12px;">
         <div style="display:flex; align-items:center; gap:10px;">
           <span style="font-size:1.4rem;">${isVideo ? '🎥' : '🖼️'}</span>
-          <h3 style="margin:0; font-size:1.25rem; font-weight:700; color:var(--text-main, #fff);">${typeLabel}</h3>
+          <h3 style="margin:0; font-size:1.25rem; font-weight:700; color:#0f172a;">${typeLabel}</h3>
         </div>
-        <span style="font-size:0.85rem; color:var(--text-muted, #94a3b8); background:rgba(255,255,255,0.04); padding:6px 14px; border-radius:20px; border:1px solid var(--border-glass, rgba(255,255,255,0.1));">📅 ${dateStr}</span>
+        <span style="font-size:0.85rem; color:#4f46e5; background:rgba(99,102,241,0.08); padding:6px 14px; border-radius:20px; border:1px solid rgba(99,102,241,0.2); font-weight:600;">📅 ${dateStr}</span>
       </div>
 
       <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:24px; align-items:start;">
-        <div style="background:#000; border-radius:14px; overflow:hidden; border:1px solid var(--border-glass, rgba(255,255,255,0.1)); display:flex; align-items:center; justify-content:center; max-height:450px; min-height:280px;">
+        <div style="background:#000; border-radius:14px; overflow:hidden; border:1px solid rgba(226,232,240,0.8); display:flex; align-items:center; justify-content:center; max-height:450px; min-height:280px; box-shadow:0 8px 24px rgba(0,0,0,0.15);">
           ${isVideo ? 
             `<video src="${url}" controls autoplay loop style="width:100%; max-height:450px; object-fit:contain;"></video>` : 
             `<img src="${url}" style="width:100%; max-height:450px; object-fit:contain; cursor:zoom-in;" onclick="window.openMediaViewer('${url}', 'image')" title="Click for full-screen view"/>`
@@ -120,19 +120,19 @@ window.openMediaDetailModal = function(assetId) {
 
         <div style="display:flex; flex-direction:column; gap:16px; height:100%;">
           <div>
-            <label style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted, #94a3b8); font-weight:600; display:block; margin-bottom:8px;">Post Caption / Prompt</label>
-            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-glass, rgba(255,255,255,0.1)); border-radius:12px; padding:16px; color:var(--text-main, #fff); font-size:0.95rem; line-height:1.6; max-height:220px; overflow-y:auto; white-space:pre-wrap;">${caption}</div>
+            <label style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.5px; color:#475569; font-weight:700; display:block; margin-bottom:8px;">Post Caption / Prompt</label>
+            <div style="background:rgba(248,250,252,0.95); border:1px solid rgba(226,232,240,0.9); border-radius:12px; padding:16px; color:#0f172a; font-size:0.95rem; line-height:1.6; max-height:220px; overflow-y:auto; white-space:pre-wrap; box-shadow:inset 0 2px 4px rgba(0,0,0,0.02);">${caption}</div>
           </div>
 
           <div style="display:flex; flex-direction:column; gap:10px; margin-top:auto;">
-            <button id="copy-caption-btn" style="background:rgba(99,102,241,0.15); border:1px solid rgba(99,102,241,0.4); color:#a5b4fc; padding:12px; border-radius:10px; cursor:pointer; font-weight:600; font-size:0.9rem; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <button id="copy-caption-btn" style="background:linear-gradient(135deg, #6366f1, #8b5cf6); border:none; color:#ffffff; padding:12px; border-radius:10px; cursor:pointer; font-weight:600; font-size:0.9rem; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(99,102,241,0.35); transition:transform 0.15s ease;">
               📋 Copy Caption / Prompt
             </button>
-            <a href="${url}" target="_blank" download style="background:rgba(255,255,255,0.05); border:1px solid var(--border-glass, rgba(255,255,255,0.15)); color:var(--text-main, #fff); padding:10px; border-radius:10px; text-decoration:none; text-align:center; font-size:0.88rem; font-weight:500; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <a href="${url}" target="_blank" download style="background:rgba(241,245,249,0.9); border:1px solid rgba(203,213,225,0.8); color:#0f172a; padding:10px; border-radius:10px; text-decoration:none; text-align:center; font-size:0.88rem; font-weight:600; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 2px 6px rgba(0,0,0,0.04);">
               🔗 Open Full-Res File
             </a>
             ${asset.id ? `
-              <button id="delete-asset-btn" style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; padding:10px; border-radius:10px; cursor:pointer; font-size:0.88rem; font-weight:500; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:4px;">
+              <button id="delete-asset-btn" style="background:rgba(254,226,226,0.85); border:1px solid rgba(252,165,165,0.8); color:#dc2626; padding:10px; border-radius:10px; cursor:pointer; font-size:0.88rem; font-weight:600; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:4px;">
                 🗑️ Delete Media Asset
               </button>
             ` : ''}
