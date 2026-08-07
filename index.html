@@ -63,6 +63,9 @@
         <li class="nav-item" data-action="switchWorkspace" data-args="media">
           <span class="icon">🖼️</span> Media Assets
         </li>
+        <li class="nav-item" data-action="openCreditWallet" data-tab="overview">
+          <span class="icon">⚡</span> AI Credits
+        </li>
         <li class="nav-item" data-action="switchWorkspace" data-args="integrations">
           <span class="icon">🔌</span> Integrations
         </li>
@@ -85,6 +88,19 @@
     <!-- Main Workspace Area -->
     <main class="workspace-container">
       
+      <!-- Top Universal Header Bar with Live Credit Counter & Low Credit Alert -->
+      <div class="workspace-top-bar" style="display:flex; justify-content:space-between; align-items:center; padding:12px 24px; border-bottom:1px solid var(--border-glass, rgba(255,255,255,0.08)); background:var(--bg-glass, rgba(255,255,255,0.02)); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); gap:16px; min-height:56px;">
+        <div id="low-credit-banner" style="display:none; align-items:center; justify-content:space-between; width:100%; max-width:580px; background:linear-gradient(135deg, rgba(239,68,68,0.9), rgba(220,38,38,0.95)); border-radius:10px; padding:6px 14px; color:#fff; font-size:0.85rem; box-shadow:0 4px 14px rgba(239,68,68,0.25);"></div>
+        <div style="margin-left:auto; display:flex; align-items:center; gap:12px;">
+          <div id="header-credit-counter" data-action="openCreditWallet" data-tab="overview" style="cursor:pointer; background:rgba(99,102,241,0.12); border:1px solid rgba(99,102,241,0.3); color:#6366f1; padding:6px 14px; border-radius:20px; font-size:0.88rem; font-weight:700; display:flex; align-items:center; gap:6px; transition:transform 0.15s ease; box-shadow:0 2px 8px rgba(99,102,241,0.1);" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" title="Click to view AI Credits Wallet & Top-Up">
+            <span>⚡</span> <span id="header-credit-count">100</span> <span style="font-size:0.75rem; color:var(--text-muted, #64748b); font-weight:600;">Credits</span>
+          </div>
+          <button class="btn btn-primary" data-action="openCreditWallet" data-tab="packs" style="padding:6px 14px; font-size:0.82rem; font-weight:700; border-radius:10px; display:flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(99,102,241,0.25);">
+            + Buy Credits
+          </button>
+        </div>
+      </div>
+
       <!-- View 1: Home (Action Feed) -->
       <section id="view-home" class="view-panel active">
         <header class="view-header">

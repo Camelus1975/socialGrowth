@@ -6,10 +6,12 @@ import { initInboxV3 } from './inbox_v3.js';
 import { initCalendarV3 } from './calendar_v3.js';
 import { initWorkspaceV3, initiateAddBusiness, deleteWorkspace, initBrandKitController, openBrandKitModal, saveBrandKit } from './workspace_v3.js';
 import { initMediaV3 } from './media_v3.js';
+import { initCreditsSystem, openCreditWalletModal } from './credits_v3.js';
 
 // Social Growth AI - V3 Architecture Entry Point
 
 window.__V3_OS__ = true; // Signal we are in V3
+window.openCreditWalletModal = openCreditWalletModal;
 
 import { state } from './state.js';
 
@@ -19,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupUIEventListeners();
   initAvatarPicker();
   initBrandKitController();
+  initCreditsSystem();
   
   // Initialize specific V3 modules
   initCopilotV3(state);

@@ -228,8 +228,11 @@ app.use('/api', authenticate);
 const billingRouter = require('./billingRouter');
 const calendarRouter = require('./calendarRouter');
 const mediaRouter = require('./mediaRouter');
+const creditsRouter = require('./creditsRouter');
 
 app.use('/api/billing', billingRouter);
+app.use('/api/credits', creditsRouter);
+app.use('/api/admin/credits', creditsRouter);
 app.use('/api/ai-gateway', aiGatewayRouter);
 app.use('/api/agent', agentRouter);
 app.use('/api/calendar', calendarRouter);
