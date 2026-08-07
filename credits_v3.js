@@ -508,10 +508,60 @@ export async function showCreditEstimatorDialog(actionCode, options = {}) {
 /**
  * Top-Up Credit Pack execution
  */
+export async function purchaseCreditPack(packCode) {
+  try {
+    const res = await requestApi('/api/credits/purchase', {
+      method: 'POST',
+      body: JSON.stringify({ packCode })
+    });
+
+    if (res && res.success) {
+      showToast(res.message || 'Credits added successfully!', 'success');
+      window.dispatchEvent(new CustomEvent('creditsUpdated'));
+      const modal = document.getElementById('credit-wallet-modal');
+      if (modal) modal.remove();
+      if (window.renderCreditsView) window.renderCreditsView();
+    } else {
+      showToast(res.error || 'Purchase failed', 'error');
+    }
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+/**
+ * Claim gamification reward
+ */
+export async function claimReward(rewardType) {
+  try {
+    const res = await requestApi('/api/credits/claim-reward', {
+      method: 'POST',
+      body: JSON.stringify({ rewardType })
+    });
+
+    if (res && res.success) {
+      showToast(`🎁 Claimed +${res.credits_awarded} daily bonus credits!`, 'success');
+      window.dispatchEvent(new CustomEvent('creditsUpdated'));
+      if (window.renderCreditsView) window.renderCreditsView();
+    } else {
+      showToast(res.message || 'Already claimed for today!', 'info');
+    }
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+export function upgradePlan(planId) {
+  showToast(`Plan ${planId.toUpperCase()} selected! Redirecting to checkout...`, 'success');
+}
+
+// Global window assignments for inline onclick handlers
 window.openCreditWalletModal = openCreditWalletModal;
 window.fetchUserWallet = fetchUserWallet;
 window.showCreditEstimatorDialog = showCreditEstimatorDialog;
+window.purchaseCreditPack = purchaseCreditPack;
 window.claimReward = claimReward;
+window.upgradePlan = upgradePlan;
 
 /**
  * Render the dedicated Full-Page AI Credits & Wallet Hub in #view-credits
