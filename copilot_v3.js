@@ -70,28 +70,46 @@ export function initCopilotV3(state) {
       sendMessage();
     }
   });
+
+  // Event listener for quick action prompt chips
+  document.addEventListener('click', (e) => {
+    const chip = e.target.closest('.copilot-chip');
+    if (chip) {
+      const prompt = chip.getAttribute('data-prompt');
+      if (prompt && inputEl) {
+        inputEl.value = prompt;
+        sendMessage();
+      }
+    }
+  });
 }
 
 function appendMessage(role, text) {
   const history = document.getElementById('copilot-chat-history');
   if (!history) return;
   
+  const welcomeCard = document.getElementById('copilot-welcome-card');
+  if (welcomeCard) {
+    welcomeCard.style.display = 'none';
+  }
+  
   const msgDiv = document.createElement('div');
-  msgDiv.style.padding = '16px';
-  msgDiv.style.borderRadius = '12px';
+  msgDiv.style.padding = '16px 20px';
+  msgDiv.style.borderRadius = '14px';
   msgDiv.style.marginBottom = '12px';
-  msgDiv.style.maxWidth = '85%';
+  msgDiv.style.maxWidth = '88%';
   msgDiv.style.lineHeight = '1.6';
+  msgDiv.style.fontSize = '15px';
   
   if (role === 'user') {
-    msgDiv.style.background = 'rgba(255,255,255,0.05)';
+    msgDiv.style.background = 'rgba(255,255,255,0.06)';
     msgDiv.style.alignSelf = 'flex-end';
     msgDiv.style.marginLeft = 'auto';
-    msgDiv.style.border = '1px solid rgba(255,255,255,0.1)';
+    msgDiv.style.border = '1px solid rgba(255,255,255,0.12)';
   } else {
-    msgDiv.style.background = 'rgba(99, 102, 241, 0.1)';
+    msgDiv.style.background = 'rgba(99, 102, 241, 0.12)';
     msgDiv.style.alignSelf = 'flex-start';
-    msgDiv.style.border = '1px solid rgba(99, 102, 241, 0.2)';
+    msgDiv.style.border = '1px solid rgba(99, 102, 241, 0.25)';
   }
   
   // Basic markdown to HTML

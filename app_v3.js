@@ -168,7 +168,11 @@ function switchWorkspace(workspaceId) {
   // Show target panel
   const targetPanel = document.getElementById('view-' + workspaceId);
   if (targetPanel) {
-    targetPanel.style.display = 'block';
+    if (workspaceId === 'copilot') {
+      targetPanel.style.display = 'flex';
+    } else {
+      targetPanel.style.display = 'block';
+    }
     targetPanel.classList.add('active');
   }
 }
