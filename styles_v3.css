@@ -134,23 +134,53 @@ h1, h2, h3 {
 }
 
 .sidebar-footer {
-  padding: 20px;
+  padding: 16px;
   border-top: 1px solid var(--border-glass);
+  margin-top: auto;
 }
 
 .user-profile {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.user-profile:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .avatar-img {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
+  object-fit: cover;
   background: #333;
+  border: 1px solid var(--border-glass);
+  flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role {
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
 .workspace-container {
