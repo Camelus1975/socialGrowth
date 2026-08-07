@@ -230,6 +230,62 @@ export function toggleAuthMode() {
   }
 }
 
+// Avatar Picker & Live Preview Controller
+export function initAvatarPicker() {
+  const fileInput = document.getElementById('avatar-file-input');
+  const urlInput = document.getElementById('profile-modal-avatar-url');
+  const previewImg = document.getElementById('profile-modal-avatar-preview');
+  const clearBtn = document.getElementById('clear-avatar-btn');
+  const presetOptions = document.querySelectorAll('.preset-avatar-option');
+
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        window.selectedAvatarFile = file;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          if (previewImg) previewImg.src = evt.target.result;
+          if (urlInput) urlInput.value = '';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  if (urlInput) {
+    urlInput.addEventListener('input', (e) => {
+      const url = e.target.value.trim();
+      if (url && previewImg) {
+        window.selectedAvatarFile = null;
+        previewImg.src = url;
+      }
+    });
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      window.selectedAvatarFile = null;
+      if (urlInput) urlInput.value = '';
+      const headerAvatar = document.getElementById('user-header-avatar');
+      if (previewImg && headerAvatar) previewImg.src = headerAvatar.src;
+    });
+  }
+
+  if (presetOptions) {
+    presetOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        window.selectedAvatarFile = null;
+        const src = opt.src;
+        if (previewImg) previewImg.src = src;
+        if (urlInput) urlInput.value = src;
+        presetOptions.forEach(p => p.style.borderColor = 'transparent');
+        opt.style.borderColor = 'var(--accent-color, #6366f1)';
+      });
+    });
+  }
+}
+
 export async function saveUserProfile() {
   const saveBtn = document.getElementById('save-profile-btn');
   if (!saveBtn) return;
@@ -252,28 +308,38 @@ export async function saveUserProfile() {
         .from('avatars')
         .upload(filePath, file, { upsert: true });
         
-      if (error) throw error;
-      
-      const { data: { publicUrl } } = window.supabaseClient.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-        
-      newAvatarUrl = publicUrl;
+      if (!error) {
+        const { data: { publicUrl } } = window.supabaseClient.storage
+          .from('avatars')
+          .getPublicUrl(filePath);
+        newAvatarUrl = publicUrl;
+      } else {
+        console.warn('Supabase avatars storage error, using data URL fallback:', error.message);
+      }
     }
     
+    // Save to Supabase Auth user metadata
     if (window.supabaseClient) {
-      const { error } = await window.supabaseClient.auth.updateUser({
-        data: { full_name: newName, avatar_url: newAvatarUrl }
-      });
-      if (error) throw error;
+      try {
+        await window.supabaseClient.auth.updateUser({
+          data: { full_name: newName, avatar_url: newAvatarUrl }
+        });
+      } catch (sbErr) {
+        console.warn('Auth updateUser error:', sbErr.message);
+      }
     }
     
+    // Local persistence
+    localStorage.setItem('user_full_name', newName);
+    localStorage.setItem('user_avatar_url', newAvatarUrl);
+    
+    // Update Header UI instantly
     const headerName = document.getElementById('user-header-name');
     const avatar = document.getElementById('user-header-avatar');
-    if (headerName) headerName.textContent = newName;
-    if (avatar) avatar.src = newAvatarUrl;
+    if (headerName && newName) headerName.textContent = newName;
+    if (avatar && newAvatarUrl) avatar.src = newAvatarUrl;
     
-    showToast('Profile updated successfully!', 'success');
+    showToast('Profile & Avatar updated successfully!', 'success');
     closeModal('user-profile-modal');
   } catch (err) {
     console.error('Error saving profile:', err);

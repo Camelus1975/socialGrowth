@@ -247,19 +247,61 @@
 
   <script type="module" src="/app_v3.js"></script>
 
-  <!-- Profile Modal -->
+  <!-- Profile & Avatar Settings Modal -->
   <div id="user-profile-modal" class="custom-modal-overlay">
-    <div class="custom-modal-content" style="max-width: 400px;">
-      <div class="modal-header">
-        <h3 style="color:white; margin:0;">Profile Settings</h3>
-        <button class="btn btn-secondary" style="padding:6px; border-radius:50%;" data-action="closeModal" data-args="user-profile-modal">✕</button>
+    <div class="custom-modal-content" style="max-width: 440px;">
+      <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;">
+        <h3 style="color:white; margin:0; font-size: 1.2rem;">Profile & Avatar Settings</h3>
+        <button class="btn btn-secondary" style="padding:4px 10px; border-radius:50%;" data-action="closeModal" data-args="user-profile-modal">✕</button>
       </div>
-      <div class="modal-body" style="display:flex; flex-direction:column; gap:20px; align-items:center;">
-        <input type="text" id="profile-modal-name" class="input-field" placeholder="Enter your name">
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:20px; align-items:center; padding: 16px 0;">
+        
+        <!-- Avatar Circular Preview & Upload Badge -->
+        <div style="position: relative; display: inline-block;">
+          <img id="profile-modal-avatar-preview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" alt="Avatar Preview" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-color, #6366f1); box-shadow: 0 0 20px rgba(99, 102, 241, 0.4); transition: transform 0.2s ease;">
+          <label for="avatar-file-input" style="position: absolute; bottom: 4px; right: 4px; background: var(--accent-color, #6366f1); color: white; border: 2px solid #111; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5);" title="Upload Photo">
+            📷
+          </label>
+          <input type="file" id="avatar-file-input" accept="image/*" style="display: none;">
+        </div>
+
+        <!-- File Upload & URL Controls -->
+        <div style="width: 100%; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn btn-secondary" style="flex: 1; font-size: 0.85rem;" onclick="document.getElementById('avatar-file-input').click()">
+              📁 Upload Photo
+            </button>
+            <button type="button" class="btn btn-secondary" style="font-size: 0.85rem;" id="clear-avatar-btn">
+              🔄 Reset
+            </button>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Or paste Image URL:</label>
+            <input type="url" id="profile-modal-avatar-url" class="input-field" placeholder="https://example.com/avatar.jpg" style="width: 100%; font-size: 0.85rem;">
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Preset Avatars:</label>
+            <div style="display: flex; gap: 10px; justify-content: center;" id="preset-avatars-container">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" class="preset-avatar-option" style="width: 42px; height: 42px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;" title="Style 1">
+              <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" class="preset-avatar-option" style="width: 42px; height: 42px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;" title="Style 2">
+              <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80" class="preset-avatar-option" style="width: 42px; height: 42px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;" title="Style 3">
+              <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80" class="preset-avatar-option" style="width: 42px; height: 42px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;" title="Style 4">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" class="preset-avatar-option" style="width: 42px; height: 42px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;" title="Style 5">
+            </div>
+          </div>
+
+          <div style="margin-top: 6px;">
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Full Name:</label>
+            <input type="text" id="profile-modal-name" class="input-field" placeholder="Enter your name" style="width: 100%;">
+          </div>
+        </div>
+
       </div>
-      <div class="modal-footer" style="justify-content: flex-end;">
+      <div class="modal-footer" style="justify-content: flex-end; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
         <button class="btn btn-secondary" data-action="closeModal" data-args="user-profile-modal">Cancel</button>
-        <button class="btn btn-primary" id="save-profile-btn" data-action="saveUserProfile">Save</button>
+        <button class="btn btn-primary" id="save-profile-btn" data-action="saveUserProfile">Save Avatar & Profile</button>
       </div>
     </div>
   </div>

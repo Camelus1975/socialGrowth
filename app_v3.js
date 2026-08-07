@@ -1,4 +1,4 @@
-import { initAuth, onAuthStateChange, logout, saveUserProfile } from './auth.js';
+import { initAuth, onAuthStateChange, logout, saveUserProfile, initAvatarPicker } from './auth.js';
 import { showToast, openModal, closeModal, toggleThemeMode } from './common.js';
 import { initCopilotV3 } from './copilot_v3.js';
 import { initGrowthV3 } from './growth_v3.js';
@@ -16,6 +16,7 @@ import { state } from './state.js';
 // Initialize Application
 document.addEventListener('DOMContentLoaded', async () => {
   setupUIEventListeners();
+  initAvatarPicker();
   
   // Initialize specific V3 modules
   initCopilotV3(state);
@@ -111,6 +112,17 @@ function setupUIEventListeners() {
         break;
       case 'openModal':
         openModal(args[0]);
+        if (args[0] === 'user-profile-modal') {
+          const headerAvatar = document.getElementById('user-header-avatar');
+          const previewImg = document.getElementById('profile-modal-avatar-preview');
+          const urlInput = document.getElementById('profile-modal-avatar-url');
+          const nameInput = document.getElementById('profile-modal-name');
+          const headerName = document.getElementById('user-header-name');
+          
+          if (headerAvatar && previewImg) previewImg.src = headerAvatar.src;
+          if (headerAvatar && urlInput) urlInput.value = headerAvatar.src;
+          if (headerName && nameInput) nameInput.value = headerName.textContent;
+        }
         break;
       case 'closeModal':
         closeModal(args[0]);
