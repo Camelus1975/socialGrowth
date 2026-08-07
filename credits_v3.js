@@ -508,47 +508,141 @@ export async function showCreditEstimatorDialog(actionCode, options = {}) {
 /**
  * Top-Up Credit Pack execution
  */
-window.purchaseCreditPack = async function(packCode) {
-  try {
-    const res = await requestApi('/api/credits/purchase', {
-      method: 'POST',
-      body: JSON.stringify({ packCode })
-    });
-
-    if (res && res.success) {
-      showToast(res.message || 'Credits added successfully!', 'success');
-      window.dispatchEvent(new CustomEvent('creditsUpdated'));
-      const modal = document.getElementById('credit-wallet-modal');
-      if (modal) modal.remove();
-    } else {
-      showToast(res.error || 'Purchase failed', 'error');
-    }
-  } catch (err) {
-    showToast(err.message, 'error');
-  }
-};
+window.openCreditWalletModal = openCreditWalletModal;
+window.fetchUserWallet = fetchUserWallet;
+window.showCreditEstimatorDialog = showCreditEstimatorDialog;
+window.claimReward = claimReward;
 
 /**
- * Claim gamification reward
+ * Render the dedicated Full-Page AI Credits & Wallet Hub in #view-credits
  */
-async function claimReward(rewardType) {
-  try {
-    const res = await requestApi('/api/credits/claim-reward', {
-      method: 'POST',
-      body: JSON.stringify({ rewardType })
-    });
+export async function renderCreditsView() {
+  const container = document.getElementById('credits-view-container');
+  if (!container) return;
 
-    if (res && res.success) {
-      showToast(`🎁 Claimed +${res.credits_awarded} daily bonus credits!`, 'success');
-      window.dispatchEvent(new CustomEvent('creditsUpdated'));
-    } else {
-      showToast(res.message || 'Already claimed for today!', 'info');
-    }
-  } catch (err) {
-    showToast(err.message, 'error');
+  container.innerHTML = '<div style="padding:40px; text-align:center; color:#64748b;">Loading AI Credits Hub...</div>';
+  const wallet = await fetchUserWallet() || cachedWallet || { balance: 100, monthlyAllowance: 100, subscriptionTier: 'free' };
+
+  let packs = [];
+  try {
+    const res = await requestApi('/api/credits/packs');
+    if (res && res.purchasePacks) packs = res.purchasePacks;
+  } catch (e) {}
+
+  container.innerHTML = `
+    <!-- Top Hero Metric Cards Grid -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:18px;">
+      
+      <!-- Balance Card -->
+      <div style="background:linear-gradient(135deg, rgba(99,102,241,0.12), rgba(236,72,153,0.08)); border:1px solid rgba(99,102,241,0.3); border-radius:18px; padding:22px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 8px 24px rgba(99,102,241,0.08);">
+        <div>
+          <span style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:#6366f1; letter-spacing:0.5px;">Current Available Balance</span>
+          <div style="font-size:2.4rem; font-weight:900; color:#0f172a; margin:6px 0 2px 0; display:flex; align-items:center; gap:8px;">
+            <span>⚡</span> ${Number(wallet.balance || 0).toLocaleString()}
+          </div>
+          <p style="margin:0; font-size:0.8rem; color:#64748b;">Active Tier: <strong style="color:#0f172a; text-transform:capitalize;">${wallet.subscriptionTier || 'Free'}</strong></p>
+        </div>
+        <button class="btn btn-primary" onclick="window.openCreditWalletModal('packs')" style="margin-top:16px; padding:8px 14px; font-size:0.85rem; font-weight:700; border-radius:10px;">
+          + Top-Up Balance
+        </button>
+      </div>
+
+      <!-- Monthly Allowance Card -->
+      <div style="background:rgba(255,255,255,0.92); border:1px solid rgba(226,232,240,0.9); border-radius:18px; padding:22px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 4px 14px rgba(0,0,0,0.03);">
+        <div>
+          <span style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:#64748b; letter-spacing:0.5px;">Monthly Plan Allowance</span>
+          <div style="font-size:2rem; font-weight:800; color:#0f172a; margin:6px 0 2px 0;">
+            ${Number(wallet.monthlyAllowance || 100).toLocaleString()}
+          </div>
+          <p style="margin:0; font-size:0.8rem; color:#64748b;">Resets every 30-day billing cycle</p>
+        </div>
+        <div style="background:rgba(241,245,249,0.9); height:8px; border-radius:4px; overflow:hidden; margin-top:16px;">
+          <div style="background:linear-gradient(90deg, #6366f1, #10b981); height:100%; width:${Math.min(100, wallet.percentRemaining || 50)}%;"></div>
+        </div>
+      </div>
+
+      <!-- Purchased Credits Card -->
+      <div style="background:rgba(255,255,255,0.92); border:1px solid rgba(226,232,240,0.9); border-radius:18px; padding:22px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 4px 14px rgba(0,0,0,0.03);">
+        <div>
+          <span style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:#64748b; letter-spacing:0.5px;">Permanent Top-Up Packs</span>
+          <div style="font-size:2rem; font-weight:800; color:#0f172a; margin:6px 0 2px 0;">
+            ${Number(wallet.purchasedCredits || 0).toLocaleString()}
+          </div>
+          <p style="margin:0; font-size:0.8rem; color:#64748b;">Never expire. Roll over automatically</p>
+        </div>
+        <span style="font-size:0.75rem; color:#10b981; font-weight:700; margin-top:16px;">✓ 100% Rollover Protection</span>
+      </div>
+
+      <!-- Bonus & Gamification Card -->
+      <div style="background:rgba(255,255,255,0.92); border:1px solid rgba(226,232,240,0.9); border-radius:18px; padding:22px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 4px 14px rgba(0,0,0,0.03);">
+        <div>
+          <span style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:#64748b; letter-spacing:0.5px;">Claimed Bonus Rewards</span>
+          <div style="font-size:2rem; font-weight:800; color:#10b981; margin:6px 0 2px 0;">
+            +${Number(wallet.bonusCredits || 0).toLocaleString()}
+          </div>
+          <p style="margin:0; font-size:0.8rem; color:#64748b;">From daily logins and referrals</p>
+        </div>
+        <button onclick="window.claimReward('daily_login')" style="background:rgba(241,245,249,0.9); border:1px solid rgba(203,213,225,0.8); color:#0f172a; padding:8px 12px; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; margin-top:16px;">
+          🎁 Claim Today (+2)
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Instant Top-Up Packs Section -->
+    <div style="background:rgba(255,255,255,0.92); border:1px solid rgba(226,232,240,0.9); border-radius:20px; padding:24px; box-shadow:0 4px 16px rgba(0,0,0,0.02);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
+        <div>
+          <h3 style="margin:0; font-size:1.2rem; font-weight:800; color:#0f172a;">⚡ Instant AI Credit Packs (Non-Expiring)</h3>
+          <p style="margin:2px 0 0 0; color:#64748b; font-size:0.85rem;">Directly recharge your wallet for large campaigns, photorealistic FLUX images, and HD videos.</p>
+        </div>
+        <span style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); color:#059669; padding:4px 12px; border-radius:20px; font-size:0.8rem; font-weight:700;">
+          Instant Balance Update
+        </span>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
+        ${packs.map(p => {
+          const isPop = p.is_popular || p.discount_percent >= 40;
+          return `
+            <div style="background:${isPop ? 'linear-gradient(135deg, rgba(99,102,241,0.06), rgba(236,72,153,0.05))' : 'rgba(248,250,252,0.95)'}; border:${isPop ? '2px solid #6366f1' : '1px solid rgba(226,232,240,0.9)'}; border-radius:16px; padding:18px; display:flex; flex-direction:column; position:relative;">
+              ${p.badge_label ? `<span style="position:absolute; top:-9px; right:12px; background:#6366f1; color:#fff; font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:10px; text-transform:uppercase;">${p.badge_label}</span>` : ''}
+              <div style="font-size:1.5rem; font-weight:900; color:#0f172a; margin-top:4px;">
+                ⚡ ${Number(p.credits).toLocaleString()}
+              </div>
+              <div style="font-size:1.25rem; font-weight:800; color:#6366f1; margin:6px 0 12px 0;">
+                $${p.price_usd}
+                ${p.discount_percent > 0 ? `<span style="font-size:0.75rem; color:#10b981; font-weight:700; margin-left:4px;">Save ${p.discount_percent}%</span>` : ''}
+              </div>
+              <button class="btn btn-primary" onclick="window.purchaseCreditPack('${p.pack_code}')" style="width:100%; margin-top:auto; padding:9px; font-weight:700; font-size:0.85rem; border-radius:10px;">
+                Buy Pack
+              </button>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- Live Transaction History Section -->
+    <div style="background:rgba(255,255,255,0.92); border:1px solid rgba(226,232,240,0.9); border-radius:20px; padding:24px; box-shadow:0 4px 16px rgba(0,0,0,0.02);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 style="margin:0; font-size:1.2rem; font-weight:800; color:#0f172a;">📜 Immutable Double-Entry Ledger</h3>
+        <button class="btn btn-secondary" onclick="window.renderCreditsView()" style="padding:6px 12px; font-size:0.8rem; border-radius:8px;">
+          🔄 Refresh Ledger
+        </button>
+      </div>
+      <div id="full-page-ledger-table">
+        <!-- History rendered below -->
+      </div>
+    </div>
+  `;
+
+  // Render ledger table inside #full-page-ledger-table
+  const ledgerContainer = container.querySelector('#full-page-ledger-table');
+  if (ledgerContainer) {
+    renderHistoryTab(ledgerContainer);
   }
 }
 
-window.upgradePlan = function(planId) {
-  showToast(`Plan ${planId.toUpperCase()} selected! Redirecting to checkout...`, 'success');
-};
+window.renderCreditsView = renderCreditsView;
+

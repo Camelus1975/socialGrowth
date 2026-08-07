@@ -155,6 +155,9 @@ function setupUIEventListeners() {
       case 'saveBrandKit':
         saveBrandKit();
         break;
+      case 'openCreditWallet':
+        openCreditWalletModal(target.getAttribute('data-tab') || args[0] || 'overview');
+        break;
     }
   });
 }
@@ -177,6 +180,10 @@ function switchWorkspace(workspaceId) {
       targetPanel.style.display = 'block';
     }
     targetPanel.classList.add('active');
+
+    if (workspaceId === 'credits' && window.renderCreditsView) {
+      window.renderCreditsView();
+    }
   }
 }
 

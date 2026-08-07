@@ -63,7 +63,7 @@
         <li class="nav-item" data-action="switchWorkspace" data-args="media">
           <span class="icon">🖼️</span> Media Assets
         </li>
-        <li class="nav-item" data-action="openCreditWallet" data-tab="overview">
+        <li class="nav-item" data-action="switchWorkspace" data-args="credits">
           <span class="icon">⚡</span> AI Credits
         </li>
         <li class="nav-item" data-action="switchWorkspace" data-args="integrations">
@@ -281,9 +281,34 @@
                 <div style="font-size:0.85rem; color:var(--text-muted);">Not connected</div>
               </div>
             </div>
-            <button class="btn btn-secondary" onclick="alert('OAuth Mock: TikTok Connected!')">Connect</button>
           </div>
 
+        </div>
+      </section>
+
+      <!-- View 7: Universal AI Credits & Wallet Hub -->
+      <section id="view-credits" class="view-panel" style="display:none; padding:24px; max-width:1300px; margin:0 auto; width:100%;">
+        <header class="view-header" style="margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+          <div>
+            <h2 style="margin:0; font-size:1.6rem; font-weight:800; display:flex; align-items:center; gap:10px; color:var(--text-main, #0f172a);">
+              <span>⚡</span> Universal AI Credits & Billing Hub
+            </h2>
+            <p style="margin:4px 0 0 0; color:var(--text-muted, #64748b); font-size:0.88rem;">
+              Universal usage tracking, quota management, and instant top-up packs across all AI providers.
+            </p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-secondary" onclick="window.claimReward && window.claimReward('daily_login')" style="padding:10px 16px; font-weight:600; border-radius:10px; display:flex; align-items:center; gap:6px;">
+              🎁 Claim Daily Bonus (+2)
+            </button>
+            <button class="btn btn-primary" onclick="window.openCreditWalletModal && window.openCreditWalletModal('packs')" style="padding:10px 20px; font-weight:700; border-radius:10px; display:flex; align-items:center; gap:6px;">
+              + Buy Credit Packs
+            </button>
+          </div>
+        </header>
+
+        <div id="credits-view-container" style="display:flex; flex-direction:column; gap:24px;">
+          <!-- Injected dynamically by renderCreditsView -->
         </div>
       </section>
 
