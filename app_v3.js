@@ -152,11 +152,14 @@ function setupUIEventListeners() {
       case 'openBrandKitModal':
         openBrandKitModal();
         break;
-      case 'saveBrandKit':
-        saveBrandKit();
-        break;
       case 'openCreditWallet':
         openCreditWalletModal(target.getAttribute('data-tab') || args[0] || 'overview');
+        break;
+      case 'claimDailyReward':
+        if (window.claimReward) window.claimReward(args[0] || 'daily_login');
+        break;
+      case 'purchaseCreditPack':
+        if (window.purchaseCreditPack) window.purchaseCreditPack(args[0]);
         break;
     }
   });

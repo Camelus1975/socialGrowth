@@ -119,11 +119,11 @@ export async function openCreditWalletModal(activeTab = 'overview') {
 
   const modal = document.createElement('div');
   modal.id = 'credit-wallet-modal';
-  modal.className = 'custom-modal-overlay';
-  modal.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(15,23,42,0.75);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.className = 'custom-modal-overlay active';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(15,23,42,0.75);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:1;pointer-events:auto;';
 
   modal.innerHTML = `
-    <div class="custom-modal-content" style="width:100%; max-width:880px; max-height:90vh; overflow-y:auto; padding:28px; position:relative; background:rgba(255,255,255,0.92); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border:1px solid rgba(255,255,255,0.8); border-radius:22px; box-shadow:0 25px 60px rgba(15,23,42,0.25), 0 10px 30px rgba(99,102,241,0.12); color:#0f172a; display:flex; flex-direction:column; gap:20px;">
+    <div class="custom-modal-content" style="width:100%; max-width:880px; max-height:90vh; overflow-y:auto; padding:28px; position:relative; background:rgba(255,255,255,0.95); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border:1px solid rgba(255,255,255,0.8); border-radius:22px; box-shadow:0 25px 60px rgba(15,23,42,0.25), 0 10px 30px rgba(99,102,241,0.12); color:#0f172a; display:flex; flex-direction:column; gap:20px; transform:translateY(0);">
       
       <!-- Close button -->
       <button id="close-wallet-modal-btn" style="position:absolute; top:20px; right:20px; background:rgba(241,245,249,0.9); border:1px solid rgba(203,213,225,0.8); color:#0f172a; border-radius:50%; width:36px; height:36px; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; z-index:10; font-weight:bold; box-shadow:0 2px 8px rgba(0,0,0,0.08);">✕</button>
@@ -434,11 +434,11 @@ export async function showCreditEstimatorDialog(actionCode, options = {}) {
     } catch (e) {}
 
     const modal = document.createElement('div');
-    modal.className = 'custom-modal-overlay';
-    modal.style.cssText = 'position:fixed;inset:0;z-index:10001;background:rgba(15,23,42,0.65);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;';
+    modal.className = 'custom-modal-overlay active';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:10001;background:rgba(15,23,42,0.65);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:1;pointer-events:auto;';
 
     modal.innerHTML = `
-      <div class="custom-modal-content" style="width:100%; max-width:440px; background:rgba(255,255,255,0.95); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.9); border-radius:20px; padding:24px; color:#0f172a; box-shadow:0 20px 50px rgba(0,0,0,0.25);">
+      <div class="custom-modal-content" style="width:100%; max-width:440px; background:rgba(255,255,255,0.95); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.9); border-radius:20px; padding:24px; color:#0f172a; box-shadow:0 20px 50px rgba(0,0,0,0.25); transform:translateY(0);">
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
           <span style="font-size:1.5rem;">⚡</span>
           <h3 style="margin:0; font-size:1.2rem; font-weight:800; color:#0f172a;">Confirm AI Credits</h3>
